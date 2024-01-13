@@ -5,6 +5,7 @@ import Stack, { StackProps } from '@mui/material/Stack';
 // theme
 import { bgGradient } from 'src/theme/css';
 import { Box, Grid } from '@mui/material';
+import { styles } from './styles';
 
 // ----------------------------------------------------------------------
 
@@ -39,11 +40,7 @@ export default function AppWelcome({
           startColor: alpha(theme.palette.primary.light, 0.2),
           endColor: alpha(theme.palette.primary.main, 0.2),
         }),
-        height: { md: 1 },
-        borderRadius: 2,
-        position: 'relative',
-        color: 'primary.darker',
-        backgroundColor: 'common.white',
+        ...styles.box_stack_info,
       }}
       {...other}
     >
@@ -65,11 +62,7 @@ export default function AppWelcome({
 
         <Box className="box_content" sx={{ marginTop: '50px' }}>
           <Typography variant="h5">Thông tin cổ phần của bạn :</Typography>
-          <Grid
-            container
-            spacing={2}
-            sx={{ textAlign: 'left', marginTop: '10px', paddingLeft: { xs: '10px', md: '0px' } }}
-          >
+          <Grid container spacing={2} sx={styles.grid_box}>
             <Grid item xs={8} md={6} lg={4}>
               <Typography>Mã cổ đông :</Typography>
             </Grid>
@@ -95,15 +88,7 @@ export default function AppWelcome({
       </Stack>
 
       {img && (
-        <Stack
-          component="span"
-          justifyContent="center"
-          sx={{
-            p: { xs: 5, md: 3 },
-            maxWidth: 360,
-            mx: 'auto',
-          }}
-        >
+        <Stack component="span" justifyContent="center" sx={styles.box_img}>
           {img}
         </Stack>
       )}

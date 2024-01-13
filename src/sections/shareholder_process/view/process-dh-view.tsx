@@ -13,7 +13,7 @@ export default function ProcessDHView() {
   const settings = useSettingsContext();
   const theme = useTheme();
   return (
-    <Container maxWidth={settings.themeStretch ? false : 'lg'}>
+    <Container sx={{ maxWidth: '100% !important' }}>
       <CustomBreadcrumbs
         heading="Tiến trình bầu cử Đại Hội"
         links={[{ name: '' }]}

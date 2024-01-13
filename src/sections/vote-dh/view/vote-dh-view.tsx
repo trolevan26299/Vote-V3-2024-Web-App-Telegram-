@@ -30,7 +30,7 @@ export default function VoteDHView() {
   };
 
   return (
-    <Container maxWidth={settings.themeStretch ? false : 'lg'}>
+    <Container sx={{ maxWidth: '100% !important' }}>
       <CustomBreadcrumbs
         heading="Bỏ phiếu đại hội"
         links={[{ name: '' }]}

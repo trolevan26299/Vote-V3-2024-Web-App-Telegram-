@@ -11,7 +11,7 @@ export default function SharesHolderInfoView() {
   const settings = useSettingsContext();
   const theme = useTheme();
   return (
-    <Container maxWidth={settings.themeStretch ? false : 'lg'}>
+    <Container sx={{ maxWidth: '100% !important' }}>
       <CustomBreadcrumbs
         heading="Danh sách các cổ đông 2024"
         links={[{ name: '' }]}

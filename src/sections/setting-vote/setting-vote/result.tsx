@@ -245,7 +245,7 @@ export default function ResultView() {
     ...options,
   });
   return (
-    <Container maxWidth={settings.themeStretch ? false : 'lg'}>
+    <Container sx={{ maxWidth: '100% !important' }}>
       <CustomBreadcrumbs
         heading="Gửi nội dung bỏ phiếu cho Cổ Đông"
         links={[{ name: '' }]}

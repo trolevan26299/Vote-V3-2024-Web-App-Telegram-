@@ -80,7 +80,7 @@ export default function SendVoteView() {
   };
 
   return (
-    <Container maxWidth={settings.themeStretch ? false : 'lg'}>
+    <Container sx={{ maxWidth: '100% !important' }}>
       <CustomBreadcrumbs
         heading="Gửi nội dung bỏ phiếu cho Cổ Đông"
         links={[{ name: '' }]}

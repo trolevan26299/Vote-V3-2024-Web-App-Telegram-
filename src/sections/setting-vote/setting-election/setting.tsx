@@ -62,7 +62,7 @@ export default function SettingEleView() {
   };
 
   return (
-    <Container maxWidth={settings.themeStretch ? false : 'lg'}>
+    <Container sx={{ maxWidth: '100% !important' }}>
       <CustomBreadcrumbs
         heading="Cài đặt nội dung bầu cử"
         links={[{ name: '' }]}

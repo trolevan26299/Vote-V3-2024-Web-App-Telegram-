@@ -5,17 +5,15 @@ import Button from '@mui/material/Button';
 import Container from '@mui/material/Container';
 import Grid from '@mui/material/Unstable_Grid2';
 import { SeoIllustration } from 'src/assets/illustrations';
-import { useSettingsContext } from 'src/components/settings';
 import { paths } from 'src/routes/paths';
 import AppWelcome from '../app-welcome';
+import { styles } from '../styles';
 
 // ----------------------------------------------------------------------
 
 export default function OverviewAppView() {
-  const settings = useSettingsContext();
-
   return (
-    <Container maxWidth={settings.themeStretch ? false : 'xl'}>
+    <Container sx={{ maxWidth: '100% !important' }}>
       <Grid container spacing={3}>
         <Grid xs={12} md={12}>
           <AppWelcome
@@ -27,22 +25,11 @@ export default function OverviewAppView() {
           />
         </Grid>
 
-        <Box
-          sx={{
-            width: 1,
-            display: 'flex',
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: { xs: 1, md: 5 },
-            marginTop: { xs: '5%', md: '10%' },
-          }}
-        >
+        <Box sx={styles.box_btn_vote}>
           <Button
             variant="contained"
             sx={{
-              width: '45%',
-              padding: { xs: '10px 30px', md: '20px 80px' },
+              ...styles.btn_vote,
               backgroundColor: '#7e9dec',
             }}
             href={paths.dashboard.voteDH}
@@ -52,8 +39,7 @@ export default function OverviewAppView() {
           <Button
             variant="contained"
             sx={{
-              width: '45%',
-              padding: { xs: '10px 30px', md: '20px 80px' },
+              ...styles.btn_vote,
               backgroundColor: '#27D0B7',
             }}
             href={paths.dashboard.voteHD}

@@ -62,7 +62,7 @@ export default function SettingView() {
   };
 
   return (
-    <Container maxWidth={settings.themeStretch ? false : 'lg'}>
+    <Container sx={{ maxWidth: '100% !important' }}>
       <CustomBreadcrumbs
         heading="Cài đặt nội dung bỏ phiếu"
         links={[{ name: '' }]}
