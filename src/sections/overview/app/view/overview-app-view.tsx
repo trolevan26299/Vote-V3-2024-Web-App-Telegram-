@@ -18,6 +18,7 @@ export default function OverviewAppView() {
   useEffect(() => {
     tele?.ready();
   });
+  console.log('=============> Tele:', tele);
   return (
     <Container sx={{ maxWidth: '100% !important' }}>
       <Grid container spacing={3}>
