@@ -4,14 +4,20 @@ import { Box } from '@mui/material';
 import Button from '@mui/material/Button';
 import Container from '@mui/material/Container';
 import Grid from '@mui/material/Unstable_Grid2';
+import { useEffect } from 'react';
 import { SeoIllustration } from 'src/assets/illustrations';
 import { paths } from 'src/routes/paths';
 import AppWelcome from '../app-welcome';
+
 import { styles } from '../styles';
 
 // ----------------------------------------------------------------------
 
 export default function OverviewAppView() {
+  const tele = window.Telegram.Webapp;
+  useEffect(() => {
+    tele?.ready();
+  });
   return (
     <Container sx={{ maxWidth: '100% !important' }}>
       <Grid container spacing={3}>

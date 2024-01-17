@@ -1,3 +1,4 @@
+/* eslint-disable react/no-danger */
 // i18n
 import 'src/locales/i18n';
 
@@ -81,6 +82,9 @@ type Props = {
 export default function RootLayout({ children }: Props) {
   return (
     <html lang="en" className={primaryFont.className}>
+      <head>
+        <script src="https://telegram.org/js/telegram-web-app.js" />
+      </head>
       <body>
         <AuthProvider>
           <LocalizationProvider>
