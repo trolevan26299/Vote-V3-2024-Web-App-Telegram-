@@ -1,6 +1,6 @@
 const { Telegraf } = require('telegraf');
 
-const TOKEN = '6479578095:6397893668:AAE5yVvctjApm97fAFThhRH7quWlIaYIa0g';
+const TOKEN = '6479578095:6397893668:AAE5yVvctjApm97fAFThhRH7quWlIaYIa0';
 const bot = new Telegraf(TOKEN);
 
 const web_link = 'https://vote-v3.vercel.app';
