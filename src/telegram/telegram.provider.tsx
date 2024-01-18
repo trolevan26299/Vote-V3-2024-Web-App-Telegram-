@@ -1,3 +1,5 @@
+'use client';
+
 // TelegramProvider
 import Script from 'next/script';
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';

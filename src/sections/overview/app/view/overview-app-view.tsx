@@ -6,8 +6,8 @@ import Container from '@mui/material/Container';
 import Grid from '@mui/material/Unstable_Grid2';
 import { SeoIllustration } from 'src/assets/illustrations';
 import { paths } from 'src/routes/paths';
-import AppWelcome from '../app-welcome';
 import { useTelegram } from 'src/telegram/telegram.provider';
+import AppWelcome from '../app-welcome';
 import { styles } from '../styles';
 
 // ----------------------------------------------------------------------
