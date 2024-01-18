@@ -36,6 +36,7 @@ import { SettingsProvider, SettingsDrawer } from 'src/components/settings';
 // auth
 import { AuthProvider, AuthConsumer } from 'src/auth/context/jwt';
 import { TelegramProvider } from 'src/telegram/telegram.provider';
+import { UserProvider } from 'src/firebase/user_accesss_provider';
 
 // ----------------------------------------------------------------------
 
@@ -98,13 +99,15 @@ export default function RootLayout({ children }: Props) {
             >
               <ThemeProvider>
                 <TelegramProvider>
-                  <MotionLazy>
-                    <SnackbarProvider>
-                      <SettingsDrawer />
-                      <ProgressBar />
-                      <AuthConsumer>{children}</AuthConsumer>
-                    </SnackbarProvider>
-                  </MotionLazy>
+                  <UserProvider>
+                    <MotionLazy>
+                      <SnackbarProvider>
+                        <SettingsDrawer />
+                        <ProgressBar />
+                        <AuthConsumer>{children}</AuthConsumer>
+                      </SnackbarProvider>
+                    </MotionLazy>
+                  </UserProvider>
                 </TelegramProvider>
               </ThemeProvider>
             </SettingsProvider>

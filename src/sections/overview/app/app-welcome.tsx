@@ -15,8 +15,8 @@ interface Props extends StackProps {
   img?: React.ReactNode;
   action?: React.ReactNode;
   code_holder?: string;
-  number_shares?: string;
-  join_rate?: string;
+  number_shares?: number;
+  join_rate?: number;
 }
 
 export default function AppWelcome({
@@ -79,7 +79,7 @@ export default function AppWelcome({
               <Typography>Tỷ lệ tham dự :</Typography>
             </Grid>
             <Grid item xs={4} md={6} lg={8}>
-              <Typography sx={{ fontWeight: 'bold' }}>{join_rate}</Typography>
+              <Typography sx={{ fontWeight: 'bold' }}>{join_rate?.toFixed(5)} %</Typography>
             </Grid>
           </Grid>
         </Box>

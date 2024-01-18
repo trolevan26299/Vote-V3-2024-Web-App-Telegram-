@@ -4,27 +4,27 @@ import { Box } from '@mui/material';
 import Button from '@mui/material/Button';
 import Container from '@mui/material/Container';
 import Grid from '@mui/material/Unstable_Grid2';
+
 import { SeoIllustration } from 'src/assets/illustrations';
+import { useUser } from 'src/firebase/user_accesss_provider';
 import { paths } from 'src/routes/paths';
-import { useTelegram } from 'src/telegram/telegram.provider';
 import AppWelcome from '../app-welcome';
 import { styles } from '../styles';
 
 // ----------------------------------------------------------------------
 
 export default function OverviewAppView() {
-  const userTelegram = useTelegram();
-  console.log('-----------------userTelegram----------------', userTelegram);
+  const { user } = useUser();
   return (
     <Container sx={{ maxWidth: '100% !important' }}>
       <Grid container spacing={3}>
         <Grid xs={12} md={12}>
           <AppWelcome
-            title={`👋 Chào mừng ${userTelegram.user?.first_name}  đến với Đại Hội Cổ Đông`}
+            title={`👋 Chào mừng ${user?.ten_cd}  đến với Đại Hội Cổ Đông`}
             img={<SeoIllustration />}
-            code_holder="V323005"
-            number_shares="10000"
-            join_rate="0.03%"
+            code_holder={user?.ma_cd}
+            number_shares={user?.cp_tham_du}
+            join_rate={user?.ty_le_cp_tham_du}
           />
         </Grid>
 

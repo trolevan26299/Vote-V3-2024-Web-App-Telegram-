@@ -11,17 +11,15 @@ import Scrollbar from 'src/components/scrollbar';
 import { TableHeadCustom } from 'src/components/table';
 
 type RowProps = {
-  code_shareholder?: string;
-  password?: string;
-  name_shareholder?: string;
-  cp_holding?: string;
-  rate?: string;
-  total_shareholder_join?: string;
-  rate_join?: string;
-  status?: string;
-  role?: string;
+  ma_cd?: string;
+  ten_cd?: string;
+  cp_so_huu?: string;
+  ty_le_cp_so_huu?: string;
+  cp_tham_du?: string;
+  ty_le_cp_tham_du?: string;
+  trang_thai?: string;
   telegram_id?: string;
-  note?: string;
+  ghi_chu?: string;
 };
 
 interface Props extends CardProps {
@@ -63,27 +61,16 @@ type SharesHolderInfoRowProps = {
 function SharesHolderInfoRow({ row, index }: SharesHolderInfoRowProps) {
   return (
     <TableRow>
-      {/* <TableCell align="left">
-        <Label
-          variant="soft"
-          color={(row.top === 'Top 1' && 'primary') || (row.top === 'Top 2' && 'info') || 'error'}
-        >
-          {row.top}
-        </Label>
-      </TableCell> */}
-
       <TableCell>{index + 1}</TableCell>
-      <TableCell align="center">{row.code_shareholder}</TableCell>
-      <TableCell align="center">{row.password}</TableCell>
-      <TableCell align="center">{row.name_shareholder}</TableCell>
-      <TableCell align="center">{row.cp_holding}</TableCell>
-      <TableCell align="center">{row.rate}</TableCell>
-      <TableCell align="center">{row.total_shareholder_join}</TableCell>
-      <TableCell align="center">{row.rate_join}</TableCell>
-      <TableCell align="center">{row.status}</TableCell>
-      <TableCell align="center">{row.role}</TableCell>
-      <TableCell align="center">{row.telegram_id}</TableCell>
-      <TableCell align="center">{row.note}</TableCell>
+      <TableCell>{row.ma_cd}</TableCell>
+      <TableCell>{row.ten_cd}</TableCell>
+      <TableCell>{row.cp_so_huu}</TableCell>
+      <TableCell>{row.ty_le_cp_so_huu}</TableCell>
+      <TableCell>{row.cp_tham_du}</TableCell>
+      <TableCell>{row.ty_le_cp_tham_du}</TableCell>
+      <TableCell>{row.trang_thai}</TableCell>
+      <TableCell>{row.telegram_id}</TableCell>
+      <TableCell>{row.ghi_chu}</TableCell>
     </TableRow>
   );
 }

@@ -13,54 +13,101 @@ import {
   Typography,
 } from '@mui/material';
 import { alpha, useTheme } from '@mui/material/styles';
-import { useState } from 'react';
+import { DataSnapshot, onValue, ref } from 'firebase/database';
+import { useEffect, useState } from 'react';
 import CustomBreadcrumbs from 'src/components/custom-breadcrumbs';
 import Scrollbar from 'src/components/scrollbar';
 import { useSettingsContext } from 'src/components/settings';
 import { TableHeadCustom } from 'src/components/table';
+import { FIREBASE_COLLECTION } from 'src/constant/firebase_collection.constant';
+import { database } from 'src/firebase/firebase.config';
+import { IQuestion } from 'src/types/setting';
 import { styles } from '../styles';
-
-type RowProps = {
-  name_question: string;
-  content: string;
-  answer: string[];
-};
 
 export default function SettingView() {
   const settings = useSettingsContext();
   const theme = useTheme();
-
-  const [answerRows, setAnswerRows] = useState([{ id: 1 }]);
-  const tableData = [
-    {
-      name_question: 'Câu hỏi 1',
-      content: 'Thông qua quy chế làm việc của đại hội',
-      answer: ['Tán thành', 'Không tán thành'],
-    },
-    {
-      name_question: 'Câu hỏi 2',
-      content: 'Thông qua quy chế làm việc của đại hội',
-      answer: ['Tán thành', 'Không tán thành'],
-    },
-  ];
   const tableLabels = [
     { id: 'name_question', label: 'Tên câu hỏi' },
     { id: 'content', label: 'Nội dung' },
     { id: 'answer', label: 'Đáp án' },
   ];
-  const handleAddRow = () => {
-    const newId = answerRows.length + 1;
-    const newRow = { id: newId };
-    setAnswerRows([...answerRows, newRow]);
-  };
 
-  const handleRemoveRow = (id: number) => {
-    if (answerRows.length > 1) {
-      const updatedRows = answerRows.filter((row) => row.id !== id);
-      setAnswerRows(updatedRows);
+  // List question get from firebase
+  const [listQuestion, setListQuestion] = useState<IQuestion[]>([]);
+
+  // ----------------- Handle FORM ----------------------------
+  const [formValuesQuestion, setFormValuesQuestion] = useState({
+    ten_poll: '',
+    ten_poll_en: '',
+    noi_dung: '',
+    noi_dung_en: '',
+    dap_an: [
+      {
+        id: 0,
+        en: '',
+        vi: '',
+      },
+    ],
+  });
+
+  const handleInputChangeQuestion = (
+    field: string,
+    value: string,
+    index?: number,
+    lang?: string
+  ) => {
+    if (index !== undefined && lang) {
+      // Handle changes for dap_an
+      const updatedDapAn = [...formValuesQuestion.dap_an];
+      updatedDapAn[index] = { ...updatedDapAn[index], [lang]: value };
+      setFormValuesQuestion((prevValues) => ({ ...prevValues, dap_an: updatedDapAn }));
+    } else {
+      // Handle changes for other fields
+      setFormValuesQuestion((prevValues) => ({ ...prevValues, [field]: value }));
     }
   };
 
+  // -----------------END  Handle FORM ----------------------------
+
+  // function to add a row answer
+  const handleAddRow = () => {
+    const newId = formValuesQuestion.dap_an.length + 1;
+    const newRow = { id: newId, vi: '', en: '' };
+    setFormValuesQuestion((prevValues) => ({
+      ...prevValues,
+      dap_an: [...prevValues.dap_an, newRow],
+    }));
+  };
+
+  // function to remove a row answer
+  const handleRemoveRow = (id: number) => {
+    if (formValuesQuestion.dap_an.length > 1) {
+      const updatedDapAn = formValuesQuestion.dap_an.filter((row) => row.id !== id);
+      setFormValuesQuestion((prevValues) => ({ ...prevValues, dap_an: updatedDapAn }));
+    }
+  };
+  useEffect(() => {
+    const userRef = ref(database, FIREBASE_COLLECTION.POLL_PROCESS);
+    const onDataChange = (snapshot: DataSnapshot) => {
+      if (snapshot.exists()) {
+        setListQuestion(snapshot.val().danh_sach_poll);
+        console.log('data câu hỏi', snapshot.val().danh_sach_poll);
+      } else {
+        console.log('No data available');
+      }
+    };
+
+    const unsubscribe = onValue(userRef, onDataChange);
+
+    // Clean up the listener when the component unmounts
+    return () => {
+      // Detach the listener
+      unsubscribe();
+    };
+  }, []);
+
+  console.log('formValuesQuestion:', formValuesQuestion);
   return (
     <Container sx={{ maxWidth: '100% !important' }}>
       <CustomBreadcrumbs
@@ -84,14 +131,20 @@ export default function SettingView() {
             label="Tiếng Việt"
             variant="outlined"
             type="text"
+            size="small"
             sx={{ width: '35%' }}
+            value={formValuesQuestion.ten_poll}
+            onChange={(e) => handleInputChangeQuestion('ten_poll', e.target.value)}
           />
           <TextField
             id="outlined-basic"
             label="Tiếng Anh"
             variant="outlined"
             type="text"
+            size="small"
             sx={{ width: '35%' }}
+            value={formValuesQuestion.ten_poll_en}
+            onChange={(e) => handleInputChangeQuestion('ten_poll_en', e.target.value)}
           />
         </Box>
         <Box className="name-content" sx={styles.box_question}>
@@ -101,19 +154,25 @@ export default function SettingView() {
             label="Tiếng Việt"
             variant="outlined"
             type="text"
+            size="small"
             sx={{ width: '35%' }}
+            value={formValuesQuestion.noi_dung}
+            onChange={(e) => handleInputChangeQuestion('noi_dung', e.target.value)}
           />
           <TextField
             id="outlined-basic"
             label="Tiếng Anh"
             variant="outlined"
             type="text"
+            size="small"
             sx={{ width: '35%' }}
+            value={formValuesQuestion.noi_dung_en}
+            onChange={(e) => handleInputChangeQuestion('noi_dung_en', e.target.value)}
           />
         </Box>
         <Typography sx={styles.title_answer}>Đáp án bỏ phiếu :</Typography>
         <Box sx={{ width: '100%' }}>
-          {answerRows.map((row, index) => (
+          {formValuesQuestion.dap_an.map((row, index) => (
             <Box key={row.id} sx={styles.box_answer}>
               <Typography sx={{ width: '15%' }}>Đáp án :</Typography>
               <TextField
@@ -122,6 +181,8 @@ export default function SettingView() {
                 variant="outlined"
                 sx={{ width: '35%' }}
                 size="small"
+                value={row.vi}
+                onChange={(e) => handleInputChangeQuestion('dap_an', e.target.value, index, 'vi')}
               />
               <TextField
                 id={`outlined-basic-en-${row.id}`}
@@ -129,21 +190,33 @@ export default function SettingView() {
                 variant="outlined"
                 sx={{ width: '35%' }}
                 size="small"
+                value={row.en}
+                onChange={(e) => handleInputChangeQuestion('dap_an', e.target.value, index, 'en')}
               />
               <Button
                 sx={styles.button_remove}
                 onClick={() => handleRemoveRow(row.id)}
-                disabled={answerRows.length === 1}
+                disabled={formValuesQuestion.dap_an.length === 1}
               >
                 <Icon icon="akar-icons:minus" color="white" width="25" height="25" />
               </Button>
+              {index === formValuesQuestion.dap_an.length - 1 && (
+                <Button sx={styles.button_add} onClick={handleAddRow}>
+                  <Icon icon="typcn:plus" color="white" width="25" height="25" />
+                </Button>
+              )}
             </Box>
           ))}
-
-          <Button sx={styles.button_add} onClick={handleAddRow}>
-            <Icon icon="typcn:plus" color="white" width="25" height="25" />
-          </Button>
         </Box>
+        <Button
+          sx={{
+            width: '100%',
+            marginTop: '20px',
+            backgroundColor: alpha(theme.palette.primary.main, 1),
+          }}
+        >
+          Submit
+        </Button>
       </Box>
       <Box className="list_question" sx={{ marginTop: '20px' }}>
         <Typography variant="h6" sx={{ mb: 2 }}>
@@ -156,7 +229,7 @@ export default function SettingView() {
                 <TableHeadCustom headLabel={tableLabels} />
 
                 <TableBody>
-                  {tableData.map((row, index) => (
+                  {listQuestion.map((row, index) => (
                     <HistoryQuestionVoteRow key={index + 1} row={row} />
                   ))}
                 </TableBody>
@@ -170,16 +243,16 @@ export default function SettingView() {
 }
 
 type HistoryQuestionVoteRowProps = {
-  row: RowProps;
+  row: IQuestion;
 };
 function HistoryQuestionVoteRow({ row }: HistoryQuestionVoteRowProps) {
   return (
     <TableRow>
-      <TableCell>{row.name_question}</TableCell>
+      <TableCell>{row?.ten_poll}</TableCell>
 
-      <TableCell align="left">{row.content}</TableCell>
+      <TableCell align="left">{row?.noi_dung}</TableCell>
 
-      <TableCell align="left">{row.answer.join(' | ')}</TableCell>
+      <TableCell align="left">{row?.dap_an?.map((item) => item.vi).join(' | ')}</TableCell>
     </TableRow>
   );
 }

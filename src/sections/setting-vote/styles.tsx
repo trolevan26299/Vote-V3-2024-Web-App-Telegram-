@@ -13,7 +13,6 @@ export const styles: { [key: string]: SxProps<Theme> } = {
       color: '#c0c0c0',
     },
     width: '60px !important',
-    marginTop: '10px',
   },
   button_remove: {
     flex: 'none',
@@ -55,9 +54,7 @@ export const styles: { [key: string]: SxProps<Theme> } = {
   box_form_setting_vote_setting: {
     padding: '20px',
     borderRadius: '10px',
-    maxHeight: '400px',
     minHeight: '400px',
-    overflowY: 'auto',
   },
   box_answer_result: {
     padding: '10px',
