@@ -20,7 +20,7 @@ export default function OverviewAppView() {
       <Grid container spacing={3}>
         <Grid xs={12} md={12}>
           <AppWelcome
-            title=" 👋 Chào mừng Lincoln đến với Đại Hội Cổ Đông"
+            title={`👋 Chào mừng ${userTelegram.user?.first_name}  đến với Đại Hội Cổ Đông`}
             img={<SeoIllustration />}
             code_holder="V323005"
             number_shares="10000"
