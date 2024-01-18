@@ -1,10 +1,10 @@
 // @mui
-import { useTheme, alpha } from '@mui/material/styles';
-import Typography from '@mui/material/Typography';
 import Stack, { StackProps } from '@mui/material/Stack';
+import Typography from '@mui/material/Typography';
+import { alpha, useTheme } from '@mui/material/styles';
 // theme
-import { bgGradient } from 'src/theme/css';
 import { Box, Grid } from '@mui/material';
+import { bgGradient } from 'src/theme/css';
 import { styles } from './styles';
 
 // ----------------------------------------------------------------------

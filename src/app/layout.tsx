@@ -35,6 +35,7 @@ import { SettingsProvider, SettingsDrawer } from 'src/components/settings';
 
 // auth
 import { AuthProvider, AuthConsumer } from 'src/auth/context/jwt';
+import { TelegramProvider } from 'src/telegram/telegram.provider';
 
 // ----------------------------------------------------------------------
 
@@ -82,9 +83,6 @@ type Props = {
 export default function RootLayout({ children }: Props) {
   return (
     <html lang="en" className={primaryFont.className}>
-      <head>
-        <script src="https://telegram.org/js/telegram-web-app.js" />
-      </head>
       <body>
         <AuthProvider>
           <LocalizationProvider>
@@ -99,13 +97,15 @@ export default function RootLayout({ children }: Props) {
               }}
             >
               <ThemeProvider>
-                <MotionLazy>
-                  <SnackbarProvider>
-                    <SettingsDrawer />
-                    <ProgressBar />
-                    <AuthConsumer>{children}</AuthConsumer>
-                  </SnackbarProvider>
-                </MotionLazy>
+                <TelegramProvider>
+                  <MotionLazy>
+                    <SnackbarProvider>
+                      <SettingsDrawer />
+                      <ProgressBar />
+                      <AuthConsumer>{children}</AuthConsumer>
+                    </SnackbarProvider>
+                  </MotionLazy>
+                </TelegramProvider>
               </ThemeProvider>
             </SettingsProvider>
           </LocalizationProvider>
