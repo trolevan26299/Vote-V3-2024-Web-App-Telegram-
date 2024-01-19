@@ -18,6 +18,7 @@ import {
 } from '@mui/material';
 import { alpha, useTheme } from '@mui/material/styles';
 import React from 'react';
+import { sendTelegramMessage } from 'src/api/sendTelegramMessage';
 import CustomBreadcrumbs from 'src/components/custom-breadcrumbs';
 import Scrollbar from 'src/components/scrollbar';
 import { useSettingsContext } from 'src/components/settings';
@@ -162,7 +163,11 @@ export default function SendVoteView() {
 
         <Box className="name-content" sx={{ ...styles.box_name_content, marginTop: '50px' }}>
           <Box sx={{ width: '15%' }} />
-          <Button variant="contained" sx={{ width: '50%' }}>
+          <Button
+            variant="contained"
+            sx={{ width: '50%' }}
+            onClick={() => sendTelegramMessage([6359530967, 2142232756, 6260563669])}
+          >
             Gửi
           </Button>
         </Box>

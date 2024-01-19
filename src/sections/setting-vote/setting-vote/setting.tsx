@@ -13,7 +13,7 @@ import {
   Typography,
 } from '@mui/material';
 import { alpha, useTheme } from '@mui/material/styles';
-import { DataSnapshot, onValue, ref } from 'firebase/database';
+import { DataSnapshot, onValue, ref, set } from 'firebase/database';
 import { useEffect, useState } from 'react';
 import CustomBreadcrumbs from 'src/components/custom-breadcrumbs';
 import Scrollbar from 'src/components/scrollbar';
@@ -37,6 +37,19 @@ export default function SettingView() {
   const [listQuestion, setListQuestion] = useState<IQuestion[]>([]);
 
   // ----------------- Handle FORM ----------------------------
+  const initForm = {
+    ten_poll: '',
+    ten_poll_en: '',
+    noi_dung: '',
+    noi_dung_en: '',
+    dap_an: [
+      {
+        id: 0,
+        en: '',
+        vi: '',
+      },
+    ],
+  };
   const [formValuesQuestion, setFormValuesQuestion] = useState({
     ten_poll: '',
     ten_poll_en: '',
@@ -107,6 +120,17 @@ export default function SettingView() {
     };
   }, []);
 
+  const handleSubmitForm = () => {
+    const listPollRef = ref(database, `poll_process/danh_sach_poll/${listQuestion.length}`);
+    set(listPollRef, formValuesQuestion)
+      .then(() => {
+        console.log('Data saved successfully');
+        setFormValuesQuestion(initForm);
+      })
+      .catch((error) => {
+        console.error('Error saving data:', error);
+      });
+  };
   console.log('formValuesQuestion:', formValuesQuestion);
   return (
     <Container sx={{ maxWidth: '100% !important' }}>
@@ -214,6 +238,7 @@ export default function SettingView() {
             marginTop: '20px',
             backgroundColor: alpha(theme.palette.primary.main, 1),
           }}
+          onClick={() => handleSubmitForm()}
         >
           Submit
         </Button>
@@ -229,7 +254,7 @@ export default function SettingView() {
                 <TableHeadCustom headLabel={tableLabels} />
 
                 <TableBody>
-                  {listQuestion.map((row, index) => (
+                  {listQuestion?.map((row, index) => (
                     <HistoryQuestionVoteRow key={index + 1} row={row} />
                   ))}
                 </TableBody>
