@@ -64,4 +64,11 @@ export const styles: { [key: string]: SxProps<Theme> } = {
     overflowY: 'auto',
     width: '100%',
   },
+
+  title_form_setting: {
+    textAlign: 'center',
+    fontSize: '22px',
+    fontWeight: 600,
+    paddingBottom: '20px',
+  },
 };

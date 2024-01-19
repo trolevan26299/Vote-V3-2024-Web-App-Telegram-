@@ -13,7 +13,8 @@ import {
   Typography,
 } from '@mui/material';
 import { alpha, useTheme } from '@mui/material/styles';
-import { DataSnapshot, onValue, ref, set } from 'firebase/database';
+import { DataSnapshot, onValue, push, ref, remove, set } from 'firebase/database';
+import { useSnackbar } from 'notistack';
 import { useEffect, useState } from 'react';
 import CustomBreadcrumbs from 'src/components/custom-breadcrumbs';
 import Scrollbar from 'src/components/scrollbar';
@@ -27,14 +28,18 @@ import { styles } from '../styles';
 export default function SettingView() {
   const settings = useSettingsContext();
   const theme = useTheme();
+  const { enqueueSnackbar } = useSnackbar();
+
   const tableLabels = [
     { id: 'name_question', label: 'Tên câu hỏi' },
     { id: 'content', label: 'Nội dung' },
     { id: 'answer', label: 'Đáp án' },
+    { id: '', label: '' },
   ];
 
   // List question get from firebase
   const [listQuestion, setListQuestion] = useState<IQuestion[]>([]);
+  const [editForm, setEditForm] = useState<string>('');
 
   // ----------------- Handle FORM ----------------------------
   const initForm = {
@@ -100,17 +105,22 @@ export default function SettingView() {
       setFormValuesQuestion((prevValues) => ({ ...prevValues, dap_an: updatedDapAn }));
     }
   };
+
+  // get data pool answers - question
   useEffect(() => {
     const userRef = ref(database, FIREBASE_COLLECTION.POLL_PROCESS);
     const onDataChange = (snapshot: DataSnapshot) => {
-      if (snapshot.exists()) {
-        setListQuestion(snapshot.val().danh_sach_poll);
-        console.log('data câu hỏi', snapshot.val().danh_sach_poll);
+      const dataSnapShot = snapshot.exists();
+      if (dataSnapShot) {
+        const listQuestionWithKeys = Object.keys(snapshot.val().danh_sach_poll).map((key) => ({
+          key,
+          ...snapshot.val().danh_sach_poll[key],
+        }));
+        setListQuestion(listQuestionWithKeys);
       } else {
         console.log('No data available');
       }
     };
-
     const unsubscribe = onValue(userRef, onDataChange);
 
     // Clean up the listener when the component unmounts
@@ -120,18 +130,57 @@ export default function SettingView() {
     };
   }, []);
 
+  // Handle Submit form for new and edit
   const handleSubmitForm = () => {
-    const listPollRef = ref(database, `poll_process/danh_sach_poll/${listQuestion.length}`);
-    set(listPollRef, formValuesQuestion)
+    const listPollRef = ref(
+      database,
+      editForm !== '' ? `poll_process/danh_sach_poll/${editForm}` : 'poll_process/danh_sach_poll'
+    );
+    const newRef = push(listPollRef);
+    set(editForm !== '' ? listPollRef : newRef, formValuesQuestion)
       .then(() => {
-        console.log('Data saved successfully');
+        enqueueSnackbar('Lưu Thành Công !', { variant: 'success' });
         setFormValuesQuestion(initForm);
+        setEditForm('');
       })
       .catch((error) => {
+        enqueueSnackbar('Lưu thông tin lỗi !', { variant: 'error' });
         console.error('Error saving data:', error);
       });
   };
-  console.log('formValuesQuestion:', formValuesQuestion);
+
+  // Handle remove a pool
+  const handleRemoveData = (key: string) => {
+    const listPollRef = ref(database, `poll_process/danh_sach_poll/${key}`);
+    remove(listPollRef)
+      .then(() => {
+        enqueueSnackbar('Xóa Thành Công !', { variant: 'success' });
+        setFormValuesQuestion(initForm);
+      })
+      .catch((error) => {
+        enqueueSnackbar('Xóa lỗi !', { variant: 'error' });
+        console.error('Error saving data:', error);
+      });
+  };
+
+  const handleEditForm = (key: string) => {
+    const dataEdit = listQuestion.find((item) => item.key === key);
+    if (dataEdit) {
+      const convertedDapAn = dataEdit?.dap_an?.map((answer) => ({
+        id: answer.id || 0, // Kiểm tra và sử dụng giá trị mặc định nếu 'answer.id' là undefined
+        en: answer.en || '',
+        vi: answer.vi || '',
+      }));
+      setEditForm(key);
+      setFormValuesQuestion({
+        ten_poll: dataEdit.ten_poll || '',
+        ten_poll_en: dataEdit.ten_poll_en || '',
+        noi_dung: dataEdit.noi_dung || '',
+        noi_dung_en: dataEdit.noi_dung_en || '',
+        dap_an: convertedDapAn || [],
+      });
+    }
+  };
   return (
     <Container sx={{ maxWidth: '100% !important' }}>
       <CustomBreadcrumbs
@@ -148,6 +197,9 @@ export default function SettingView() {
           ...styles.box_form_setting_vote_setting,
         }}
       >
+        <Typography sx={styles.title_form_setting}>
+          {editForm !== '' ? 'Edit Form' : 'New Form'}
+        </Typography>
         <Box className="name-content" sx={styles.box_name_content}>
           <Typography sx={{ width: '15%' }}>Tên nội dung :</Typography>
           <TextField
@@ -254,8 +306,33 @@ export default function SettingView() {
                 <TableHeadCustom headLabel={tableLabels} />
 
                 <TableBody>
-                  {listQuestion?.map((row, index) => (
-                    <HistoryQuestionVoteRow key={index + 1} row={row} />
+                  {listQuestion?.map((row) => (
+                    <TableRow key={row?.key}>
+                      <TableCell>{row?.ten_poll}</TableCell>
+
+                      <TableCell align="left">{row?.noi_dung}</TableCell>
+
+                      <TableCell align="left">
+                        {row?.dap_an?.map((item) => item.vi).join(' | ')}
+                      </TableCell>
+                      <TableCell align="left">
+                        <Button
+                          variant="contained"
+                          color="error"
+                          onClick={() => handleRemoveData(row.key as string)}
+                        >
+                          Xóa
+                        </Button>
+                        <Button
+                          variant="contained"
+                          color="warning"
+                          sx={{ marginLeft: '10px' }}
+                          onClick={() => handleEditForm(row.key as string)}
+                        >
+                          Chỉnh sửa
+                        </Button>
+                      </TableCell>
+                    </TableRow>
                   ))}
                 </TableBody>
               </Table>
@@ -264,20 +341,5 @@ export default function SettingView() {
         </Card>
       </Box>
     </Container>
-  );
-}
-
-type HistoryQuestionVoteRowProps = {
-  row: IQuestion;
-};
-function HistoryQuestionVoteRow({ row }: HistoryQuestionVoteRowProps) {
-  return (
-    <TableRow>
-      <TableCell>{row?.ten_poll}</TableCell>
-
-      <TableCell align="left">{row?.noi_dung}</TableCell>
-
-      <TableCell align="left">{row?.dap_an?.map((item) => item.vi).join(' | ')}</TableCell>
-    </TableRow>
   );
 }

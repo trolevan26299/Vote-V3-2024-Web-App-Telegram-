@@ -32,11 +32,7 @@ export const sendTelegramMessage = async (chatIds: number[]) => {
 
     // Đợi cho tất cả các tin nhắn được gửi xong
     await Promise.all(sendMessages);
-
-    // Trả về kết quả cho client
-    // res.status(200).json({ success: true });
   } catch (error) {
     console.error('Error sending message to Telegram:', error);
-    // res.status(500).json({ success: false, error: 'Internal Server Error' });
   }
 };
