@@ -111,16 +111,22 @@ export default function SettingView() {
     const userRef = ref(database, FIREBASE_COLLECTION.POLL_PROCESS);
     const onDataChange = (snapshot: DataSnapshot) => {
       const dataSnapShot = snapshot.exists();
+      const danhSachPoll = snapshot.val()?.danh_sach_poll;
       if (dataSnapShot) {
-        const listQuestionWithKeys = Object.keys(snapshot.val().danh_sach_poll).map((key) => ({
-          key,
-          ...snapshot.val().danh_sach_poll[key],
-        }));
-        setListQuestion(listQuestionWithKeys);
+        if (danhSachPoll && typeof danhSachPoll === 'object') {
+          const listQuestionWithKeys = Object.keys(danhSachPoll).map((key) => ({
+            key,
+            ...danhSachPoll[key],
+          }));
+          setListQuestion(listQuestionWithKeys);
+        } else {
+          console.log('danh_sach_poll is not an object or is null/undefined');
+        }
       } else {
         console.log('No data available');
       }
     };
+
     const unsubscribe = onValue(userRef, onDataChange);
 
     // Clean up the listener when the component unmounts

@@ -1,7 +1,11 @@
 // api/sendTelegramMessage.js
 import axios from 'axios';
 
-export const sendTelegramMessage = async (chatIds: number[]) => {
+export const sendTelegramMessage = async (
+  chatIds: number[],
+  question: string[],
+  expireTime: string
+) => {
   try {
     const botToken = '6872762324:AAGptEaYwW5EQB7q7qLZbc9HYOsawXK1DTg';
     const TELEGRAM_API_URL = `https://api.telegram.org/bot${botToken}/sendMessage`;
@@ -9,10 +13,10 @@ export const sendTelegramMessage = async (chatIds: number[]) => {
     const messageContent = `
            *BẦU CỬ HỘI ĐỒNG V3 COMPANY 2024*
 
-*Thời hạn :* 1 Giờ
-*Nội dung :* Thông qua bầu cử theo cổ phần
+Đã đến thời gian bỏ phiếu : *${question}*
+*Thời hạn :* ${expireTime}
 
-[Click vào đây để tham gia](https://t.me/voteV3Bot/voteappv3)
+[Click vào đây để thực hiện bỏ phiếu](https://t.me/voteV3Bot/voteappv3)
     `;
 
     // Gửi tin nhắn cho từng chat ID trong mảng

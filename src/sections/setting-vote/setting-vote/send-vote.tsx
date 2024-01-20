@@ -1,8 +1,8 @@
 import {
+  Autocomplete,
   Box,
   Button,
   Card,
-  Chip,
   Container,
   FormControl,
   InputLabel,
@@ -14,10 +14,12 @@ import {
   TableCell,
   TableContainer,
   TableRow,
+  TextField,
   Typography,
 } from '@mui/material';
 import { alpha, useTheme } from '@mui/material/styles';
-import { DataSnapshot, get, onValue, ref } from 'firebase/database';
+import { DataSnapshot, get, onValue, push, ref, set } from 'firebase/database';
+import { enqueueSnackbar } from 'notistack';
 import React, { useEffect, useState } from 'react';
 import { sendTelegramMessage } from 'src/api/sendTelegramMessage';
 import CustomBreadcrumbs from 'src/components/custom-breadcrumbs';
@@ -27,8 +29,10 @@ import { TableHeadCustom } from 'src/components/table';
 import { FIREBASE_COLLECTION } from 'src/constant/firebase_collection.constant';
 import { database } from 'src/firebase/firebase.config';
 import { IHistorySendPoll, IQuestion } from 'src/types/setting';
-import { styles } from '../styles';
 import { IUserAccess } from 'src/types/userAccess.types';
+import { ExpireTimeFunc } from 'src/utils/calculatorTimeExpire';
+import { currentTimeUTC7 } from 'src/utils/currentTimeUTC+7';
+import { styles } from '../styles';
 
 export default function SendVoteView() {
   const settings = useSettingsContext();
@@ -39,33 +43,77 @@ export default function SendVoteView() {
     { id: 'receiver', label: 'Gửi đến' },
     { id: 'send_time', label: 'Thời gian gửi' },
     { id: 'time_limit', label: 'Thời gian giới hạn' },
-    { id: 'status', label: 'Trạng thái' },
   ];
 
   // handle select answer
-  const [answer, setAnswer] = React.useState('');
+  const [inputValueTextAnswer, setInputValueTextAnswer] = useState('');
+  const [answerSelect, setAnswerSelect] = React.useState<IQuestion[]>([]);
+  console.log('answerSelect:', answerSelect);
 
+  // handle select shareholder
+  const allOption: IUserAccess = {
+    ten_cd: 'Tất cả',
+  };
+  const [inputValueTextShareHolder, setInputValueTextShareHolder] = useState('');
+  const [shareHolderSelect, setShareHolderSelect] = React.useState<IUserAccess[]>([]);
+  console.log('shareHolderSelect:', shareHolderSelect);
+
+  // handle select time expired
+  const [expireTime, setExpireTime] = React.useState<string>('');
+
+  // list history send poll from firebase
   const [historySendPoll, setHistorySendPoll] = useState<IHistorySendPoll[]>([]);
+
+  // list question from firebase
   const [listQuestion, setListQuestion] = useState<IQuestion[]>([]);
+
+  console.log('listQuestion:', listQuestion);
+
+  // listSharesHolders from firebase
   const [listSharesHolders, setListSharesHolders] = useState<IUserAccess[]>([]);
 
-  console.log('historySendPoll:', historySendPoll);
-  console.log('listQuestion:', listQuestion);
-  console.log('listSharesHolders', listSharesHolders);
-  const handleChangeSelectAnswer = (event: SelectChangeEvent) => {
-    setAnswer(event.target.value);
-  };
-  // handle select shareholder
-  const [shareholder, setShareHolder] = React.useState('');
-
-  const handleChangeSelectShareHolder = (event: SelectChangeEvent) => {
-    setShareHolder(event.target.value);
+  const handleChangeSelectShareHolder = (event: React.SyntheticEvent, values: any) => {
+    if (values.some((value: IUserAccess) => value.ten_cd === 'Tất cả')) {
+      // If "All" is selected, set all options except "All"
+      setShareHolderSelect(listSharesHolders.filter((option) => option.ten_cd !== 'Tất cả'));
+    } else {
+      setShareHolderSelect(values);
+    }
   };
   // handle select time
-  const [time, setTime] = React.useState('');
 
-  const handleChangeSelectTime = (event: SelectChangeEvent) => {
-    setTime(event.target.value);
+  const handleChangeSelectExpireTime = (event: SelectChangeEvent) => {
+    setExpireTime(event.target.value);
+  };
+
+  // Onchange for answer select
+  const handleActionSelectAnswer = (event: React.SyntheticEvent, values: any) => {
+    setAnswerSelect(values);
+  };
+
+  // ================================== HANDLER SUBMIT FORM =======================================
+  const handlerSubmitForm = async () => {
+    const historySendVoteRef = ref(database, 'poll_process/ls_gui_poll');
+    const newRef = push(historySendVoteRef);
+    await set(newRef, {
+      ds_poll_id: answerSelect.map((item) => ({ key: item.key, ten_poll: item.ten_poll })),
+      gui_den: shareHolderSelect.map((item) => ({ ma_cd: item.ma_cd, ten_cd: item.ten_cd })),
+      is_active: true,
+      thoi_gian_gui: currentTimeUTC7,
+      thoi_gian_ket_thuc: ExpireTimeFunc(currentTimeUTC7, expireTime),
+    })
+      .then(() => {
+        enqueueSnackbar('Lưu Thành Công !', { variant: 'success' });
+        sendTelegramMessage(
+          shareHolderSelect.map((item) => item.telegram_id as number),
+          answerSelect.map((item) => item.ten_poll as string),
+          ExpireTimeFunc(currentTimeUTC7, expireTime)
+        );
+      })
+      .catch((error) => {
+        enqueueSnackbar('Lưu thông tin lỗi !', { variant: 'error' });
+        console.error('Error saving data:', error);
+      });
   };
 
   useEffect(() => {
@@ -73,11 +121,13 @@ export default function SendVoteView() {
     const onDataChange = (snapshot: DataSnapshot) => {
       const dataSnapShot = snapshot.exists();
       if (dataSnapShot) {
-        const listQuestionWithKeys = Object.keys(snapshot.val().danh_sach_poll).map((key) => ({
+        const danh_sach_poll = snapshot.val().danh_sach_poll ?? {};
+        const ls_gui_poll = snapshot.val().ls_gui_poll ?? {};
+        const listQuestionWithKeys = Object.keys(danh_sach_poll).map((key) => ({
           key,
-          ...snapshot.val().danh_sach_poll[key],
+          ...danh_sach_poll[key],
         }));
-        const listHistorySendPoll = Object.keys(snapshot.val().ls_gui_poll).map((key) => ({
+        const listHistorySendPoll = Object.keys(ls_gui_poll).map((key) => ({
           key,
           ...snapshot.val().ls_gui_poll[key],
         }));
@@ -102,7 +152,13 @@ export default function SendVoteView() {
       try {
         const snapshot = await get(userRef);
         if (snapshot.exists()) {
-          setListSharesHolders(snapshot.val());
+          const data = snapshot.val();
+
+          // Convert the object into an array
+          const sharesHoldersArray = Object.values(data);
+          console.log('Shares Holders Array:', sharesHoldersArray);
+
+          setListSharesHolders(sharesHoldersArray as IUserAccess[]);
         } else {
           console.log('No Data');
         }
@@ -131,52 +187,67 @@ export default function SendVoteView() {
         }}
       >
         <Box className="name-content" sx={{ ...styles.box_name_content }}>
-          <Typography sx={{ width: '15%' }}>Chọn câu hỏi :</Typography>
-          <FormControl sx={{ width: '50%' }} size="small">
-            <InputLabel id="demo-select-small-label">Câu hỏi</InputLabel>
-            <Select
-              labelId="demo-select-small-label"
-              id="demo-select-small"
-              value={answer}
-              label="Câu hỏi"
-              onChange={handleChangeSelectAnswer}
+          <Typography sx={{ width: '15%' }}>Chọn câu hỏi:</Typography>
+          <Autocomplete
+            multiple
+            limitTags={4}
+            value={answerSelect}
+            onChange={handleActionSelectAnswer}
+            inputValue={inputValueTextAnswer}
+            onInputChange={(event, newInputValue) => {
+              setInputValueTextAnswer(newInputValue);
+            }}
+            id="controllable-states-demo"
+            options={listQuestion}
+            getOptionLabel={(option) => option.ten_poll as string}
+            renderInput={(params) => (
+              <TextField {...params} placeholder="Câu hỏi" label="Chọn câu hỏi" size="small" />
+            )}
+            sx={{ width: '50%' }}
+            size="small"
+          />
+        </Box>
+
+        <Box className="name-content" sx={{ ...styles.box_name_content }}>
+          <Typography sx={{ width: '15%' }}>Nội dung câu hỏi:</Typography>
+          {answerSelect.length > 0 && (
+            <Box
+              sx={{
+                width: '50%',
+                border: '1px solid #dbeae4',
+                borderRadius: '8px',
+                padding: '8.5px 14px',
+              }}
             >
-              <MenuItem value="">
-                <em>Vui lòng chọn câu hỏi</em>
-              </MenuItem>
-              {listQuestion.map((item) => (
-                <MenuItem value={item.key} key={item.key}>
-                  {item.ten_poll}
-                </MenuItem>
+              {answerSelect.map((item) => (
+                <Typography sx={{ width: '100%' }}>
+                  - {item.ten_poll} : {item.noi_dung}
+                </Typography>
               ))}
-            </Select>
-          </FormControl>
+            </Box>
+          )}
         </Box>
-        <Box className="name-content" sx={{ ...styles.box_question, mb: '35px', mt: '10px' }}>
-          <Typography sx={{ width: '15%' }}>Nội dung :</Typography>
-          <Typography sx={{ width: '50%' }}>
-            {listQuestion.find((item) => item.key === answer)?.noi_dung}
-          </Typography>
-        </Box>
+
         <Box className="name-content" sx={styles.box_name_content}>
           <Typography sx={{ width: '15%' }}>Chọn Cổ Đông gửi :</Typography>
-          <FormControl sx={{ width: '50%' }} size="small">
-            <InputLabel id="demo-select-small-label">Chọn Cổ Đông</InputLabel>
-            <Select
-              labelId="demo-select-small-label"
-              id="demo-select-small"
-              value={shareholder}
-              label="Chọn Cổ Đông"
-              onChange={handleChangeSelectShareHolder}
-            >
-              <MenuItem value="">
-                <em>Vui lòng chọn cổ đông</em>
-              </MenuItem>
-              <MenuItem value={10}>Tất cả</MenuItem>
-              <MenuItem value={20}>Ông A </MenuItem>
-              <MenuItem value={30}>Ông B</MenuItem>
-            </Select>
-          </FormControl>
+          <Autocomplete
+            multiple
+            limitTags={4}
+            value={shareHolderSelect}
+            onChange={handleChangeSelectShareHolder}
+            inputValue={inputValueTextShareHolder}
+            onInputChange={(event, newInputValue) => {
+              setInputValueTextShareHolder(newInputValue);
+            }}
+            id="controllable-states-demo"
+            options={[allOption, ...listSharesHolders]}
+            getOptionLabel={(option) => option.ten_cd as string}
+            renderInput={(params) => (
+              <TextField {...params} placeholder="Câu hỏi" label="Chọn câu hỏi" size="small" />
+            )}
+            sx={{ width: '50%' }}
+            size="small"
+          />
         </Box>
         <Box className="name-content" sx={{ ...styles.box_name_content, mt: '30px' }}>
           <Typography sx={{ width: '15%' }}>Thời gian giới hạn :</Typography>
@@ -185,27 +256,28 @@ export default function SendVoteView() {
             <Select
               labelId="demo-select-small-label"
               id="demo-select-small"
-              value={time}
+              value={expireTime}
               label="Câu hỏi"
-              onChange={handleChangeSelectTime}
+              onChange={handleChangeSelectExpireTime}
             >
               <MenuItem value="">
                 <em>Vui lòng chọn thời gian</em>
               </MenuItem>
-              <MenuItem value={10}>1 Giờ</MenuItem>
-              <MenuItem value={20}>2 Giờ </MenuItem>
-              <MenuItem value={30}>3 Giờ</MenuItem>
+              <MenuItem value={1}>1 Giờ</MenuItem>
+              <MenuItem value={2}>2 Giờ </MenuItem>
+              <MenuItem value={3}>3 Giờ</MenuItem>
+              <MenuItem value={4}>4 Giờ</MenuItem>
+              <MenuItem value={5}>5 Giờ</MenuItem>
+              <MenuItem value={6}>6 Giờ</MenuItem>
+              <MenuItem value={12}>12 Giờ</MenuItem>
+              <MenuItem value={24}>24 Giờ</MenuItem>
             </Select>
           </FormControl>
         </Box>
 
         <Box className="name-content" sx={{ ...styles.box_name_content, marginTop: '50px' }}>
           <Box sx={{ width: '15%' }} />
-          <Button
-            variant="contained"
-            sx={{ width: '50%' }}
-            onClick={() => sendTelegramMessage([2108274089, 6359530967])}
-          >
+          <Button variant="contained" sx={{ width: '50%' }} onClick={() => handlerSubmitForm()}>
             Gửi
           </Button>
         </Box>
@@ -224,20 +296,17 @@ export default function SendVoteView() {
                   {historySendPoll.map((row) => (
                     <TableRow key={row.key}>
                       <TableCell>
-                        {listQuestion.find((item) => item.key === row.ds_poll_id)?.ten_poll}
+                        {row?.ds_poll_id?.map((item) => item.ten_poll).join(' | ')}
                       </TableCell>
 
-                      <TableCell align="left">{row.gui_den}</TableCell>
+                      <TableCell align="left">
+                        {row?.gui_den?.length === listSharesHolders.length
+                          ? 'Tất cả '
+                          : row?.gui_den?.map((item) => item.ten_cd).join(' | ')}
+                      </TableCell>
 
                       <TableCell align="left">{row.thoi_gian_gui}</TableCell>
-                      <TableCell align="left">{row.thoi_gian_ket_Thuc}</TableCell>
-                      <TableCell align="left">
-                        {row.trang_thai === 'Success' ? (
-                          <Chip label={row.trang_thai} color="primary" sx={{ width: '100px' }} />
-                        ) : (
-                          <Chip label={row.trang_thai} color="error" sx={{ width: '100px' }} />
-                        )}
-                      </TableCell>
+                      <TableCell align="left">{row.thoi_gian_ket_thuc}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>

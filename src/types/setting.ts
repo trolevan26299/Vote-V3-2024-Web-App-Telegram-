@@ -13,12 +13,21 @@ export interface IAnswer {
   en?: string;
 }
 
+export interface IListPollHistorySendVote {
+  key?: string;
+  ten_poll?: string;
+}
+export interface IListSender {
+  ma_cd?: string;
+  ten_cd?: string;
+}
+
 export interface IHistorySendPoll {
   key?: string;
-  ds_poll_id?: string;
-  gui_den?: string;
+  ds_poll_id?: IListPollHistorySendVote[];
+  gui_den?: IListSender[];
   is_active?: boolean;
   thoi_gian_gui?: string;
-  thoi_gian_ket_Thuc?: string;
+  thoi_gian_ket_thuc?: string;
   trang_thai?: string;
 }
