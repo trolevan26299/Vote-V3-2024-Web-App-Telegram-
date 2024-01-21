@@ -20,7 +20,6 @@ export const UserContext = createContext<IUserContext>({});
 export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<IUserAccess>();
   const userAccess = useTelegram();
-  console.log('userAccess:', userAccess?.user?.id);
 
   useEffect(() => {
     // const idTelegram = 6359530967; // Đặt giá trị idTelegram tùy theo nhu cầu của bạn
@@ -36,6 +35,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
             const data = childSnapshot.val();
 
             // Kiểm tra nếu trường "telegram_id" bằng với idTelegram
+            console.log('userAccess:', userAccess?.user?.id);
             if (data && data.telegram_id === userAccess?.user?.id) {
               setUser(data);
               console.log(data);
