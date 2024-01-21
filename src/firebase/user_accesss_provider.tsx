@@ -21,7 +21,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   console.log('userAccess:', userAccess?.user?.id);
 
   useEffect(() => {
-    const idTelegram = 6359530967; // Đặt giá trị idTelegram tùy theo nhu cầu của bạn
+    // const idTelegram = 6359530967; // Đặt giá trị idTelegram tùy theo nhu cầu của bạn
     const userRef = ref(database, FIREBASE_COLLECTION.THONG_TIN_CD);
     const fetchData = async () => {
       try {
@@ -34,7 +34,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
             const data = childSnapshot.val();
 
             // Kiểm tra nếu trường "telegram_id" bằng với idTelegram
-            if (data && data.telegram_id === idTelegram) {
+            if (data && data.telegram_id === userAccess?.user?.id) {
               setUser(data);
               console.log(data);
             }
