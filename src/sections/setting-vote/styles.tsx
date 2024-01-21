@@ -71,4 +71,11 @@ export const styles: { [key: string]: SxProps<Theme> } = {
     fontWeight: 600,
     paddingBottom: '20px',
   },
+  box_info_total: {
+    color: '#000',
+    marginTop: '10px',
+    padding: '10px',
+    borderRadius: '10px',
+    width: '20%',
+  },
 };

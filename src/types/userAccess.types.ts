@@ -15,4 +15,5 @@ export interface IUserAccess {
   ty_le_cp_so_huu?: number;
   ty_le_cp_tham_du?: number;
   ghi_chu?: string;
+  nguoi_nuoc_ngoai?: boolean;
 }

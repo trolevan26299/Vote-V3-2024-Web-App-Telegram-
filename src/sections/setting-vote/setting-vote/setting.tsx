@@ -291,11 +291,19 @@ export default function SettingView() {
           ))}
         </Box>
         <Button
+          variant="contained"
           sx={{
             width: '100%',
             marginTop: '20px',
-            backgroundColor: alpha(theme.palette.primary.main, 1),
           }}
+          disabled={
+            formValuesQuestion.noi_dung === '' ||
+            formValuesQuestion.noi_dung_en === '' ||
+            formValuesQuestion.ten_poll === '' ||
+            formValuesQuestion.ten_poll_en === '' ||
+            formValuesQuestion.dap_an[0].en === '' ||
+            formValuesQuestion.dap_an[0].vi === ''
+          }
           onClick={() => handleSubmitForm()}
         >
           Submit

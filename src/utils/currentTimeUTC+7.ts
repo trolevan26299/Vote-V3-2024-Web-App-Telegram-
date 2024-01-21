@@ -1,6 +1,6 @@
 const currentUTC7Time = new Date().toLocaleString('en-US', {
-  timeZone: 'Asia/Bangkok', // UTC+7 timezone
-  hour12: false, // 24-hour format
+  timeZone: 'Asia/Bangkok',
+  hour12: false,
   year: 'numeric',
   month: '2-digit',
   day: '2-digit',

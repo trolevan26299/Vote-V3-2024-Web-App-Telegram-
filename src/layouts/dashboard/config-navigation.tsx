@@ -57,38 +57,44 @@ export function useNavData() {
             path: paths.dashboard.root,
             icon: ICONS.dashboard,
           },
+          // {
+          //   title: 'Tiến trình bầu cử',
+          //   path: paths.dashboard.process.dh,
+          //   icon: ICONS.ecommerce,
+          //   children: [
+          //     { title: 'Bỏ phiếu đại hội', path: paths.dashboard.process.dh },
+          //     {
+          //       title: 'Bầu cử hội đồng',
+          //       path: paths.dashboard.process.hd,
+          //     },
+          //   ],
+          // },
           {
-            title: 'Tiến trình bầu cử',
+            title: 'Tiến trình bỏ phiếu',
             path: paths.dashboard.process.dh,
             icon: ICONS.ecommerce,
-            children: [
-              { title: 'Bỏ phiếu đại hội', path: paths.dashboard.process.dh },
-              {
-                title: 'Bầu cử hội đồng',
-                path: paths.dashboard.process.hd,
-              },
-            ],
+            // children: [],
           },
           {
             title: 'Bỏ phiếu đại hội',
             path: paths.dashboard.voteDH,
             icon: ICONS.analytics,
           },
-          {
-            title: 'Bầu cử hội đồng',
-            path: paths.dashboard.voteHD,
-            icon: ICONS.banking,
-          },
+          // {
+          //   title: 'Bầu cử hội đồng',
+          //   path: paths.dashboard.voteHD,
+          //   icon: ICONS.banking,
+          // },
           {
             title: 'Quản Lý',
             icon: ICONS.booking,
             path: paths.dashboard.settingVote.vote,
             children: [
               { title: 'Cài đặt bỏ phiếu', path: paths.dashboard.settingVote.vote },
-              {
-                title: 'Cài đặt bầu cử',
-                path: paths.dashboard.settingVote.election,
-              },
+              // {
+              //   title: 'Cài đặt bầu cử',
+              //   path: paths.dashboard.settingVote.election,
+              // },
               {
                 title: 'Thông tin cổ đông',
                 path: paths.dashboard.settingVote.info,

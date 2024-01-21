@@ -48,7 +48,6 @@ export default function SendVoteView() {
   // handle select answer
   const [inputValueTextAnswer, setInputValueTextAnswer] = useState('');
   const [answerSelect, setAnswerSelect] = React.useState<IQuestion[]>([]);
-  console.log('answerSelect:', answerSelect);
 
   // handle select shareholder
   const allOption: IUserAccess = {
@@ -56,7 +55,6 @@ export default function SendVoteView() {
   };
   const [inputValueTextShareHolder, setInputValueTextShareHolder] = useState('');
   const [shareHolderSelect, setShareHolderSelect] = React.useState<IUserAccess[]>([]);
-  console.log('shareHolderSelect:', shareHolderSelect);
 
   // handle select time expired
   const [expireTime, setExpireTime] = React.useState<string>('');
@@ -66,8 +64,6 @@ export default function SendVoteView() {
 
   // list question from firebase
   const [listQuestion, setListQuestion] = useState<IQuestion[]>([]);
-
-  console.log('listQuestion:', listQuestion);
 
   // listSharesHolders from firebase
   const [listSharesHolders, setListSharesHolders] = useState<IUserAccess[]>([]);
@@ -91,6 +87,11 @@ export default function SendVoteView() {
     setAnswerSelect(values);
   };
 
+  const setInitFormWhenSubmit = () => {
+    setAnswerSelect([]);
+    setShareHolderSelect([]);
+    setExpireTime('');
+  };
   // ================================== HANDLER SUBMIT FORM =======================================
   const handlerSubmitForm = async () => {
     const historySendVoteRef = ref(database, 'poll_process/ls_gui_poll');
@@ -105,10 +106,16 @@ export default function SendVoteView() {
       .then(() => {
         enqueueSnackbar('Lưu Thành Công !', { variant: 'success' });
         sendTelegramMessage(
-          shareHolderSelect.map((item) => item.telegram_id as number),
+          shareHolderSelect.map((item) => ({
+            telegram_id: item.telegram_id as number,
+            nguoi_nuoc_ngoai: item.nguoi_nuoc_ngoai as boolean,
+          })),
           answerSelect.map((item) => item.ten_poll as string),
+          answerSelect.map((item) => item.ten_poll_en as string),
+
           ExpireTimeFunc(currentTimeUTC7, expireTime)
         );
+        setInitFormWhenSubmit();
       })
       .catch((error) => {
         enqueueSnackbar('Lưu thông tin lỗi !', { variant: 'error' });
@@ -277,7 +284,12 @@ export default function SendVoteView() {
 
         <Box className="name-content" sx={{ ...styles.box_name_content, marginTop: '50px' }}>
           <Box sx={{ width: '15%' }} />
-          <Button variant="contained" sx={{ width: '50%' }} onClick={() => handlerSubmitForm()}>
+          <Button
+            variant="contained"
+            disabled={answerSelect.length < 0 || shareHolderSelect.length < 0 || expireTime === ''}
+            sx={{ width: '50%' }}
+            onClick={() => handlerSubmitForm()}
+          >
             Gửi
           </Button>
         </Box>

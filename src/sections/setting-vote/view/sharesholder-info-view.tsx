@@ -11,6 +11,7 @@ import { database } from 'src/firebase/firebase.config';
 import { IUserAccess } from 'src/types/userAccess.types';
 import { bgGradient } from '../../../theme/css';
 import SharesHolderInfoTable from '../sharesholder-info/sharesholder-info';
+import { styles } from '../styles';
 
 interface ShareholdersData {
   [key: string]: IUserAccess;
@@ -37,6 +38,21 @@ export default function SharesHolderInfoView() {
         ghi_chu: shareholder?.ghi_chu?.toString(), // You can add the appropriate property here
       }))
     : [];
+
+  const totalCpSoHuu = transformedData
+    .reduce((sum, shareholder) => {
+      const cpSoHuu = parseInt(shareholder.cp_so_huu as string, 10) || 0;
+      return sum + cpSoHuu;
+    }, 0)
+    .toLocaleString('en-US');
+
+  // Calculate total cp_tham_du
+  const totalCpThamDu = transformedData
+    .reduce((sum, shareholder) => {
+      const cpThamDu = parseInt(shareholder.cp_tham_du as string, 10) || 0;
+      return sum + cpThamDu;
+    }, 0)
+    .toLocaleString('en-US');
   useEffect(() => {
     const userRef = ref(database, FIREBASE_COLLECTION.THONG_TIN_CD);
 
@@ -60,7 +76,7 @@ export default function SharesHolderInfoView() {
   }, []);
 
   return (
-    <Container sx={{ maxWidth: '100% !important' }}>
+    <Container sx={{ maxWidth: '100% !important', height: '70vh' }}>
       <CustomBreadcrumbs
         heading="Danh sách các cổ đông 2024"
         links={[{ name: '' }]}
@@ -83,7 +99,7 @@ export default function SharesHolderInfoView() {
           { id: 'ghi_chu', label: 'Ghi chú' },
         ]}
         sx={{
-          maxHeight: '40%',
+          maxHeight: '100%',
           overflow: 'auto',
         }}
       />
@@ -94,15 +110,17 @@ export default function SharesHolderInfoView() {
             startColor: alpha(theme.palette.primary.light, 0.2),
             endColor: alpha(theme.palette.primary.main, 0.2),
           }),
-          color: '#000',
-          marginTop: '10px',
-          padding: '10px',
-          borderRadius: '10px',
-          width: '20%',
+          ...styles.box_info_total,
         }}
       >
-        <Typography sx={{ fontWeight: 500 }}>Tổng cổ phần sữ hữu: 10</Typography>
-        <Typography sx={{ fontWeight: 500 }}>Tổng cổ phần tham dự: 10</Typography>
+        <Typography sx={{ fontWeight: 500 }}>
+          {' '}
+          - Tổng cổ phần sữ hữu: <b>{totalCpSoHuu}</b>
+        </Typography>
+        <Typography sx={{ fontWeight: 500 }}>
+          {' '}
+          - Tổng cổ phần tham dự: <b>{totalCpThamDu}</b>{' '}
+        </Typography>
       </Box>
     </Container>
   );

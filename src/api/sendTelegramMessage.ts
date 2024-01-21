@@ -2,8 +2,12 @@
 import axios from 'axios';
 
 export const sendTelegramMessage = async (
-  chatIds: number[],
+  chatIds: {
+    telegram_id: number;
+    nguoi_nuoc_ngoai: boolean;
+  }[],
   question: string[],
+  questionEng: string[],
   expireTime: string
 ) => {
   try {
@@ -18,12 +22,20 @@ export const sendTelegramMessage = async (
 
 [Click vào đây để thực hiện bỏ phiếu](https://t.me/voteV3Bot/voteappv3)
     `;
+    const messageContentEng = `
+*Shareholder election V3 COMPANY 2024*
+
+It's time to vote: : *${questionEng}*
+*Due time :* ${expireTime}
+
+[Please click here to vote](https://t.me/voteV3Bot/voteappv3)
+`;
 
     // Gửi tin nhắn cho từng chat ID trong mảng
-    const sendMessages = chatIds.map(async (chatId: number) => {
+    const sendMessages = chatIds.map(async (item) => {
       const data = {
-        chat_id: chatId,
-        text: messageContent,
+        chat_id: item.telegram_id,
+        text: item.nguoi_nuoc_ngoai === true ? messageContentEng : messageContent,
         parse_mode: 'MarkdownV2',
       };
 
@@ -31,7 +43,7 @@ export const sendTelegramMessage = async (
       const response = await axios.post(TELEGRAM_API_URL, data);
 
       // Xử lý phản hồi từ API Telegram
-      console.log(`response khi gửi tin nhắn đến ${chatId}:`, response);
+      console.log(`response khi gửi tin nhắn đến ${item.telegram_id}:`, response);
     });
 
     // Đợi cho tất cả các tin nhắn được gửi xong
