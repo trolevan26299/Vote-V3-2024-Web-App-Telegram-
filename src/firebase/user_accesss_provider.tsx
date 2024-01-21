@@ -19,11 +19,19 @@ export const UserContext = createContext<IUserContext>({});
 
 export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<IUserAccess>();
-  const userAccess = useTelegram();
+  const [userAccess, setUserAccess] = useState<number | undefined>(0);
+
+  console.log('userAccess', userAccess);
+  const telegramContext = useTelegram();
+
+  useEffect(() => {
+    setUserAccess(telegramContext?.user?.id);
+  }, [telegramContext]);
 
   useEffect(() => {
     // const idTelegram = 6359530967; // Đặt giá trị idTelegram tùy theo nhu cầu của bạn
     const userRef = ref(database, FIREBASE_COLLECTION.THONG_TIN_CD);
+    if (!userAccess) return;
     const fetchData = async () => {
       try {
         const snapshot = await get(userRef);
@@ -35,8 +43,8 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
             const data = childSnapshot.val();
 
             // Kiểm tra nếu trường "telegram_id" bằng với idTelegram
-            console.log('userAccess:', userAccess?.user?.id);
-            if (data && data.telegram_id === userAccess?.user?.id) {
+            console.log('userAccess2:', userAccess);
+            if (data && data.telegram_id === userAccess) {
               setUser(data);
               console.log(data);
             }
@@ -51,7 +59,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     };
 
     fetchData();
-  }, []);
+  }, [userAccess]);
 
   const value = useMemo(() => ({ user }), [user]);
 

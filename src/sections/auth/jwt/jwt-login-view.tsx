@@ -1,7 +1,7 @@
 'use client';
 
 import { yupResolver } from '@hookform/resolvers/yup';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as Yup from 'yup';
 // @mui
@@ -22,8 +22,16 @@ import { useAuthContext } from 'src/auth/hooks';
 // s
 import FormProvider, { RHFTextField } from 'src/components/hook-form';
 import Iconify from 'src/components/iconify';
+import { get, ref } from 'firebase/database';
+import { database } from 'src/firebase/firebase.config';
+import { FIREBASE_COLLECTION } from 'src/constant/firebase_collection.constant';
 
 // ----------------------------------------------------------------------
+
+interface IAccountManager {
+  user_name: string;
+  password: string;
+}
 
 export default function JwtLoginView() {
   const { login } = useAuthContext();
@@ -32,6 +40,8 @@ export default function JwtLoginView() {
 
   const [errorMsg, setErrorMsg] = useState('');
 
+  const [accountManager, setAccountManager] = useState<IAccountManager>();
+
   const searchParams = useSearchParams();
 
   const returnTo = searchParams.get('returnTo');
@@ -39,13 +49,13 @@ export default function JwtLoginView() {
   const password = useBoolean();
 
   const LoginSchema = Yup.object().shape({
-    email: Yup.string().required('Email is required').email('Email must be a valid email address'),
+    userName: Yup.string().required('Email is required'),
     password: Yup.string().required('Password is required'),
   });
 
   const defaultValues = {
-    email: 'demo@minimals.cc',
-    password: 'demo1234',
+    userName: '',
+    password: '',
   };
 
   const methods = useForm({
@@ -62,12 +72,15 @@ export default function JwtLoginView() {
   // const checkLogin =
   const onSubmit = handleSubmit(async (data) => {
     try {
-      if (data.email === defaultValues.email && data.password === defaultValues.password) {
+      if (
+        data.userName === accountManager?.user_name &&
+        data.password === accountManager?.password
+      ) {
         localStorage.setItem('checked', JSON.stringify(true));
         router.push(PATH_AFTER_LOGIN);
       } else {
         reset();
-        setErrorMsg('Invalid email or password');
+        setErrorMsg('Invalid UserName or password');
       }
     } catch (error) {
       console.error(error);
@@ -75,6 +88,23 @@ export default function JwtLoginView() {
       setErrorMsg(typeof error === 'string' ? error : error.message);
     }
   });
+
+  useEffect(() => {
+    const userRef = ref(database, FIREBASE_COLLECTION.ACCOUNT_MANAGER);
+    const fetchData = async () => {
+      try {
+        const snapshot = await get(userRef);
+        if (snapshot.exists()) {
+          setAccountManager(snapshot.val()[0]);
+        } else {
+          console.log('NO DATA');
+        }
+      } catch (error) {
+        console.error('ERROR:', error);
+      }
+    };
+    fetchData();
+  }, []);
 
   const renderHead = (
     <Stack spacing={2} sx={{ mb: 5, mt: 10 }}>
@@ -86,7 +116,7 @@ export default function JwtLoginView() {
     <Stack spacing={2.5}>
       {!!errorMsg && <Alert severity="error">{errorMsg}</Alert>}
 
-      <RHFTextField name="email" label="Email address" />
+      <RHFTextField name="userName" label="User Name" />
 
       <RHFTextField
         name="password"
