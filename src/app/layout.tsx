@@ -85,34 +85,37 @@ export default function RootLayout({ children }: Props) {
   return (
     <html lang="en" className={primaryFont.className}>
       <body>
-        <AuthProvider>
-          <LocalizationProvider>
-            <SettingsProvider
-              defaultSettings={{
-                themeMode: 'light', // 'light' | 'dark'
-                themeDirection: 'ltr', //  'rtl' | 'ltr'
-                themeContrast: 'default', // 'default' | 'bold'
-                themeLayout: 'vertical', // 'vertical' | 'horizontal' | 'mini'
-                themeColorPresets: 'default', // 'default' | 'cyan' | 'purple' | 'blue' | 'orange' | 'red'
-                themeStretch: false,
-              }}
-            >
-              <ThemeProvider>
-                <TelegramProvider>
-                  <UserProvider>
-                    <MotionLazy>
-                      <SnackbarProvider>
-                        <SettingsDrawer />
-                        <ProgressBar />
-                        <AuthConsumer>{children}</AuthConsumer>
-                      </SnackbarProvider>
-                    </MotionLazy>
-                  </UserProvider>
-                </TelegramProvider>
-              </ThemeProvider>
-            </SettingsProvider>
-          </LocalizationProvider>
-        </AuthProvider>
+        {/* <AuthProvider> */}
+        <LocalizationProvider>
+          <SettingsProvider
+            defaultSettings={{
+              themeMode: 'light', // 'light' | 'dark'
+              themeDirection: 'ltr', //  'rtl' | 'ltr'
+              themeContrast: 'default', // 'default' | 'bold'
+              themeLayout: 'vertical', // 'vertical' | 'horizontal' | 'mini'
+              themeColorPresets: 'default', // 'default' | 'cyan' | 'purple' | 'blue' | 'orange' | 'red'
+              themeStretch: false,
+            }}
+          >
+            <ThemeProvider>
+              <TelegramProvider>
+                <UserProvider>
+                  <MotionLazy>
+                    <SnackbarProvider>
+                      <SettingsDrawer />
+                      <ProgressBar />
+                      {/* <AuthConsumer>
+    {children}
+                        </AuthConsumer> */}
+                      {children}
+                    </SnackbarProvider>
+                  </MotionLazy>
+                </UserProvider>
+              </TelegramProvider>
+            </ThemeProvider>
+          </SettingsProvider>
+        </LocalizationProvider>
+        {/* </AuthProvider> */}
       </body>
     </html>
   );

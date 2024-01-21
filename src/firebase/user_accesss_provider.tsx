@@ -2,6 +2,7 @@
 
 // UserProvider.js
 import { get, ref } from 'firebase/database';
+
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { FIREBASE_COLLECTION } from 'src/constant/firebase_collection.constant';
 import { useTelegram } from 'src/telegram/telegram.provider';
@@ -18,6 +19,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<IUserAccess>();
   const userAccess = useTelegram();
   console.log('userAccess:', userAccess?.user?.id);
+
   useEffect(() => {
     const idTelegram = 6359530967; // Đặt giá trị idTelegram tùy theo nhu cầu của bạn
     const userRef = ref(database, FIREBASE_COLLECTION.THONG_TIN_CD);
