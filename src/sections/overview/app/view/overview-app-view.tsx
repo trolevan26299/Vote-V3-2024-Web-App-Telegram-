@@ -15,6 +15,7 @@ import { styles } from '../styles';
 
 export default function OverviewAppView() {
   const { user } = useUser();
+  console.log('userId Access:', user);
   return (
     <Container sx={{ maxWidth: '100% !important' }}>
       <Grid container spacing={3}>
