@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef } from 'react';
+import { PATH_AFTER_LOGIN } from 'src/config-global';
 import { paths } from 'src/routes/paths';
 import { useTelegram } from 'src/telegram/telegram.provider';
 import { useRouter } from '../../routes/hooks/index';
@@ -9,18 +10,24 @@ type Props = {
 
 export default function AuthGuard({ children }: Props) {
   const router = useRouter();
-  const [checked, setChecked] = useState(false);
   const userAccess = useTelegram();
 
+  const checked = useRef<boolean>(false);
+
   useEffect(() => {
-    console.log('userAccess:', userAccess?.user?.id);
+    const storedChecked = localStorage.getItem('checked');
+
+    checked.current = storedChecked ? JSON.parse(storedChecked) : false;
+
     if (userAccess?.user?.id) {
-      setChecked(true);
+      localStorage.setItem('checked', JSON.stringify(true));
+    } else if (checked.current === true) {
+      router.push(PATH_AFTER_LOGIN);
     } else {
       router.replace(paths.auth.jwt.login);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [checked]);
 
   if (!checked) {
     return null;

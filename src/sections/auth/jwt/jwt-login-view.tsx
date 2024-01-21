@@ -62,12 +62,13 @@ export default function JwtLoginView() {
   // const checkLogin =
   const onSubmit = handleSubmit(async (data) => {
     try {
-      // if (data.email === defaultValues.email && data.password === defaultValues.password) {
-      router.push(PATH_AFTER_LOGIN);
-      // } else {
-      //   reset();
-      //   setErrorMsg('Invalid email or password');
-      // }
+      if (data.email === defaultValues.email && data.password === defaultValues.password) {
+        localStorage.setItem('checked', JSON.stringify(true));
+        router.push(PATH_AFTER_LOGIN);
+      } else {
+        reset();
+        setErrorMsg('Invalid email or password');
+      }
     } catch (error) {
       console.error(error);
       reset();
