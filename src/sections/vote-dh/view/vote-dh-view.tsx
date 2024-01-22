@@ -11,7 +11,8 @@ import {
   Typography,
 } from '@mui/material';
 import { alpha, useTheme } from '@mui/material/styles';
-import { DataSnapshot, onValue, ref } from 'firebase/database';
+import { DataSnapshot, child, onValue, push, ref, set, update } from 'firebase/database';
+import { enqueueSnackbar } from 'notistack';
 import { useEffect, useState } from 'react';
 import CustomBreadcrumbs from 'src/components/custom-breadcrumbs';
 import { useSettingsContext } from 'src/components/settings';
@@ -19,6 +20,9 @@ import { FIREBASE_COLLECTION } from 'src/constant/firebase_collection.constant';
 import { database } from 'src/firebase/firebase.config';
 import { useUser } from 'src/firebase/user_accesss_provider';
 import { IHistorySendPoll, IQuestion } from 'src/types/setting';
+import { IHistoryVoted, ISelectedAnswer } from 'src/types/votedh.types';
+import { convertToMilliseconds } from 'src/utils/convertTimeStringToMiliSeconds';
+import { currentTimeUTC7 } from 'src/utils/currentTimeUTC+7';
 import { bgGradient } from '../../../theme/css';
 import VoteDHTable from '../vote-dh-table';
 
@@ -26,27 +30,150 @@ export default function VoteDHView() {
   const settings = useSettingsContext();
   const theme = useTheme();
   const { user } = useUser();
-  const [value, setValue] = useState('yes');
-  // Handle change form
 
   // LIST DATA SEND POLL FROM FIREBASE
+
   const [historySendPollData, setHistorySendPollData] = useState<IHistorySendPoll[]>([]);
   const [danhSachPollData, setDanhSachPollData] = useState<IQuestion[]>([]);
+  const [selectedAnswers, setSelectedAnswers] = useState<ISelectedAnswer[]>([]);
+  const [listHistoryVoted, setListHistoryVoted] = useState<IHistoryVoted[]>([]);
 
-  console.log('----------history-send-poll-data', historySendPollData);
-  console.log('----------danhSachPollData', danhSachPollData);
+  const handleChange = (
+    event: React.ChangeEvent<HTMLInputElement>,
+    questionKey: string,
+    key_history_send_poll: string
+  ) => {
+    const selectedAnswerId = (event.target as HTMLInputElement).value;
 
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setValue((event.target as HTMLInputElement).value);
+    // Kiểm tra xem ý kiến này đã được chọn trước đó hay chưa
+    const existingAnswerIndex = selectedAnswers.findIndex(
+      (answer) => answer.key_question === questionKey
+    );
+
+    // Nếu đã chọn, cập nhật giá trị mới
+    if (existingAnswerIndex !== -1) {
+      const updatedSelectedAnswers = [...selectedAnswers];
+      updatedSelectedAnswers[existingAnswerIndex].answer_select_id = selectedAnswerId;
+      updatedSelectedAnswers[existingAnswerIndex].time_voted = currentTimeUTC7;
+      updatedSelectedAnswers[existingAnswerIndex].key_history_send_poll = key_history_send_poll;
+      setSelectedAnswers(updatedSelectedAnswers);
+    } else {
+      // Nếu chưa chọn, thêm vào danh sách
+      setSelectedAnswers((prevSelectedAnswers) => [
+        ...prevSelectedAnswers,
+        {
+          key_question: questionKey,
+          answer_select_id: selectedAnswerId,
+          time_voted: currentTimeUTC7,
+          key_history_send_poll,
+        },
+      ]);
+    }
   };
 
+  // LIST POLL QUESTION SATISFIED
   const filteredData = historySendPollData.filter((item) => {
-    if (item.gui_den) {
-      return item.gui_den.some((den) => den.ma_cd === user?.ma_cd && den.status === 'sent');
+    // Kiểm tra xem item có thuộc tính gui_den và thoi_gian_ket_thuc hay không
+    if (item.gui_den && item.thoi_gian_ket_thuc) {
+      // Chuyển đổi item.thoi_gian_ket_thuc thành số mili giây
+      const endTime = convertToMilliseconds(item.thoi_gian_ket_thuc);
+      // Chuyển đổi currentTimeUTC7 thành số mili giây
+      const currentUTC7Date = convertToMilliseconds(currentTimeUTC7);
+      // So sánh endTime và currentUTC7Date
+      if (endTime > currentUTC7Date) {
+        // Lọc qua mảng item.gui_den và trả về những phần tử có ma_cd bằng user?.ma_cd và status bằng 'sent'
+        return (
+          item.gui_den.filter((den) => den.ma_cd === user?.ma_cd && den.status === 'sent').length >
+          0
+        );
+      }
     }
-    return [];
+    // Nếu không thỏa mãn điều kiện, trả về false
+    return false;
   });
-  console.log('filteredData:', filteredData);
+
+  // Tổng số câu hỏi mà user sẽ phải trả lời
+  const numberQuestionNoVote = filteredData.reduce(
+    (total, item) => total + (item?.ds_poll_id?.length ?? 0),
+    0
+  );
+
+  const updateHistorySendPoll = async () => {
+    // update lịch sử gửi poll khi gửi ý kiến thành công
+    // status : sent => voted
+    // Tạo mảng mới với dữ liệu đã được cập nhật
+    const updatedFilteredData = filteredData.map((item) => {
+      // Kiểm tra xem item có thuộc tính gui_den hay không
+      if (item.gui_den) {
+        // Lọc qua mảng item.gui_den và tìm đến object có ma_cd === user?.ma_cd
+        const updatedGuiDen = item.gui_den.map((den) => {
+          // Nếu ma_cd trùng với user?.ma_cd, thì cập nhật thuộc tính status thành 'voted'
+          if (den.ma_cd === user?.ma_cd) {
+            return { ...den, status: 'voted' };
+          }
+          // Nếu ma_cd không trùng, giữ nguyên object
+          return den;
+        });
+
+        // Trả về một bản sao của item với gui_den đã được cập nhật
+        return { ...item, gui_den: updatedGuiDen };
+      }
+
+      // Nếu item không có gui_den, giữ nguyên item
+      return item;
+    });
+
+    const historySendVoteRef = ref(database, 'poll_process/ls_gui_poll');
+
+    // Sử dụng Promise.all để chờ tất cả các phần tử trong mảng được cập nhật
+    await Promise.all(
+      updatedFilteredData.map(async (item) => {
+        // Kiểm tra xem item có thuộc tính key hay không
+        if (item.key) {
+          // Tạo đường dẫn đến item cần cập nhật
+          const itemRef = child(historySendVoteRef, item.key);
+
+          // Cập nhật dữ liệu trong Firebase Realtime Database
+          await update(itemRef, item);
+        }
+      })
+    );
+
+    // In ra mảng updatedFilteredData để kiểm tra
+    console.log('Updated filteredData:', updatedFilteredData);
+  };
+
+  console.log(
+    'listHistoryVoted:',
+    listHistoryVoted.find((item) => item.ma_cd === user?.ma_cd)
+  );
+
+  const handleSubmitVote = async () => {
+    const dataExist =
+      listHistoryVoted.length > 0
+        ? listHistoryVoted.find((item) => item?.ma_cd === user?.ma_cd)
+        : undefined; // Tìm xem đã gửi voted lần nào chưa
+    const historyVotedRef = ref(
+      database,
+      `poll_process/ls_poll/${dataExist ? dataExist?.key : ''}`
+    ); // nếu có rồi đổi ref để chỉnh sửa , nếu chưa ref để thêm mới
+
+    const newRef = push(historyVotedRef);
+
+    await set(dataExist ? historyVotedRef : newRef, {
+      ma_cd: user?.ma_cd,
+      detail: dataExist ? [...dataExist.detail, ...selectedAnswers] : selectedAnswers,
+    })
+      .then(() => {
+        updateHistorySendPoll();
+        enqueueSnackbar('Gửi ý kiến thành công  !', { variant: 'success' });
+      })
+      .catch((error) => {
+        enqueueSnackbar('Gửi ý kiến lỗi !', { variant: 'error' });
+        console.log('Error saving data:', error);
+      });
+  };
+  // GET DATA FROM FIREBASE
   useEffect(() => {
     const userRef = ref(database, FIREBASE_COLLECTION.POLL_PROCESS);
     const onDataChange = (snapshot: DataSnapshot) => {
@@ -54,6 +181,7 @@ export default function VoteDHView() {
       if (dataSnapShot) {
         const ls_gui_poll = snapshot.val().ls_gui_poll ?? {};
         const danh_sach_poll = snapshot.val().danh_sach_poll ?? {};
+        const ls_poll = snapshot.val().ls_poll ?? {};
         const listHistorySendPoll = Object.keys(ls_gui_poll).map((key) => ({
           key,
           ...snapshot.val().ls_gui_poll[key],
@@ -62,8 +190,14 @@ export default function VoteDHView() {
           key,
           ...snapshot.val().danh_sach_poll[key],
         }));
+        const lsVoted = Object.keys(ls_poll).map((key) => ({
+          key,
+          ...snapshot.val().ls_poll[key],
+        }));
+
         setHistorySendPollData(listHistorySendPoll);
         setDanhSachPollData(listPoll);
+        setListHistoryVoted(lsVoted);
       }
     };
     const unsubscribe = onValue(userRef, onDataChange);
@@ -97,64 +231,101 @@ export default function VoteDHView() {
           borderRadius: '10px',
         }}
       >
-        {filteredData.map((item) => (
+        {filteredData.map(
+          (item) =>
+            item.ds_poll_id?.map((item2) => (
+              <Box
+                className="box_form"
+                sx={{
+                  ...bgGradient({
+                    direction: '135deg',
+                    startColor: alpha(theme.palette.primary.light, 0.2),
+                    endColor: alpha(theme.palette.primary.main, 0.2),
+                  }),
+                  padding: '10px',
+                  borderRadius: '10px',
+                }}
+              >
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: '30px' }}>
+                  <FormControl>
+                    <Box marginBottom={1.5}>
+                      <Typography sx={{ fontSize: '18px', fontWeight: '600' }}>
+                        {danhSachPollData.find((item3) => item3.key === item2.key)?.ten_poll}
+                      </Typography>
+                      <Typography>
+                        Nội dung :{' '}
+                        {danhSachPollData.find((item3) => item3.key === item2.key)?.noi_dung}{' '}
+                      </Typography>
+                    </Box>
+                    <Box
+                      className="box_answer"
+                      sx={{
+                        display: 'flex',
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        gap: '30px',
+                      }}
+                    >
+                      <Typography sx={{ fontSize: '16px', fontWeight: 'bold' }}>
+                        Ý kiến của bạn :
+                      </Typography>
+                      <RadioGroup
+                        aria-labelledby="demo-controlled-radio-buttons-group"
+                        name="controlled-radio-buttons-group"
+                        value={
+                          selectedAnswers.find(
+                            (itemSelectAnswer) => itemSelectAnswer.key_question === item2.key
+                          )?.answer_select_id || ''
+                        }
+                        onChange={(event) =>
+                          handleChange(event, item2.key as string, item.key as string)
+                        }
+                        sx={{ display: 'flex', flexDirection: 'row' }}
+                      >
+                        {danhSachPollData
+                          .find((item3) => item3.key === item2.key)
+                          ?.dap_an?.map((itemAnswer) => (
+                            <FormControlLabel
+                              key={itemAnswer.id}
+                              value={itemAnswer.id}
+                              control={<Radio />}
+                              label={itemAnswer.vi}
+                            />
+                          ))}
+                      </RadioGroup>
+                    </Box>
+                  </FormControl>
+                </Box>
+              </Box>
+            ))
+        )}
+        {filteredData.length > 0 ? (
+          <Button
+            variant="contained"
+            sx={{ width: { sx: '100%', md: '10%' } }}
+            onClick={() => handleSubmitVote()}
+            disabled={numberQuestionNoVote !== selectedAnswers.length}
+          >
+            Gửi ý kiến
+          </Button>
+        ) : (
           <Box
-            className="box_form"
             sx={{
-              ...bgGradient({
-                direction: '135deg',
-                startColor: alpha(theme.palette.primary.light, 0.2),
-                endColor: alpha(theme.palette.primary.main, 0.2),
-              }),
-              padding: '10px',
-              borderRadius: '10px',
+              width: 1,
+              height: '100px',
+              display: 'flex',
+              flexDirection: 'row',
+              justifyContent: 'center',
+              alignItems: 'center',
             }}
           >
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: '30px' }}>
-              {item.ds_poll_id?.map((item2) => (
-                <FormControl>
-                  <Box marginBottom={1.5}>
-                    <Typography sx={{ fontSize: '18px', fontWeight: '600' }}>
-                      {danhSachPollData.find((item3) => item3.key === item2.key)?.ten_poll}
-                    </Typography>
-                    <Typography>Nội dung : Thông qua quy chế làm việc của Đại Hội </Typography>
-                  </Box>
-                  <Box
-                    className="box_answer"
-                    sx={{
-                      display: 'flex',
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      gap: '30px',
-                    }}
-                  >
-                    <Typography sx={{ fontSize: '16px', fontWeight: 'bold' }}>
-                      Ý kiến của bạn :
-                    </Typography>
-                    <RadioGroup
-                      aria-labelledby="demo-controlled-radio-buttons-group"
-                      name="controlled-radio-buttons-group"
-                      value={value}
-                      onChange={handleChange}
-                      sx={{ display: 'flex', flexDirection: 'row' }}
-                    >
-                      <FormControlLabel value="yes" control={<Radio />} label="Tán Thành" />
-                      <FormControlLabel value="no" control={<Radio />} label="Không tán thành" />
-                    </RadioGroup>
-                  </Box>
-                </FormControl>
-              ))}
-            </Box>
+            <Typography sx={{ fontWeight: 'bold' }}>Không có câu hỏi cần trả lời</Typography>
           </Box>
-        ))}
-
-        <Button variant="contained" sx={{ width: { sx: '100%', md: '10%' } }}>
-          Gửi ý kiến
-        </Button>
+        )}
       </Box>
       <Box className="vote-history-table" sx={{ marginTop: '50px' }}>
         <Typography variant="h6" sx={{ pb: '10px' }}>
-          Lịch Sử Bỏ Phiếu
+          Lịch Sử Bỏ Phiếu Của Bạn :
         </Typography>
         <VoteDHTable
           tableData={[
@@ -166,9 +337,9 @@ export default function VoteDHView() {
             { content: 'Bạn có đồng ý với .......?', opinion: 'Tán thành', status: 'Thành công' },
           ]}
           tableLabels={[
+            { id: 'question', label: 'Câu hỏi' },
             { id: 'content', label: 'Nội dung' },
-            { id: 'opinion', label: 'Ý kiến' },
-            { id: 'status', label: 'Trạng Thái', align: 'center' },
+            { id: 'answer', label: 'Câu trả lời', align: 'center' },
           ]}
         />
       </Box>
