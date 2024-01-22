@@ -12,19 +12,18 @@ import InputAdornment from '@mui/material/InputAdornment';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 // routes
-import { useRouter, useSearchParams } from 'src/routes/hooks';
+import { useRouter } from 'src/routes/hooks';
 // config
 import { PATH_AFTER_LOGIN } from 'src/config-global';
 // hooks
 import { useBoolean } from 'src/hooks/use-boolean';
 // auth
-import { useAuthContext } from 'src/auth/hooks';
 // s
+import { get, ref } from 'firebase/database';
 import FormProvider, { RHFTextField } from 'src/components/hook-form';
 import Iconify from 'src/components/iconify';
-import { get, ref } from 'firebase/database';
-import { database } from 'src/firebase/firebase.config';
 import { FIREBASE_COLLECTION } from 'src/constant/firebase_collection.constant';
+import { database } from 'src/firebase/firebase.config';
 
 // ----------------------------------------------------------------------
 
@@ -34,22 +33,16 @@ interface IAccountManager {
 }
 
 export default function JwtLoginView() {
-  const { login } = useAuthContext();
-
   const router = useRouter();
 
   const [errorMsg, setErrorMsg] = useState('');
 
   const [accountManager, setAccountManager] = useState<IAccountManager>();
 
-  const searchParams = useSearchParams();
-
-  const returnTo = searchParams.get('returnTo');
-
   const password = useBoolean();
 
   const LoginSchema = Yup.object().shape({
-    userName: Yup.string().required('Email is required'),
+    userName: Yup.string().required('UserName is required'),
     password: Yup.string().required('Password is required'),
   });
 

@@ -98,7 +98,11 @@ export default function SendVoteView() {
     const newRef = push(historySendVoteRef);
     await set(newRef, {
       ds_poll_id: answerSelect.map((item) => ({ key: item.key, ten_poll: item.ten_poll })),
-      gui_den: shareHolderSelect.map((item) => ({ ma_cd: item.ma_cd, ten_cd: item.ten_cd })),
+      gui_den: shareHolderSelect.map((item) => ({
+        ma_cd: item.ma_cd,
+        ten_cd: item.ten_cd,
+        status: 'sent',
+      })),
       is_active: true,
       thoi_gian_gui: currentTimeUTC7,
       thoi_gian_ket_thuc: ExpireTimeFunc(currentTimeUTC7, expireTime),
@@ -163,7 +167,6 @@ export default function SendVoteView() {
 
           // Convert the object into an array
           const sharesHoldersArray = Object.values(data);
-          console.log('Shares Holders Array:', sharesHoldersArray);
 
           setListSharesHolders(sharesHoldersArray as IUserAccess[]);
         } else {

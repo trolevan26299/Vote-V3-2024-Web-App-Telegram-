@@ -20,6 +20,7 @@ export interface IListPollHistorySendVote {
 export interface IListSender {
   ma_cd?: string;
   ten_cd?: string;
+  status?: string;
 }
 
 export interface IHistorySendPoll {
