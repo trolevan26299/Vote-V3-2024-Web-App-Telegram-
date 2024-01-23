@@ -11,9 +11,10 @@ import Scrollbar from 'src/components/scrollbar';
 import { TableHeadCustom } from 'src/components/table';
 
 type RowProps = {
-  content: string;
-  opinion: string;
-  status: string;
+  question?: string;
+  content?: string;
+  answer?: string;
+  time?: string;
 };
 
 interface Props extends CardProps {
@@ -49,11 +50,12 @@ type VoteDHTableRowProps = {
 function VoteDHTableRow({ row }: VoteDHTableRowProps) {
   return (
     <TableRow>
-      <TableCell align="left">{row.content}</TableCell>
+      <TableCell>{row?.question}</TableCell>
+      <TableCell>{row?.content}</TableCell>
 
-      <TableCell>{row.opinion}</TableCell>
+      <TableCell>{row?.answer}</TableCell>
 
-      <TableCell align="center">{row.status}</TableCell>
+      <TableCell>{row?.time}</TableCell>
     </TableRow>
   );
 }

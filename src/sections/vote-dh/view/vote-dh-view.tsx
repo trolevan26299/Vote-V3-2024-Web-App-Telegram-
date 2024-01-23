@@ -19,6 +19,8 @@ import { useSettingsContext } from 'src/components/settings';
 import { FIREBASE_COLLECTION } from 'src/constant/firebase_collection.constant';
 import { database } from 'src/firebase/firebase.config';
 import { useUser } from 'src/firebase/user_accesss_provider';
+import { useRouter } from 'src/routes/hooks';
+import { paths } from 'src/routes/paths';
 import { IHistorySendPoll, IQuestion } from 'src/types/setting';
 import { IHistoryVoted, ISelectedAnswer } from 'src/types/votedh.types';
 import { convertToMilliseconds } from 'src/utils/convertTimeStringToMiliSeconds';
@@ -30,7 +32,7 @@ export default function VoteDHView() {
   const settings = useSettingsContext();
   const theme = useTheme();
   const { user } = useUser();
-
+  const router = useRouter();
   // LIST DATA SEND POLL FROM FIREBASE
 
   const [historySendPollData, setHistorySendPollData] = useState<IHistorySendPoll[]>([]);
@@ -38,6 +40,21 @@ export default function VoteDHView() {
   const [selectedAnswers, setSelectedAnswers] = useState<ISelectedAnswer[]>([]);
   const [listHistoryVoted, setListHistoryVoted] = useState<IHistoryVoted[]>([]);
 
+  const arrayDataHistoryVoted = (
+    listHistoryVoted.find((item) => item.ma_cd === user?.ma_cd)?.detail || []
+  ).map((item) => {
+    const pollInfo = danhSachPollData.find((poll) => poll.key === item.key_question) || {};
+    const { ten_poll, noi_dung, dap_an } = pollInfo;
+
+    return {
+      question: ten_poll,
+      content: noi_dung,
+      answer: dap_an?.find((dap_an_item) => dap_an_item.id === Number(item.answer_select_id))?.vi,
+      time: item.time_voted,
+    };
+  });
+
+  // handle change form
   const handleChange = (
     event: React.ChangeEvent<HTMLInputElement>,
     questionKey: string,
@@ -135,18 +152,11 @@ export default function VoteDHView() {
 
           // Cập nhật dữ liệu trong Firebase Realtime Database
           await update(itemRef, item);
+          router.push(paths.dashboard.process.dh);
         }
       })
     );
-
-    // In ra mảng updatedFilteredData để kiểm tra
-    console.log('Updated filteredData:', updatedFilteredData);
   };
-
-  console.log(
-    'listHistoryVoted:',
-    listHistoryVoted.find((item) => item.ma_cd === user?.ma_cd)
-  );
 
   const handleSubmitVote = async () => {
     const dataExist =
@@ -328,18 +338,12 @@ export default function VoteDHView() {
           Lịch Sử Bỏ Phiếu Của Bạn :
         </Typography>
         <VoteDHTable
-          tableData={[
-            { content: 'Bạn có đồng ý với .......?', opinion: 'Tán thành', status: 'Thành công' },
-            { content: 'Bạn có đồng ý với .......?', opinion: 'Tán thành', status: 'Thành công' },
-            { content: 'Bạn có đồng ý với .......?', opinion: 'Tán thành', status: 'Thành công' },
-            { content: 'Bạn có đồng ý với .......?', opinion: 'Tán thành', status: 'Thành công' },
-            { content: 'Bạn có đồng ý với .......?', opinion: 'Tán thành', status: 'Thành công' },
-            { content: 'Bạn có đồng ý với .......?', opinion: 'Tán thành', status: 'Thành công' },
-          ]}
+          tableData={arrayDataHistoryVoted}
           tableLabels={[
             { id: 'question', label: 'Câu hỏi' },
             { id: 'content', label: 'Nội dung' },
-            { id: 'answer', label: 'Câu trả lời', align: 'center' },
+            { id: 'answer', label: 'Câu trả lời' },
+            { id: 'time_send_vote', label: 'Thời gian gửi' },
           ]}
         />
       </Box>
