@@ -10,3 +10,8 @@ export type IHistoryVoted = {
   ma_cd: string;
   detail: ISelectedAnswer[];
 };
+
+export type IDataQuestionSelect = {
+  key: string;
+  ten_poll: string;
+};
