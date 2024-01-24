@@ -31,14 +31,12 @@ interface left_chart {
 }
 interface Props {
   percentSendPollData: number;
-  questionSelect: string;
   pollDataByKey?: IQuestion;
   listResultByQuestion?: ISelectedAnswer[];
 }
 
 export default function DHContentLeft({
   percentSendPollData,
-  questionSelect,
   pollDataByKey,
   listResultByQuestion,
 }: Props) {

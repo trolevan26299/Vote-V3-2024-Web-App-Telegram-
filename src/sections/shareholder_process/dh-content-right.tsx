@@ -2,6 +2,8 @@ import { Box, LinearProgress, Stack, Typography } from '@mui/material';
 import { alpha, useTheme } from '@mui/material/styles';
 import { ApexOptions } from 'apexcharts';
 import Chart, { useChart } from 'src/components/chart';
+import { IQuestion, IHistorySendPoll } from 'src/types/setting';
+import { ISelectedAnswer } from 'src/types/votedh.types';
 import { fNumber } from 'src/utils/format-number';
 import { bgGradient } from '../../theme/css';
 
@@ -13,15 +15,69 @@ interface chart {
   }[];
   options?: ApexOptions;
 }
-export default function DHContentRight() {
+
+interface Props {
+  historySendPollData?: IHistorySendPoll[];
+  pollDataByKey?: IQuestion;
+  listResultByQuestion?: ISelectedAnswer[];
+  questionSelect?: string;
+}
+
+export default function DHContentRight({
+  historySendPollData,
+  pollDataByKey,
+  listResultByQuestion,
+  questionSelect,
+}: Props) {
   const theme = useTheme();
+
+  // ------------------ LOGIC tính đã gửi câu hỏi select đến bao nhiêu người và không được trùng lặp số người
+  const filteredArray =
+    historySendPollData &&
+    historySendPollData.filter(
+      (obj) => obj.ds_poll_id?.some((item) => item.key === questionSelect)
+    );
+
+  // Bạn tạo một Set để lưu trữ các ma_cd đã xuất hiện
+  const seenMaCd: string[] = [];
+
+  // Bạn sử dụng phương thức reduce() để tính toán kết quả
+  const totalUserReceivedQuestion =
+    (filteredArray &&
+      filteredArray
+        .flatMap((obj) => obj.gui_den) // Chuyển mảng 2D thành mảng 1D
+        .filter((item) => {
+          // Nếu ma_cd đã xuất hiện, bỏ qua phần tử này
+          if (seenMaCd.includes(item?.ma_cd as string)) {
+            return false;
+          }
+          // Nếu chưa xuất hiện, thêm ma_cd vào mảng và giữ lại phần tử này
+          seenMaCd.push(item?.ma_cd as string);
+          return true;
+        }).length) ||
+    0;
+
+  console.log('result:', totalUserReceivedQuestion);
+  // ------------------ END LOGIC tính đã gửi câu hỏi select đến bao nhiêu người và không được trùng lặp số
+
   const chart: chart = {
-    series: [
-      { label: 'Tán thành', value: 500 },
-      { label: 'Không tán thành', value: 200 },
-      { label: 'Chưa bình chọn', value: 448 },
-    ],
+    series:
+      (pollDataByKey &&
+        pollDataByKey?.dap_an?.map((item) => ({
+          label: item?.vi || '',
+          value:
+            (listResultByQuestion &&
+              listResultByQuestion.filter((item2) => item2?.answer_select_id === String(item?.id))
+                .length) ||
+            0,
+        }))) ||
+      [],
   };
+
+  // Tính tổng value trong mảng
+  const totalValue = chart.series.reduce((sum, item) => sum + item.value, 0);
+  chart.series.push({ label: 'Chưa bình chọn', value: totalUserReceivedQuestion - totalValue });
+
   const { series, colors, options } = chart;
   const chartSeries = series.map((i) => i.value);
 
@@ -38,7 +94,7 @@ export default function DHContentRight() {
     },
     plotOptions: {
       bar: {
-        horizontal: true,
+        horizontal: false,
         barHeight: '28%',
         borderRadius: 2,
       },

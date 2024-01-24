@@ -60,6 +60,7 @@ export default function ProcessDHView() {
     SetQuestionSelect(event.target.value);
   };
 
+  console.log('history send poll data:', historySendPollData);
   // Tiến trình gửi : hàm check xem câu hỏi được select đã gửi đến bao nhiêu người rồi ,và thấy thông tin những người được gửi không trùng nhau
   const numberProcessSendPoll = () => {
     const newArray: IListSender[] = [];
@@ -218,14 +219,18 @@ export default function ProcessDHView() {
           <Grid item xs={12} md={6} lg={6}>
             <DHContentLeft
               percentSendPollData={percentSendPollData}
-              questionSelect={questionSelect}
               pollDataByKey={danhSachPollData.find((poll) => poll.key === questionSelect)}
               listResultByQuestion={listResultByQuestion}
             />
           </Grid>
 
           <Grid item xs={12} md={6} lg={6}>
-            <DHContentRight />
+            <DHContentRight
+              pollDataByKey={danhSachPollData.find((poll) => poll.key === questionSelect)}
+              listResultByQuestion={listResultByQuestion}
+              historySendPollData={historySendPollData}
+              questionSelect={questionSelect}
+            />
           </Grid>
           <Grid item xs={12} md={12} lg={12}>
             <DHContentTable
