@@ -109,6 +109,8 @@ export default function VoteDHView() {
     return false;
   });
 
+  console.log('------------------filtered data------------------ :', filteredData);
+
   // Tổng số câu hỏi mà user sẽ phải trả lời
   const numberQuestionNoVote = filteredData.reduce(
     (total, item) => total + (item?.ds_poll_id?.length ?? 0),
