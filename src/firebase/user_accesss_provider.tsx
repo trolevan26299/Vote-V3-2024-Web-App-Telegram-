@@ -37,10 +37,10 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
       try {
         const snapshot = await get(userRef);
 
+        console.log('------------snapshot: ', snapshot);
         if (snapshot.exists()) {
           // Lặp qua từng đối tượng trong collection
           snapshot.forEach((childSnapshot) => {
-            console.log('------------childSnapshot: ', childSnapshot);
             const data = childSnapshot.val();
             if (data && data.telegram_id === userAccess) {
               setUser(data);
@@ -57,8 +57,8 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     };
 
     fetchData();
-    // }, [userAccess]);
-  }, []);
+  }, [userAccess]);
+  // }, []);
 
   const value = useMemo(() => ({ user }), [user]);
 
