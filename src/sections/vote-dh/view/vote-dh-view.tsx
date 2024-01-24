@@ -100,13 +100,13 @@ export default function VoteDHView() {
       if (endTime > currentUTC7Date) {
         // Lọc qua mảng item.gui_den và trả về những phần tử có ma_cd bằng user?.ma_cd và status bằng 'sent'
         return (
-          item.gui_den.filter((den) => den.ma_cd === user?.ma_cd && den.status === 'sent').length >
+          item.gui_den.filter((den) => den.ma_cd === user?.ma_cd && den.status !== 'voted').length >
           0
         );
       }
     }
-    // Nếu không thỏa mãn điều kiện, trả về false
-    return false;
+    // Nếu không thỏa mãn điều kiện, trả về array
+    return [];
   });
 
   console.log('------------------filtered data------------------ :', filteredData);
