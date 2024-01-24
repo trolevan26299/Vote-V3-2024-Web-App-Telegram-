@@ -40,6 +40,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
         if (snapshot.exists()) {
           // Lặp qua từng đối tượng trong collection
           snapshot.forEach((childSnapshot) => {
+            console.log('------------childSnapshot: ', childSnapshot);
             const data = childSnapshot.val();
             if (data && data.telegram_id === userAccess) {
               setUser(data);
