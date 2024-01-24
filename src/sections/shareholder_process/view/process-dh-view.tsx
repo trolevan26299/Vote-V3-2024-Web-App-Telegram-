@@ -2,7 +2,6 @@
 
 import {
   Alert,
-  AlertTitle,
   Box,
   Container,
   FormControl,
@@ -14,13 +13,13 @@ import {
   Typography,
 } from '@mui/material';
 import { alpha, useTheme } from '@mui/material/styles';
-import { DataSnapshot, onValue, ref } from 'firebase/database';
+import { DataSnapshot, get, onValue, ref } from 'firebase/database';
 import { useEffect, useState } from 'react';
 import CustomBreadcrumbs from 'src/components/custom-breadcrumbs';
 import { useSettingsContext } from 'src/components/settings';
 import { FIREBASE_COLLECTION } from 'src/constant/firebase_collection.constant';
 import { database } from 'src/firebase/firebase.config';
-import { IHistorySendPoll, IQuestion } from 'src/types/setting';
+import { IHistorySendPoll, IListSender, IQuestion } from 'src/types/setting';
 import { IDataQuestionSelect, IHistoryVoted } from 'src/types/votedh.types';
 import { bgGradient } from '../../../theme/css';
 import DHContentLeft from '../dh-content-left';
@@ -35,6 +34,7 @@ export default function ProcessDHView() {
   const [historySendPollData, setHistorySendPollData] = useState<IHistorySendPoll[]>([]);
   const [danhSachPollData, setDanhSachPollData] = useState<IQuestion[]>([]);
   const [listHistoryVoted, setListHistoryVoted] = useState<IHistoryVoted[]>([]);
+  const [totalSharesHolder, setTotalSharesHolder] = useState<number>(0);
 
   // CODE FOR SELECT QUESTION FROM FIREBASE
   const existingKeys = new Set<string>();
@@ -55,13 +55,58 @@ export default function ProcessDHView() {
 
   // CODE FOR SELECT QUESTION
   // Handle select question
-  const [questionSelect, SetQuestionSelect] = useState<string>(questionSelectData[0]?.key);
+  const [questionSelect, SetQuestionSelect] = useState<string>(questionSelectData[0]?.key || '');
   const handleChangeSelectQuestion = (event: SelectChangeEvent) => {
     SetQuestionSelect(event.target.value);
   };
-  console.log('questionSelect : ', questionSelect);
+
+  // Tiến trình gửi : hàm check xem câu hỏi được select đã gửi đến bao nhiêu người rồi ,và thấy thông tin những người được gửi không trùng nhau
+  const numberProcessSendPoll = () => {
+    const newArray: IListSender[] = [];
+
+    historySendPollData.forEach((item) => {
+      // Lọc qua từng phần tử và chấm đến thuộc tính ds_poll_id
+      const dsPollIdArray = item.ds_poll_id || [];
+
+      dsPollIdArray.forEach((dsPollItem) => {
+        // Kiểm tra nếu có object nào có key === questionSelect
+        if (dsPollItem.key === questionSelect) {
+          // Chấm đến thuộc tính gui_den và lọc để kiểm tra sự tồn tại
+          const guiDenArray = item.gui_den || [];
+          let isExisting = false;
+
+          guiDenArray.forEach((guiDenItem) => {
+            if (newArray.some((i) => i.ma_cd === guiDenItem.ma_cd)) {
+              isExisting = true;
+            }
+          });
+
+          // Nếu không tồn tại thì thêm vào mảng mới
+          if (!isExisting) {
+            newArray.push(...guiDenArray);
+          }
+        }
+      });
+    });
+
+    return newArray;
+  };
+  const numberSendPoll = numberProcessSendPoll();
+  const percentSendPollData = ((numberSendPoll.length || 0) / totalSharesHolder) * 100;
+
+  // List result by question
+  const listResultByQuestion = [];
+  // eslint-disable-next-line no-restricted-syntax
+  for (const obj of listHistoryVoted) {
+    // Bạn lọc các object trong thuộc tính detail theo điều kiện của bạn
+    const filteredArray = obj.detail.filter((item) => item.key_question === questionSelect);
+
+    // Bạn push các object trong filteredArray vào result
+    listResultByQuestion.push(...filteredArray);
+  }
 
   useEffect(() => {
+    // get data từ firebase realtime
     const userRef = ref(database, FIREBASE_COLLECTION.POLL_PROCESS);
     const onDataChange = (snapshot: DataSnapshot) => {
       const dataSnapShot = snapshot.exists();
@@ -92,6 +137,28 @@ export default function ProcessDHView() {
       // Detach the listener
       unsubscribe();
     };
+  }, []);
+
+  useEffect(() => {
+    // Get Data danh sách cổ đông không realtime
+    const userRef = ref(database, FIREBASE_COLLECTION.THONG_TIN_CD);
+    const fetchData = async () => {
+      try {
+        const snapshot = await get(userRef);
+        if (snapshot.exists()) {
+          const dataObject = snapshot.val();
+          const dataArray = Object.values(dataObject);
+          setTotalSharesHolder(dataArray.length);
+        } else {
+          console.log('No Data');
+        }
+      } catch (error) {
+        console.error('Error when get data:', error);
+      }
+    };
+
+    fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
@@ -149,7 +216,12 @@ export default function ProcessDHView() {
           sx={{ textAlign: 'center', paddingLeft: { xs: '0px', md: '0px' } }}
         >
           <Grid item xs={12} md={6} lg={6}>
-            <DHContentLeft />
+            <DHContentLeft
+              percentSendPollData={percentSendPollData}
+              questionSelect={questionSelect}
+              pollDataByKey={danhSachPollData.find((poll) => poll.key === questionSelect)}
+              listResultByQuestion={listResultByQuestion}
+            />
           </Grid>
 
           <Grid item xs={12} md={6} lg={6}>

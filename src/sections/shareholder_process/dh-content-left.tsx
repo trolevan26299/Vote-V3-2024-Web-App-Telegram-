@@ -4,6 +4,8 @@ import { useTheme, alpha, styled } from '@mui/material/styles';
 import Chart, { useChart } from 'src/components/chart';
 import { ApexOptions } from 'apexcharts';
 import { fNumber } from 'src/utils/format-number';
+import { IQuestion } from 'src/types/setting';
+import { ISelectedAnswer } from 'src/types/votedh.types';
 
 const CHART_HEIGHT = 400;
 const LEGEND_HEIGHT = 72;
@@ -27,15 +29,35 @@ interface left_chart {
   }[];
   options?: ApexOptions;
 }
+interface Props {
+  percentSendPollData: number;
+  questionSelect: string;
+  pollDataByKey?: IQuestion;
+  listResultByQuestion?: ISelectedAnswer[];
+}
 
-export default function DHContentLeft() {
+export default function DHContentLeft({
+  percentSendPollData,
+  questionSelect,
+  pollDataByKey,
+  listResultByQuestion,
+}: Props) {
   const theme = useTheme();
+  console.log('listResultByQuestion: ', listResultByQuestion);
+  console.log('poll data by key:', pollDataByKey);
 
   const chart: left_chart = {
-    series: [
-      { label: 'Tán thành', value: 70 },
-      { label: 'Không tán thành', value: 30 },
-    ],
+    series:
+      (pollDataByKey &&
+        pollDataByKey?.dap_an?.map((item) => ({
+          label: item?.vi || '',
+          value:
+            (listResultByQuestion &&
+              listResultByQuestion.filter((item2) => item2?.answer_select_id === String(item?.id))
+                .length) ||
+            0,
+        }))) ||
+      [],
   };
   const { series, colors, options } = chart;
   const chartSeries = series.map((i) => i.value);
@@ -100,12 +122,12 @@ export default function DHContentLeft() {
         <Stack key="success">
           <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 1 }}>
             <Box sx={{ typography: 'overline' }}>pending</Box>
-            <Box sx={{ typography: 'subtitle1' }}>50%</Box>
+            <Box sx={{ typography: 'subtitle1' }}>{percentSendPollData.toFixed(2)}%</Box>
           </Stack>
 
           <LinearProgress
             variant="determinate"
-            value={50}
+            value={percentSendPollData}
             sx={{
               height: 8,
               color: (theme3) => alpha(theme3.palette.primary.light, 0.2),
