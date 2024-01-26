@@ -27,9 +27,9 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   }, [telegramContext]);
 
   useEffect(() => {
-    const idTelegram = 6359530967; // Đặt giá trị idTelegram tùy theo nhu cầu của bạn
+    // const idTelegram = 6359530967; // Đặt giá trị idTelegram tùy theo nhu cầu của bạn
     const userRef = ref(database, FIREBASE_COLLECTION.THONG_TIN_CD);
-    // if (!userAccess) return;
+    if (!userAccess) return;
     const fetchData = async () => {
       try {
         const snapshot = await get(userRef);
@@ -38,7 +38,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
           // Lặp qua từng đối tượng trong collection
           snapshot.forEach((childSnapshot) => {
             const data = childSnapshot.val();
-            if (data && data.telegram_id === idTelegram) {
+            if (data && data.telegram_id === userAccess) {
               setUser(data);
               console.log(data);
             }
@@ -53,8 +53,8 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     };
 
     fetchData();
-    // }, [userAccess]);
-  }, []);
+  }, [userAccess]);
+  // }, []);
 
   const value = useMemo(() => ({ user }), [user]);
 

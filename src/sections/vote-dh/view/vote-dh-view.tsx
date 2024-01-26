@@ -96,17 +96,23 @@ export default function VoteDHView() {
       const endTime = convertToMilliseconds(item.thoi_gian_ket_thuc);
       // Chuyển đổi currentTimeUTC7 thành số mili giây
       const currentUTC7Date = convertToMilliseconds(currentTimeUTC7);
-      // So sánh endTime và currentUTC7Date
+
+      // Kiểm tra xem endTime có lớn hơn currentUTC7Date không
       if (endTime > currentUTC7Date) {
         // Lọc qua mảng item.gui_den và trả về những phần tử có ma_cd bằng user?.ma_cd và status bằng 'sent'
-        return (
-          item.gui_den.filter((den) => den.ma_cd === user?.ma_cd && den.status !== 'voted').length >
-          0
+        const filteredDen = item.gui_den.filter(
+          (den) => den.ma_cd === user?.ma_cd && den.status === 'sent'
         );
+
+        // Nếu có ít nhất một phần tử thỏa mãn điều kiện trong gui_den, trả về mảng đó
+        if (filteredDen.length > 0) {
+          return true;
+        }
       }
     }
-    // Nếu không thỏa mãn điều kiện, trả về array
-    return [];
+
+    // Nếu không thỏa mãn điều kiện hoặc không có phần tử nào thỏa mãn trong gui_den, trả về false
+    return false;
   });
 
   console.log('------------------filtered data------------------ :', filteredData);
