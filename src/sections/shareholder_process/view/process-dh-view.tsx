@@ -34,7 +34,7 @@ export default function ProcessDHView() {
   const [historySendPollData, setHistorySendPollData] = useState<IHistorySendPoll[]>([]);
   const [danhSachPollData, setDanhSachPollData] = useState<IQuestion[]>([]);
   const [listHistoryVoted, setListHistoryVoted] = useState<IHistoryVoted[]>([]);
-  const [totalSharesHolder, setTotalSharesHolder] = useState<number>(0);
+  const [totalSharesHolder, setTotalSharesHolder] = useState<any>([]);
 
   // CODE FOR SELECT QUESTION FROM FIREBASE
   const existingKeys = new Set<string>();
@@ -60,7 +60,6 @@ export default function ProcessDHView() {
     SetQuestionSelect(event.target.value);
   };
 
-  console.log('history send poll data:', historySendPollData);
   // Tiến trình gửi : hàm check xem câu hỏi được select đã gửi đến bao nhiêu người rồi ,và thấy thông tin những người được gửi không trùng nhau
   const numberProcessSendPoll = () => {
     const newArray: IListSender[] = [];
@@ -93,15 +92,15 @@ export default function ProcessDHView() {
     return newArray;
   };
   const numberSendPoll = numberProcessSendPoll();
-  const percentSendPollData = ((numberSendPoll.length || 0) / totalSharesHolder) * 100;
+  const percentSendPollData = ((numberSendPoll.length || 0) / totalSharesHolder.length) * 100;
 
   // List result by question
   const listResultByQuestion = [];
   // eslint-disable-next-line no-restricted-syntax
   for (const obj of listHistoryVoted) {
     // Bạn lọc các object trong thuộc tính detail theo điều kiện của bạn
-    const filteredArray = obj.detail.filter((item) => item.key_question === questionSelect);
-
+    let filteredArray = obj.detail.filter((item) => item.key_question === questionSelect);
+    filteredArray = filteredArray.map((item) => ({ ...item, ma_cd: obj.ma_cd }));
     // Bạn push các object trong filteredArray vào result
     listResultByQuestion.push(...filteredArray);
   }
@@ -149,7 +148,7 @@ export default function ProcessDHView() {
         if (snapshot.exists()) {
           const dataObject = snapshot.val();
           const dataArray = Object.values(dataObject);
-          setTotalSharesHolder(dataArray.length);
+          setTotalSharesHolder(dataArray);
         } else {
           console.log('No Data');
         }
@@ -221,6 +220,7 @@ export default function ProcessDHView() {
               percentSendPollData={percentSendPollData}
               pollDataByKey={danhSachPollData.find((poll) => poll.key === questionSelect)}
               listResultByQuestion={listResultByQuestion}
+              totalSharesHolder={totalSharesHolder}
             />
           </Grid>
 

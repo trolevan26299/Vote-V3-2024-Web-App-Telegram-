@@ -3,6 +3,7 @@ export type ISelectedAnswer = {
   key_history_send_poll: string;
   answer_select_id: string;
   time_voted: string;
+  ma_cd?: string;
 };
 
 export type IHistoryVoted = {

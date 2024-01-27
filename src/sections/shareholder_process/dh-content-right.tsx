@@ -30,13 +30,27 @@ export default function DHContentRight({
   questionSelect,
 }: Props) {
   const theme = useTheme();
-
   // ------------------ LOGIC tính đã gửi câu hỏi select đến bao nhiêu người và không được trùng lặp số người
   const filteredArray =
     historySendPollData &&
     historySendPollData.filter(
       (obj) => obj.ds_poll_id?.some((item) => item.key === questionSelect)
     );
+  const uniqueGuiDenObjects: any = [];
+
+  filteredArray?.forEach((item: any) => {
+    item.gui_den.forEach((obj: any) => {
+      const exists = uniqueGuiDenObjects.some((uniqueObj: any) => uniqueObj.ma_cd === obj.ma_cd);
+      if (!exists) {
+        uniqueGuiDenObjects.push(obj);
+      }
+    });
+  });
+
+  const numberUserVoted = uniqueGuiDenObjects.filter(
+    (itemUserVoted: any) => itemUserVoted.status === 'voted'
+  ).length;
+  const percentUserVoted = (numberUserVoted / uniqueGuiDenObjects.length) * 100;
 
   // Bạn tạo một Set để lưu trữ các ma_cd đã xuất hiện
   const seenMaCd: string[] = [];
@@ -57,7 +71,6 @@ export default function DHContentRight({
         }).length) ||
     0;
 
-  console.log('result:', totalUserReceivedQuestion);
   // ------------------ END LOGIC tính đã gửi câu hỏi select đến bao nhiêu người và không được trùng lặp số
 
   const chart: chart = {
@@ -124,12 +137,12 @@ export default function DHContentRight({
         <Stack key="success">
           <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 1 }}>
             <Box sx={{ typography: 'overline' }}>pending</Box>
-            <Box sx={{ typography: 'subtitle1' }}>50%</Box>
+            <Box sx={{ typography: 'subtitle1' }}>{percentUserVoted} %</Box>
           </Stack>
 
           <LinearProgress
             variant="determinate"
-            value={50}
+            value={percentUserVoted}
             sx={{
               height: 8,
               color: (theme3) => alpha(theme3.palette.primary.light, 0.2),
