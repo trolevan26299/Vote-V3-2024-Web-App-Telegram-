@@ -1,11 +1,11 @@
 import { Box, LinearProgress, Stack, Typography } from '@mui/material';
-import { bgGradient } from 'src/theme/css';
-import { useTheme, alpha, styled } from '@mui/material/styles';
-import Chart, { useChart } from 'src/components/chart';
+import { alpha, styled, useTheme } from '@mui/material/styles';
 import { ApexOptions } from 'apexcharts';
-import { fNumber } from 'src/utils/format-number';
-import { IAnswer, IQuestion } from 'src/types/setting';
+import Chart, { useChart } from 'src/components/chart';
+import { bgGradient } from 'src/theme/css';
+import { IQuestion } from 'src/types/setting';
 import { ISelectedAnswer } from 'src/types/votedh.types';
+import { fNumber } from 'src/utils/format-number';
 
 const CHART_HEIGHT = 400;
 const LEGEND_HEIGHT = 72;
@@ -32,45 +32,30 @@ interface left_chart {
 interface Props {
   percentSendPollData: number;
   pollDataByKey?: IQuestion;
-  listResultByQuestion?: ISelectedAnswer[];
-  totalSharesHolder?: any[];
+  // listResultByQuestion?: ISelectedAnswer[];
+  // totalSharesHolder?: any[];
+  calculateTotalCP: (itemPoll: number) => number;
 }
 
 export default function DHContentLeft({
   percentSendPollData,
   pollDataByKey,
-  listResultByQuestion,
-  totalSharesHolder,
+  // listResultByQuestion,
+  // totalSharesHolder,
+  calculateTotalCP,
 }: Props) {
   const theme = useTheme();
-  console.log('listResultByQuestion: ', listResultByQuestion);
-  console.log('poll data by key:', pollDataByKey);
-
-  const abc = (itemPoll: number) => {
-    const listInfoForAnswer = listResultByQuestion?.filter(
-      (item) => item.answer_select_id === String(itemPoll)
-    );
-    console.log('listInfoForAnswer: ', listInfoForAnswer);
-    const c = listInfoForAnswer?.reduce(
-      (accumulator, current) =>
-        accumulator +
-        (totalSharesHolder?.find((item2) => item2.ma_cd === current.ma_cd)?.cp_tham_du || 0),
-      0
-    );
-    return c || 0;
-  };
-  console.log('------------------------:', abc(0));
 
   const chart: left_chart = {
     series:
       (pollDataByKey &&
         pollDataByKey?.dap_an?.map((item) => ({
           label: item?.vi || '',
-          value: abc(item.id as number),
+          value: calculateTotalCP(item.id as number),
         }))) ||
       [],
   };
-  console.log('chart', chart);
+
   const { series, colors, options } = chart;
   const chartSeries = series.map((i) => i.value);
   const chartOptions = useChart({

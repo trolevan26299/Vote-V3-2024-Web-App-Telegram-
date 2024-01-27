@@ -60,6 +60,8 @@ export default function ProcessDHView() {
     SetQuestionSelect(event.target.value);
   };
 
+  const pollDataByKey = danhSachPollData.find((poll) => poll.key === questionSelect);
+
   // Tiến trình gửi : hàm check xem câu hỏi được select đã gửi đến bao nhiêu người rồi ,và thấy thông tin những người được gửi không trùng nhau
   const numberProcessSendPoll = () => {
     const newArray: IListSender[] = [];
@@ -95,7 +97,7 @@ export default function ProcessDHView() {
   const percentSendPollData = ((numberSendPoll.length || 0) / totalSharesHolder.length) * 100;
 
   // List result by question
-  const listResultByQuestion = [];
+  const listResultByQuestion: any = [];
   // eslint-disable-next-line no-restricted-syntax
   for (const obj of listHistoryVoted) {
     // Bạn lọc các object trong thuộc tính detail theo điều kiện của bạn
@@ -105,6 +107,39 @@ export default function ProcessDHView() {
     listResultByQuestion.push(...filteredArray);
   }
 
+  const calculateTotalCP = (itemPoll: number) => {
+    const listInfoForAnswer = listResultByQuestion?.filter(
+      (item: any) => item.answer_select_id === String(itemPoll)
+    );
+    const totalNumberCP = listInfoForAnswer?.reduce(
+      (accumulator: any, current: any) =>
+        accumulator +
+        (totalSharesHolder?.find((item2: any) => item2.ma_cd === current.ma_cd)?.cp_tham_du || 0),
+      0
+    );
+    return totalNumberCP || 0;
+  };
+
+  const totalAllCP = listResultByQuestion.reduce(
+    (accumulator: any, current: any) =>
+      accumulator +
+      (totalSharesHolder?.find((item: any) => item.ma_cd === current.ma_cd)?.cp_tham_du || 0),
+    0
+  );
+  const dataTable =
+    (pollDataByKey &&
+      pollDataByKey?.dap_an?.map((item) => ({
+        answer: item?.vi || '',
+        turn: listResultByQuestion.filter(
+          (item2: any) => item2.answer_select_id === String(item.id)
+        ).length,
+        numberCP: calculateTotalCP(item.id as number),
+        percent: `${((calculateTotalCP(item.id as number) / totalAllCP) * 100).toFixed(2)}%`,
+      }))) ||
+    [];
+  console.log('poll data by key:', pollDataByKey);
+  console.log('listResultByQuestion:', listResultByQuestion);
+  console.log('dataTable:', dataTable);
   useEffect(() => {
     // get data từ firebase realtime
     const userRef = ref(database, FIREBASE_COLLECTION.POLL_PROCESS);
@@ -217,16 +252,15 @@ export default function ProcessDHView() {
         >
           <Grid item xs={12} md={6} lg={6}>
             <DHContentLeft
+              calculateTotalCP={calculateTotalCP}
               percentSendPollData={percentSendPollData}
-              pollDataByKey={danhSachPollData.find((poll) => poll.key === questionSelect)}
-              listResultByQuestion={listResultByQuestion}
-              totalSharesHolder={totalSharesHolder}
+              pollDataByKey={pollDataByKey}
             />
           </Grid>
 
           <Grid item xs={12} md={6} lg={6}>
             <DHContentRight
-              pollDataByKey={danhSachPollData.find((poll) => poll.key === questionSelect)}
+              pollDataByKey={pollDataByKey}
               listResultByQuestion={listResultByQuestion}
               historySendPollData={historySendPollData}
               questionSelect={questionSelect}
@@ -234,22 +268,13 @@ export default function ProcessDHView() {
           </Grid>
           <Grid item xs={12} md={12} lg={12}>
             <DHContentTable
-              tableData={[
-                { top: 'Top 1', answer: 'Tán thành', turn: '2', numberCP: '1000', rate: '100%' },
-                {
-                  top: 'Top 2',
-                  answer: 'Không tán thành',
-                  turn: '2',
-                  numberCP: '1000',
-                  rate: '100%',
-                },
-              ]}
+              tableData={dataTable}
               tableLabels={[
                 { id: 'top', label: 'Top' },
                 { id: 'answer', label: 'Đáp án' },
-                { id: 'turn', label: 'Lượt bầu', align: 'center' },
-                { id: 'numberCP', label: 'Số CP', align: 'right' },
-                { id: 'rate', label: '%', align: 'right' },
+                { id: 'turn', label: 'Lượt bầu' },
+                { id: 'numberCP', label: 'Số CP' },
+                { id: 'percent', label: '%' },
               ]}
             />
           </Grid>
