@@ -134,12 +134,10 @@ export default function ProcessDHView() {
           (item2: any) => item2.answer_select_id === String(item.id)
         ).length,
         numberCP: calculateTotalCP(item.id as number),
-        percent: `${((calculateTotalCP(item.id as number) / totalAllCP) * 100).toFixed(2)}%`,
+        percent: ((calculateTotalCP(item.id as number) / totalAllCP) * 100).toFixed(1),
       }))) ||
     [];
-  console.log('poll data by key:', pollDataByKey);
-  console.log('listResultByQuestion:', listResultByQuestion);
-  console.log('dataTable:', dataTable);
+
   useEffect(() => {
     // get data từ firebase realtime
     const userRef = ref(database, FIREBASE_COLLECTION.POLL_PROCESS);

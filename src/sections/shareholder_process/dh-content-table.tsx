@@ -12,11 +12,11 @@ import Scrollbar from 'src/components/scrollbar';
 import { TableHeadCustom } from 'src/components/table';
 
 type RowProps = {
-  top: string;
   answer: string;
-  turn: string;
-  numberCP: string;
-  rate: string;
+  turn?: number;
+  numberCP?: number;
+  percent: string | number;
+  top?: string;
 };
 
 interface Props extends CardProps {
@@ -25,6 +25,16 @@ interface Props extends CardProps {
   tableLabels: any;
 }
 export default function DHContentTable({ subheader, tableData, tableLabels, ...other }: Props) {
+  // Sắp xếp mảng tableData theo giá trị row.percent giảm dần
+  const sortedTableData = [...tableData].sort(
+    (a, b) => (b.percent as number) - (a.percent as number)
+  );
+
+  // Gán giá trị "Top" cho mỗi phần tử trong mảng tableData
+  const updatedTableData = sortedTableData.map((row, index) => ({
+    ...row,
+    top: `Top ${index + 1}`,
+  }));
   return (
     <Card {...other}>
       <TableContainer sx={{ overflow: 'unset' }}>
@@ -33,8 +43,8 @@ export default function DHContentTable({ subheader, tableData, tableLabels, ...o
             <TableHeadCustom headLabel={tableLabels} />
 
             <TableBody>
-              {tableData.map((row) => (
-                <EcommerceBestSalesmanRow key={row.top} row={row} />
+              {updatedTableData.map((row, index) => (
+                <ProcessVoteTableRow key={index} row={row} />
               ))}
             </TableBody>
           </Table>
@@ -46,10 +56,10 @@ export default function DHContentTable({ subheader, tableData, tableLabels, ...o
 
 // ----------------------------------------------------------------------
 
-type EcommerceBestSalesmanRowProps = {
+type ProcessVoteRowProps = {
   row: RowProps;
 };
-function EcommerceBestSalesmanRow({ row }: EcommerceBestSalesmanRowProps) {
+function ProcessVoteTableRow({ row }: ProcessVoteRowProps) {
   return (
     <TableRow>
       <TableCell align="left">
@@ -60,13 +70,10 @@ function EcommerceBestSalesmanRow({ row }: EcommerceBestSalesmanRowProps) {
           {row.top}
         </Label>
       </TableCell>
-
       <TableCell>{row.answer}</TableCell>
-
-      <TableCell align="center">{row.turn}</TableCell>
-
-      <TableCell align="right">{row.numberCP}</TableCell>
-      <TableCell align="right">{row.rate}</TableCell>
+      <TableCell>{row.turn}</TableCell>
+      <TableCell>{row.numberCP}</TableCell>
+      <TableCell>{row.percent} %</TableCell>
     </TableRow>
   );
 }
