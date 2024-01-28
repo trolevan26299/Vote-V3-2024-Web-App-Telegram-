@@ -52,10 +52,10 @@ export default function DHContentRight({
   ).length;
   const percentUserVoted = (numberUserVoted / uniqueGuiDenObjects.length) * 100;
 
-  // Bạn tạo một Set để lưu trữ các ma_cd đã xuất hiện
+  //  tạo một Set để lưu trữ các ma_cd đã xuất hiện
   const seenMaCd: string[] = [];
 
-  // Bạn sử dụng phương thức reduce() để tính toán kết quả
+  //  sử dụng phương thức reduce() để tính toán kết quả
   const totalUserReceivedQuestion =
     (filteredArray &&
       filteredArray

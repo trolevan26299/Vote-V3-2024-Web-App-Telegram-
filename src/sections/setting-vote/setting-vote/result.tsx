@@ -26,6 +26,7 @@ import { FIREBASE_COLLECTION } from 'src/constant/firebase_collection.constant';
 import { database } from 'src/firebase/firebase.config';
 import { IHistorySendPoll, IQuestion } from 'src/types/setting';
 import { IDataQuestionSelect, IHistoryVoted } from 'src/types/votedh.types';
+import { numberWithCommas } from 'src/utils/numberWithComma';
 import { styles } from '../styles';
 import ResultChartLeft from './result-chart-left';
 import ResultChartRight from './result-chart-right';
@@ -43,7 +44,6 @@ interface info_holder_vote {
   name: string;
   share: string;
   percent_holding: string;
-  poll_answer: string;
   answer: string;
   answer_time: string;
 }
@@ -66,7 +66,6 @@ export default function ResultView() {
     { id: 'name', label: 'Tên CĐ' },
     { id: 'share', label: 'Cổ phần' },
     { id: 'percent_holding', label: '% Nắm giữ' },
-    { id: 'poll_answer', label: 'Poll Trả lời' },
     { id: 'answer', label: 'Câu trả lời' },
     { id: 'answer_time', label: 'Thời gian trả lời' },
   ];
@@ -103,7 +102,6 @@ export default function ResultView() {
       name: 'Lincoln',
       share: '66,67%',
       percent_holding: '30.000',
-      poll_answer: '1',
       answer: '23213',
       answer_time: '12:30:00 17/112/2023',
     },
@@ -112,7 +110,6 @@ export default function ResultView() {
       name: 'Lincoln',
       share: '66,67%',
       percent_holding: '30.000',
-      poll_answer: '1',
       answer: '23213',
       answer_time: '12:30:00 17/112/2023',
     },
@@ -121,7 +118,6 @@ export default function ResultView() {
       name: 'Lincoln',
       share: '66,67%',
       percent_holding: '30.000',
-      poll_answer: '1',
       answer: '23213',
       answer_time: '12:30:00 17/112/2023',
     },
@@ -139,8 +135,9 @@ export default function ResultView() {
   const [historySendPollData, setHistorySendPollData] = useState<IHistorySendPoll[]>([]);
   const [danhSachPollData, setDanhSachPollData] = useState<IQuestion[]>([]);
   const [listHistoryVoted, setListHistoryVoted] = useState<IHistoryVoted[]>([]);
-  const [infoListSharesHolder, setInfoListSharesHolder] = useState<any>([]);
+  const [infoListSharesHolder, setInfoListSharesHolder] = useState<any[]>([]);
 
+  console.log('infoListSharesHolder', infoListSharesHolder);
   // CODE FOR SELECT QUESTION FROM FIREBASE
   const existingKeys = new Set<string>();
 
@@ -157,6 +154,7 @@ export default function ResultView() {
     });
     return result;
   }, [] as IHistorySendPoll[]);
+  console.log('question select data :', questionSelectData);
   const [questionSelect, SetQuestionSelect] = useState<string>(questionSelectData[0]?.key || '');
   // Function handle data
   const handleChangeSelectQuestion = (event: SelectChangeEvent) => {
@@ -174,8 +172,9 @@ export default function ResultView() {
     // Bạn push các object trong filteredArray vào result
     listResultByQuestion.push(...filteredArray);
   }
+  console.log('listResultByQuestion:', listResultByQuestion);
 
-  // FUNCTION TO CALCULATE TOTLA CP
+  // FUNCTION TO CALCULATE TOTAL CP
   const calculateTotalCP = (itemPoll: number) => {
     const listInfoForAnswer = listResultByQuestion?.filter(
       (item: any) => item.answer_select_id === String(itemPoll)
@@ -189,6 +188,56 @@ export default function ResultView() {
     );
     return totalNumberCP || 0;
   };
+
+  // Code lấy ra list cổ đông đã gửi poll theo câu hỏi ==================================
+  const filteredArray =
+    historySendPollData &&
+    historySendPollData.filter(
+      (obj) => obj.ds_poll_id?.some((item) => item.key === questionSelect)
+    );
+  const uniqueGuiDenObjects: any = [];
+
+  filteredArray?.forEach((item: any) => {
+    item.gui_den.forEach((obj: any) => {
+      const exists = uniqueGuiDenObjects.some((uniqueObj: any) => uniqueObj.ma_cd === obj.ma_cd);
+      if (!exists) {
+        uniqueGuiDenObjects.push(obj);
+      }
+    });
+  });
+  console.log('uniqueGuiDenObjects', uniqueGuiDenObjects);
+
+  // tổng cổ phần đã bầu
+  const totalCPVoted = listResultByQuestion.reduce(
+    (accumulator: any, current: any) =>
+      accumulator +
+      (infoListSharesHolder?.find((item: any) => item.ma_cd === current.ma_cd)?.cp_tham_du || 0),
+    0
+  );
+  const totalCPSentPoll = uniqueGuiDenObjects.reduce(
+    (accumulator: any, current: any) =>
+      accumulator +
+      (infoListSharesHolder?.find((item: any) => item.ma_cd === current.ma_cd)?.cp_tham_du || 0),
+    0
+  );
+
+  // tổng cổ phần cổ đông gửi poll (CP đã bầu  + CP chưa bầu)
+
+  const totalShares = infoListSharesHolder
+    .filter((item) => item.trang_thai === 'Tham dự')
+    .reduce((sum, item) => sum + item.cp_tham_du, 0);
+  // End Code lấy ra list cổ đông đã gửi poll theo câu hỏi ==============================
+
+  // DATA Table kết quả bầu cử
+  const dataResultVote =
+    pollDataByKey &&
+    pollDataByKey.dap_an?.map((item: any) => ({
+      answer: item.vi,
+      numberTurn: listResultByQuestion.filter(
+        (item2: any) => item2.answer_select_id === String(item.id)
+      ).length,
+    }));
+  // END Data Table kết quả bầu cử
 
   // GET DATA TỪ FIREBASE ---------------------------------------------------------------
   useEffect(() => {
@@ -331,19 +380,29 @@ export default function ResultView() {
                   <TableBody>
                     <TableRow>
                       <TableCell>SL Tham Gia :</TableCell>
-                      <TableCell align="left">3</TableCell>
+                      <TableCell align="left">
+                        {
+                          infoListSharesHolder.filter((item: any) => item?.trang_thai === 'Tham dự')
+                            .length
+                        }
+                      </TableCell>
                     </TableRow>
                     <TableRow>
                       <TableCell>Đã Gửi :</TableCell>
-                      <TableCell align="left">3</TableCell>
+                      <TableCell align="left">{uniqueGuiDenObjects?.length}</TableCell>
                     </TableRow>
                     <TableRow>
                       <TableCell>Đã Bầu Chọn :</TableCell>
-                      <TableCell align="left">3</TableCell>
+                      <TableCell align="left">
+                        {uniqueGuiDenObjects.filter((item: any) => item.status === 'voted').length}
+                      </TableCell>
                     </TableRow>
                     <TableRow>
                       <TableCell>Chưa Bầu Chọn :</TableCell>
-                      <TableCell align="left">3</TableCell>
+                      <TableCell align="left">
+                        {' '}
+                        {uniqueGuiDenObjects.filter((item: any) => item.status === 'sent').length}
+                      </TableCell>
                     </TableRow>
                   </TableBody>
                 </Table>
@@ -358,20 +417,18 @@ export default function ResultView() {
                 <Table size="small">
                   <TableBody>
                     <TableRow>
-                      <TableCell>SL Tham Gia :</TableCell>
-                      <TableCell align="left">3</TableCell>
+                      <TableCell>CP tham dự:</TableCell>
+                      <TableCell align="left">{numberWithCommas(totalShares)} CP</TableCell>
                     </TableRow>
                     <TableRow>
-                      <TableCell>Đã Gửi :</TableCell>
-                      <TableCell align="left">3</TableCell>
+                      <TableCell>CP đã bầu :</TableCell>
+                      <TableCell align="left">{numberWithCommas(totalCPVoted)} CP</TableCell>
                     </TableRow>
                     <TableRow>
-                      <TableCell>Đã Bầu Chọn :</TableCell>
-                      <TableCell align="left">3</TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell>Chưa Bầu Chọn :</TableCell>
-                      <TableCell align="left">3</TableCell>
+                      <TableCell>CP chưa bầu :</TableCell>
+                      <TableCell align="left">
+                        {numberWithCommas(totalCPSentPoll - totalCPVoted)} CP
+                      </TableCell>
                     </TableRow>
                   </TableBody>
                 </Table>
@@ -458,7 +515,6 @@ export default function ResultView() {
                       <TableCell>{item.name}</TableCell>
                       <TableCell>{item.share}</TableCell>
                       <TableCell>{item.percent_holding}</TableCell>
-                      <TableCell>{item.poll_answer}</TableCell>
                       <TableCell>{item.answer}</TableCell>
                       <TableCell>{item.answer_time}</TableCell>
                     </TableRow>

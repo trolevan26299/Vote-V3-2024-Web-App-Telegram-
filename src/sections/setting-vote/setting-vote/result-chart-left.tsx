@@ -43,6 +43,7 @@ export default function ResultChartLeft({ pollDataByKey, calculateTotalCP }: Pro
       [],
   };
   const { series, colors, options } = chart;
+  console.log('series:', series);
 
   const chartSeriesLeft = series.map((i) => i.value);
   const chartOptionsLeft = useChart({
