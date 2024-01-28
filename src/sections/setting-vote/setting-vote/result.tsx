@@ -15,46 +15,21 @@ import {
   TableRow,
   Typography,
 } from '@mui/material';
-import { alpha, styled, useTheme } from '@mui/material/styles';
-import { ApexOptions } from 'apexcharts';
-import React from 'react';
-import Chart, { useChart } from 'src/components/chart';
+import { alpha, useTheme } from '@mui/material/styles';
+import { DataSnapshot, get, onValue, ref } from 'firebase/database';
+import React, { useEffect, useState } from 'react';
 import CustomBreadcrumbs from 'src/components/custom-breadcrumbs';
 import Scrollbar from 'src/components/scrollbar';
 import { useSettingsContext } from 'src/components/settings';
 import { TableHeadCustom } from 'src/components/table';
-import { fNumber } from 'src/utils/format-number';
+import { FIREBASE_COLLECTION } from 'src/constant/firebase_collection.constant';
+import { database } from 'src/firebase/firebase.config';
+import { IHistorySendPoll, IQuestion } from 'src/types/setting';
+import { IDataQuestionSelect, IHistoryVoted } from 'src/types/votedh.types';
 import { styles } from '../styles';
+import ResultChartLeft from './result-chart-left';
+import ResultChartRight from './result-chart-right';
 
-const CHART_HEIGHT = 350;
-const LEGEND_HEIGHT = 72;
-const StyledChart = styled(Chart)(({ theme }) => ({
-  height: CHART_HEIGHT,
-  '& .apexcharts-canvas, .apexcharts-inner, svg, foreignObject': {
-    height: `100% !important`,
-  },
-  '& .apexcharts-legend': {
-    height: LEGEND_HEIGHT,
-    borderTop: `dashed 1px ${theme.palette.divider}`,
-    top: `calc(${CHART_HEIGHT - LEGEND_HEIGHT}px) !important`,
-  },
-}));
-interface left_chart {
-  colors?: string[];
-  series: {
-    label: string;
-    value: number;
-  }[];
-  options?: ApexOptions;
-}
-interface left_chart2 {
-  colors?: string[];
-  series2: {
-    label: string;
-    value: number;
-  }[];
-  options?: ApexOptions;
-}
 interface result_vote {
   id: string;
   answer: string;
@@ -151,6 +126,8 @@ export default function ResultView() {
       answer_time: '12:30:00 17/112/2023',
     },
   ];
+
+  // CODE
   // handle select answer
   const [answer, setAnswer] = React.useState('');
 
@@ -158,92 +135,118 @@ export default function ResultView() {
     setAnswer(event.target.value);
   };
 
-  // Chart left
-  const chart: left_chart = {
-    series: [
-      { label: 'Tán thành', value: 70 },
-      { label: 'Không tán thành', value: 30 },
-    ],
-  };
-  const { series, colors, options } = chart;
-  const chartSeries = series.map((i) => i.value);
-  const chartOptions = useChart({
-    chart: {
-      sparkline: {
-        enabled: true,
-      },
-    },
-    colors,
-    labels: series.map((i) => i.label),
-    stroke: {
-      colors: [theme.palette.background.paper],
-    },
-    legend: {
-      floating: true,
-      position: 'bottom',
-      horizontalAlign: 'center',
-    },
-    dataLabels: {
-      enabled: true,
-      dropShadow: {
-        enabled: false,
-      },
-    },
-    tooltip: {
-      fillSeriesColor: false,
-      y: {
-        formatter: (value: number) => fNumber(value),
-        title: {
-          formatter: (seriesName: string) => `${seriesName}`,
-        },
-      },
-    },
-    plotOptions: {
-      pie: {
-        donut: {
-          labels: {
-            show: false,
-          },
-        },
-      },
-    },
-    ...options,
-  });
+  // data from firebase state --------------------------------------------------
+  const [historySendPollData, setHistorySendPollData] = useState<IHistorySendPoll[]>([]);
+  const [danhSachPollData, setDanhSachPollData] = useState<IQuestion[]>([]);
+  const [listHistoryVoted, setListHistoryVoted] = useState<IHistoryVoted[]>([]);
+  const [infoListSharesHolder, setInfoListSharesHolder] = useState<any>([]);
 
-  // Chart Right
-  const chart2: left_chart2 = {
-    series2: [
-      { label: 'Tán thành', value: 500 },
-      { label: 'Không tán thành', value: 200 },
-      { label: 'Chưa bình chọn', value: 448 },
-    ],
-  };
-  const { series2 } = chart2;
-  const chartSeries2 = series2.map((i) => i.value);
+  // CODE FOR SELECT QUESTION FROM FIREBASE
+  const existingKeys = new Set<string>();
 
-  const chartOptions2 = useChart({
-    colors,
-    tooltip: {
-      marker: { show: false },
-      y: {
-        formatter: (value: number) => fNumber(value),
-        title: {
-          formatter: () => '',
-        },
-      },
-    },
-    plotOptions: {
-      bar: {
-        horizontal: true,
-        barHeight: '28%',
-        borderRadius: 2,
-      },
-    },
-    xaxis: {
-      categories: series2.map((i) => i.label),
-    },
-    ...options,
-  });
+  // Lọc và merge dữ liệu từ ds_poll_id
+  const questionSelectData: any = historySendPollData.reduce((result, historyItem) => {
+    // Duyệt qua mỗi phần tử trong ds_poll_id của historyItem
+    historyItem?.ds_poll_id?.forEach((poll) => {
+      // Kiểm tra xem đã có key này trong Set chưa
+      if (!existingKeys.has(poll.key as string)) {
+        // Nếu chưa có, thêm vào mảng kết quả và đánh dấu là đã xuất hiện
+        existingKeys.add(poll.key as string);
+        result.push(poll);
+      }
+    });
+    return result;
+  }, [] as IHistorySendPoll[]);
+  const [questionSelect, SetQuestionSelect] = useState<string>(questionSelectData[0]?.key || '');
+  // Function handle data
+  const handleChangeSelectQuestion = (event: SelectChangeEvent) => {
+    SetQuestionSelect(event.target.value);
+  };
+  const pollDataByKey = danhSachPollData.find((poll) => poll.key === questionSelect);
+
+  // List result by question
+  const listResultByQuestion: any = [];
+  // eslint-disable-next-line no-restricted-syntax
+  for (const obj of listHistoryVoted) {
+    // Bạn lọc các object trong thuộc tính detail theo điều kiện của bạn
+    let filteredArray = obj.detail.filter((item) => item.key_question === questionSelect);
+    filteredArray = filteredArray.map((item) => ({ ...item, ma_cd: obj.ma_cd }));
+    // Bạn push các object trong filteredArray vào result
+    listResultByQuestion.push(...filteredArray);
+  }
+
+  // FUNCTION TO CALCULATE TOTLA CP
+  const calculateTotalCP = (itemPoll: number) => {
+    const listInfoForAnswer = listResultByQuestion?.filter(
+      (item: any) => item.answer_select_id === String(itemPoll)
+    );
+    const totalNumberCP = listInfoForAnswer?.reduce(
+      (accumulator: any, current: any) =>
+        accumulator +
+        (infoListSharesHolder?.find((item2: any) => item2.ma_cd === current.ma_cd)?.cp_tham_du ||
+          0),
+      0
+    );
+    return totalNumberCP || 0;
+  };
+
+  // GET DATA TỪ FIREBASE ---------------------------------------------------------------
+  useEffect(() => {
+    // get data từ firebase realtime
+    const userRef = ref(database, FIREBASE_COLLECTION.POLL_PROCESS);
+    const onDataChange = (snapshot: DataSnapshot) => {
+      const dataSnapShot = snapshot.exists();
+      if (dataSnapShot) {
+        const ls_gui_poll = snapshot.val().ls_gui_poll ?? {};
+        const danh_sach_poll = snapshot.val().danh_sach_poll ?? {};
+        const ls_poll = snapshot.val().ls_poll ?? {};
+        const listHistorySendPoll = Object.keys(ls_gui_poll).map((key) => ({
+          key,
+          ...snapshot.val().ls_gui_poll[key],
+        }));
+        const listPoll = Object.keys(danh_sach_poll).map((key) => ({
+          key,
+          ...snapshot.val().danh_sach_poll[key],
+        }));
+        const lsVoted = Object.keys(ls_poll).map((key) => ({
+          key,
+          ...snapshot.val().ls_poll[key],
+        }));
+
+        setHistorySendPollData(listHistorySendPoll);
+        setDanhSachPollData(listPoll);
+        setListHistoryVoted(lsVoted);
+      }
+    };
+    const unsubscribe = onValue(userRef, onDataChange);
+    return () => {
+      // Detach the listener
+      unsubscribe();
+    };
+  }, []);
+
+  useEffect(() => {
+    // Get Data danh sách cổ đông từ firebase không realtime
+    const userRef = ref(database, FIREBASE_COLLECTION.THONG_TIN_CD);
+    const fetchData = async () => {
+      try {
+        const snapshot = await get(userRef);
+        if (snapshot.exists()) {
+          const dataObject = snapshot.val();
+          const dataArray = Object.values(dataObject);
+          setInfoListSharesHolder(dataArray);
+        } else {
+          console.log('No Data');
+        }
+      } catch (error) {
+        console.error('Error when get data:', error);
+      }
+    };
+
+    fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  // END CODE
   return (
     <Container sx={{ maxWidth: '100% !important' }}>
       <CustomBreadcrumbs
@@ -273,27 +276,29 @@ export default function ResultView() {
           <Box sx={{ width: '60%' }}>
             <Box className="name-content" sx={{ ...styles.box_name_content }}>
               <Typography sx={{ width: '15%' }}>Chọn câu hỏi :</Typography>
-              <FormControl sx={{ width: '50%' }} size="small">
-                <InputLabel id="demo-select-small-label">Câu hỏi</InputLabel>
+              <FormControl sx={{ width: '85% !important' }} size="small">
+                <InputLabel id="demo-simple-select-label" sx={{ width: '100%' }} size="small">
+                  Chọn câu hỏi
+                </InputLabel>
                 <Select
-                  labelId="demo-select-small-label"
-                  id="demo-select-small"
-                  value={answer}
-                  label="Câu hỏi"
-                  onChange={handleChangeSelectAnswer}
+                  labelId="demo-simple-select-label"
+                  id="demo-simple-select"
+                  value={questionSelect}
+                  label="Chọn Câu Hỏi"
+                  onChange={handleChangeSelectQuestion}
+                  sx={{ width: '50% !important' }}
                 >
-                  <MenuItem value="">
-                    <em>Vui lòng chọn câu hỏi</em>
-                  </MenuItem>
-                  <MenuItem value={10}>Câu hỏi 1</MenuItem>
-                  <MenuItem value={20}>Câu hỏi 2 </MenuItem>
-                  <MenuItem value={30}>Câu hỏi 3</MenuItem>
+                  {questionSelectData.map((item: IDataQuestionSelect) => (
+                    <MenuItem value={item.key}>{item.ten_poll}</MenuItem>
+                  ))}
                 </Select>
               </FormControl>
             </Box>
             <Box className="name-content" sx={{ ...styles.box_question, mt: '10px' }}>
               <Typography sx={{ width: '15%' }}>Nội dung :</Typography>
-              <Typography sx={{ width: '50%' }}>Thông qua quy chế làm việc của Đại Hội </Typography>
+              <Typography sx={{ width: '85%' }}>
+                {danhSachPollData.find((item) => item.key === questionSelect)?.noi_dung}
+              </Typography>
             </Box>
           </Box>
           <Button
@@ -388,30 +393,13 @@ export default function ResultView() {
           borderRadius: '10px',
         }}
       >
-        <Box className="chart_left" sx={{ width: '50%', textAlign: 'center' }}>
-          <Typography sx={{ fontWeight: '600', fontSize: '16px' }}>
-            Biểu đồ cổ phần số lượng bình chọn
-          </Typography>
-          <StyledChart
-            dir="ltr"
-            type="pie"
-            series={chartSeries}
-            options={chartOptions}
-            height={280}
-          />
-        </Box>
-        <Box className="chart_left" sx={{ width: '50%', textAlign: 'center' }}>
-          <Typography sx={{ fontWeight: '600', fontSize: '16px' }}>
-            Biểu đồ cổ đông bình chọn
-          </Typography>
-          <Chart
-            type="bar"
-            dir="ltr"
-            series={[{ data: chartSeries2 }]}
-            options={chartOptions2}
-            height={364}
-          />
-        </Box>
+        <ResultChartLeft calculateTotalCP={calculateTotalCP} pollDataByKey={pollDataByKey} />
+        <ResultChartRight
+          pollDataByKey={pollDataByKey}
+          listResultByQuestion={listResultByQuestion}
+          historySendPollData={historySendPollData}
+          questionSelect={questionSelect}
+        />
       </Box>
       <Box
         sx={{

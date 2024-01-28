@@ -250,8 +250,8 @@ export default function ProcessDHView() {
         >
           <Grid item xs={12} md={6} lg={6}>
             <DHContentLeft
-              calculateTotalCP={calculateTotalCP}
               percentSendPollData={percentSendPollData}
+              calculateTotalCP={calculateTotalCP}
               pollDataByKey={pollDataByKey}
             />
           </Grid>
