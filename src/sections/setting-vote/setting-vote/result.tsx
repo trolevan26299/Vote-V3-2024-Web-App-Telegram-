@@ -188,20 +188,21 @@ export default function ResultView() {
   // DATA Table kết quả bầu cử
 
   const dataResultVote =
-    pollDataByKey &&
-    pollDataByKey.dap_an?.map((item: any) => ({
-      answer: item.vi,
-      numberTurn: listResultByQuestion.filter(
-        (item2: any) => item2.answer_select_id === String(item.id)
-      ).length,
-      rate_vote:
-        (listResultByQuestion.filter((item3: any) => Number(item3.answer_select_id) === item.id)
-          .length /
-          uniqueGuiDenObjects.length) *
-        100,
-      share_vote: calculateTotalCP(item.id as number),
-      rate_share: (calculateTotalCP(item.id as number) / totalCPSentPoll) * 100,
-    }));
+    (pollDataByKey &&
+      pollDataByKey.dap_an?.map((item: any) => ({
+        answer: item.vi,
+        numberTurn: listResultByQuestion.filter(
+          (item2: any) => item2.answer_select_id === String(item.id)
+        ).length,
+        rate_vote:
+          (listResultByQuestion.filter((item3: any) => Number(item3.answer_select_id) === item.id)
+            .length /
+            uniqueGuiDenObjects.length) *
+          100,
+        share_vote: calculateTotalCP(item.id as number),
+        rate_share: (calculateTotalCP(item.id as number) / totalCPSentPoll) * 100,
+      }))) ||
+    [];
 
   // const totalVoted =
   dataResultVote?.push({
@@ -469,18 +470,18 @@ export default function ResultView() {
             <Scrollbar>
               <Table size="small">
                 <TableHeadCustom headLabel={tableLabelsResultVote} />
-                <TableBody>
-                  {dataResultVote &&
-                    dataResultVote.map((item: result_vote, index) => (
-                      <TableRow key={index}>
-                        <TableCell>{index + 1}</TableCell>
-                        <TableCell>{item.answer}</TableCell>
-                        <TableCell>{item.numberTurn}</TableCell>
-                        <TableCell>{item.rate_vote.toFixed(1)} %</TableCell>
-                        <TableCell>{numberWithCommas(item.share_vote)} CP</TableCell>
-                        <TableCell>{item.rate_share.toFixed(1)} %</TableCell>
-                      </TableRow>
-                    ))}
+
+                <TableBody sx={{ margin: 'auto !important' }}>
+                  {dataResultVote.map((item: result_vote, index) => (
+                    <TableRow key={index}>
+                      <TableCell>{index + 1}</TableCell>
+                      <TableCell>{item.answer}</TableCell>
+                      <TableCell>{item.numberTurn}</TableCell>
+                      <TableCell>{item.rate_vote.toFixed(1)} %</TableCell>
+                      <TableCell>{numberWithCommas(item.share_vote)} CP</TableCell>
+                      <TableCell>{item.rate_share.toFixed(1)} %</TableCell>
+                    </TableRow>
+                  ))}
                 </TableBody>
               </Table>
             </Scrollbar>

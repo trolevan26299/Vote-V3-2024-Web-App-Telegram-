@@ -4,7 +4,6 @@ import { ApexOptions } from 'apexcharts';
 import Chart, { useChart } from 'src/components/chart';
 import { bgGradient } from 'src/theme/css';
 import { IQuestion } from 'src/types/setting';
-import { ISelectedAnswer } from 'src/types/votedh.types';
 import { fNumber } from 'src/utils/format-number';
 
 const CHART_HEIGHT = 400;

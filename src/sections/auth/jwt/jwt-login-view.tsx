@@ -37,7 +37,7 @@ export default function JwtLoginView() {
 
   const [errorMsg, setErrorMsg] = useState('');
 
-  const [accountManager, setAccountManager] = useState<IAccountManager>();
+  const [accountManager, setAccountManager] = useState<IAccountManager[]>([]);
 
   const password = useBoolean();
 
@@ -66,8 +66,8 @@ export default function JwtLoginView() {
   const onSubmit = handleSubmit(async (data) => {
     try {
       if (
-        data.userName === accountManager?.user_name &&
-        data.password === accountManager?.password
+        accountManager.find((item) => item.user_name === data.userName) &&
+        accountManager.find((item) => item.password === data.password)
       ) {
         localStorage.setItem('checked', JSON.stringify(true));
         router.push(PATH_AFTER_LOGIN);
@@ -88,7 +88,7 @@ export default function JwtLoginView() {
       try {
         const snapshot = await get(userRef);
         if (snapshot.exists()) {
-          setAccountManager(snapshot.val()[0]);
+          setAccountManager(snapshot.val());
         } else {
           console.log('NO DATA');
         }
