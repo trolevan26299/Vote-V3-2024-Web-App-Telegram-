@@ -32,20 +32,19 @@ import ResultChartLeft from './result-chart-left';
 import ResultChartRight from './result-chart-right';
 
 interface result_vote {
-  id: string;
   answer: string;
-  number_vote: string;
-  rate_vote: string;
-  share_vote: string;
-  rate_share: string;
+  numberTurn: number;
+  rate_vote: number;
+  share_vote: number;
+  rate_share: number;
 }
 interface info_holder_vote {
-  code: string;
-  name: string;
-  share: string;
-  percent_holding: string;
-  answer: string;
-  answer_time: string;
+  ma_cd: string;
+  ten_cd: string;
+  cp_tham_du: number;
+  ty_le_cp_tham_du: number;
+  answerVoted: string;
+  time_voted: string;
 }
 
 export default function ResultView() {
@@ -70,66 +69,7 @@ export default function ResultView() {
     { id: 'answer_time', label: 'Thời gian trả lời' },
   ];
 
-  const result_vote: result_vote[] = [
-    {
-      id: '1',
-      answer: 'Tán thành',
-      number_vote: '2',
-      rate_vote: '66,67%',
-      share_vote: '30.000',
-      rate_share: '100%',
-    },
-    {
-      id: '2',
-      answer: 'Không tán thành',
-      number_vote: '1',
-      rate_vote: '46,67%',
-      share_vote: '20.000',
-      rate_share: '60%',
-    },
-    {
-      id: '3',
-      answer: 'Chưa bầu chọn',
-      number_vote: '5',
-      rate_vote: '86,67%',
-      share_vote: '50.000',
-      rate_share: '80%',
-    },
-  ];
-  const info_holder_vote: info_holder_vote[] = [
-    {
-      code: 'M3232131AAXZ',
-      name: 'Lincoln',
-      share: '66,67%',
-      percent_holding: '30.000',
-      answer: '23213',
-      answer_time: '12:30:00 17/112/2023',
-    },
-    {
-      code: 'M3232131AAXZ',
-      name: 'Lincoln',
-      share: '66,67%',
-      percent_holding: '30.000',
-      answer: '23213',
-      answer_time: '12:30:00 17/112/2023',
-    },
-    {
-      code: 'M3232131AAXZ',
-      name: 'Lincoln',
-      share: '66,67%',
-      percent_holding: '30.000',
-      answer: '23213',
-      answer_time: '12:30:00 17/112/2023',
-    },
-  ];
-
   // CODE
-  // handle select answer
-  const [answer, setAnswer] = React.useState('');
-
-  const handleChangeSelectAnswer = (event: SelectChangeEvent) => {
-    setAnswer(event.target.value);
-  };
 
   // data from firebase state --------------------------------------------------
   const [historySendPollData, setHistorySendPollData] = useState<IHistorySendPoll[]>([]);
@@ -137,7 +77,6 @@ export default function ResultView() {
   const [listHistoryVoted, setListHistoryVoted] = useState<IHistoryVoted[]>([]);
   const [infoListSharesHolder, setInfoListSharesHolder] = useState<any[]>([]);
 
-  console.log('infoListSharesHolder', infoListSharesHolder);
   // CODE FOR SELECT QUESTION FROM FIREBASE
   const existingKeys = new Set<string>();
 
@@ -154,7 +93,7 @@ export default function ResultView() {
     });
     return result;
   }, [] as IHistorySendPoll[]);
-  console.log('question select data :', questionSelectData);
+
   const [questionSelect, SetQuestionSelect] = useState<string>(questionSelectData[0]?.key || '');
   // Function handle data
   const handleChangeSelectQuestion = (event: SelectChangeEvent) => {
@@ -166,13 +105,12 @@ export default function ResultView() {
   const listResultByQuestion: any = [];
   // eslint-disable-next-line no-restricted-syntax
   for (const obj of listHistoryVoted) {
-    // Bạn lọc các object trong thuộc tính detail theo điều kiện của bạn
+    // lọc các object trong thuộc tính detail theo điều kiện
     let filteredArray = obj.detail.filter((item) => item.key_question === questionSelect);
     filteredArray = filteredArray.map((item) => ({ ...item, ma_cd: obj.ma_cd }));
-    // Bạn push các object trong filteredArray vào result
+    //  push các object trong filteredArray vào result
     listResultByQuestion.push(...filteredArray);
   }
-  console.log('listResultByQuestion:', listResultByQuestion);
 
   // FUNCTION TO CALCULATE TOTAL CP
   const calculateTotalCP = (itemPoll: number) => {
@@ -205,7 +143,24 @@ export default function ResultView() {
       }
     });
   });
-  console.log('uniqueGuiDenObjects', uniqueGuiDenObjects);
+  //  tạo một Set để lưu trữ các ma_cd đã xuất hiện
+  const seenMaCd: string[] = [];
+
+  //  Tổng số user nhận được câu hỏi
+  const totalUserReceivedQuestion =
+    (filteredArray &&
+      filteredArray
+        .flatMap((obj) => obj.gui_den) // Chuyển mảng 2D thành mảng 1D
+        .filter((item) => {
+          // Nếu ma_cd đã xuất hiện, bỏ qua phần tử này
+          if (seenMaCd.includes(item?.ma_cd as string)) {
+            return false;
+          }
+          // Nếu chưa xuất hiện, thêm ma_cd vào mảng và giữ lại phần tử này
+          seenMaCd.push(item?.ma_cd as string);
+          return true;
+        }).length) ||
+    0;
 
   // tổng cổ phần đã bầu
   const totalCPVoted = listResultByQuestion.reduce(
@@ -214,6 +169,7 @@ export default function ResultView() {
       (infoListSharesHolder?.find((item: any) => item.ma_cd === current.ma_cd)?.cp_tham_du || 0),
     0
   );
+  // tổng cổ phần đã đã gửi poll
   const totalCPSentPoll = uniqueGuiDenObjects.reduce(
     (accumulator: any, current: any) =>
       accumulator +
@@ -226,9 +182,11 @@ export default function ResultView() {
   const totalShares = infoListSharesHolder
     .filter((item) => item.trang_thai === 'Tham dự')
     .reduce((sum, item) => sum + item.cp_tham_du, 0);
+
   // End Code lấy ra list cổ đông đã gửi poll theo câu hỏi ==============================
 
   // DATA Table kết quả bầu cử
+
   const dataResultVote =
     pollDataByKey &&
     pollDataByKey.dap_an?.map((item: any) => ({
@@ -236,8 +194,46 @@ export default function ResultView() {
       numberTurn: listResultByQuestion.filter(
         (item2: any) => item2.answer_select_id === String(item.id)
       ).length,
+      rate_vote:
+        (listResultByQuestion.filter((item3: any) => Number(item3.answer_select_id) === item.id)
+          .length /
+          uniqueGuiDenObjects.length) *
+        100,
+      share_vote: calculateTotalCP(item.id as number),
+      rate_share: (calculateTotalCP(item.id as number) / totalCPSentPoll) * 100,
     }));
+
+  // const totalVoted =
+  dataResultVote?.push({
+    answer: 'Chưa bầu chọn',
+    numberTurn: totalUserReceivedQuestion - listResultByQuestion.length,
+    rate_vote: Math.round(
+      100 - dataResultVote.reduce((sum, item) => sum + Number(item.rate_vote), 0)
+    ),
+    share_vote: totalCPSentPoll - totalCPVoted,
+    rate_share: ((totalCPSentPoll - totalCPVoted) / totalCPSentPoll) * 100,
+  });
+
   // END Data Table kết quả bầu cử
+
+  // Data Table thông tin cổ đông bầu cử
+  const dataTableInfoVoted = listResultByQuestion.map((item: any) => {
+    const sharesHolder = infoListSharesHolder.find((item2: any) => item.ma_cd === item2.ma_cd);
+    const answerVoted = pollDataByKey?.dap_an?.find(
+      (item3: any) => item.answer_select_id && String(item3.id) === item.answer_select_id
+    )?.vi;
+
+    return {
+      ma_cd: item.ma_cd,
+      ten_cd: sharesHolder?.ten_cd,
+      cp_tham_du: sharesHolder?.cp_tham_du,
+      ty_le_cp_tham_du: sharesHolder?.ty_le_cp_tham_du,
+      answerVoted,
+      time_voted: item.time_voted,
+    };
+  });
+
+  // END Data Table thông tin cổ đông bầu cử
 
   // GET DATA TỪ FIREBASE ---------------------------------------------------------------
   useEffect(() => {
@@ -454,8 +450,7 @@ export default function ResultView() {
         <ResultChartRight
           pollDataByKey={pollDataByKey}
           listResultByQuestion={listResultByQuestion}
-          historySendPollData={historySendPollData}
-          questionSelect={questionSelect}
+          totalUserReceivedQuestion={totalUserReceivedQuestion}
         />
       </Box>
       <Box
@@ -475,16 +470,17 @@ export default function ResultView() {
               <Table size="small">
                 <TableHeadCustom headLabel={tableLabelsResultVote} />
                 <TableBody>
-                  {result_vote.map((item: result_vote) => (
-                    <TableRow>
-                      <TableCell>{item.id}</TableCell>
-                      <TableCell>{item.answer}</TableCell>
-                      <TableCell>{item.number_vote}</TableCell>
-                      <TableCell>{item.rate_vote}</TableCell>
-                      <TableCell>{item.share_vote}</TableCell>
-                      <TableCell>{item.rate_share}</TableCell>
-                    </TableRow>
-                  ))}
+                  {dataResultVote &&
+                    dataResultVote.map((item: result_vote, index) => (
+                      <TableRow key={index}>
+                        <TableCell>{index + 1}</TableCell>
+                        <TableCell>{item.answer}</TableCell>
+                        <TableCell>{item.numberTurn}</TableCell>
+                        <TableCell>{item.rate_vote.toFixed(1)} %</TableCell>
+                        <TableCell>{numberWithCommas(item.share_vote)} CP</TableCell>
+                        <TableCell>{item.rate_share.toFixed(1)} %</TableCell>
+                      </TableRow>
+                    ))}
                 </TableBody>
               </Table>
             </Scrollbar>
@@ -508,15 +504,15 @@ export default function ResultView() {
               <Table size="small">
                 <TableHeadCustom headLabel={tableLabelsInfoShareHolderVote} />
                 <TableBody>
-                  {info_holder_vote.map((item: info_holder_vote, index) => (
-                    <TableRow>
+                  {dataTableInfoVoted.map((item: info_holder_vote, index: number) => (
+                    <TableRow key={index}>
                       <TableCell>{index + 1}</TableCell>
-                      <TableCell>{item.code}</TableCell>
-                      <TableCell>{item.name}</TableCell>
-                      <TableCell>{item.share}</TableCell>
-                      <TableCell>{item.percent_holding}</TableCell>
-                      <TableCell>{item.answer}</TableCell>
-                      <TableCell>{item.answer_time}</TableCell>
+                      <TableCell>{item.ma_cd}</TableCell>
+                      <TableCell>{item.ten_cd}</TableCell>
+                      <TableCell>{numberWithCommas(item.cp_tham_du)}</TableCell>
+                      <TableCell>{item.ty_le_cp_tham_du.toFixed(6)}</TableCell>
+                      <TableCell>{item.answerVoted}</TableCell>
+                      <TableCell>{item.time_voted}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>

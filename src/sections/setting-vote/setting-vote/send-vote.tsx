@@ -168,7 +168,9 @@ export default function SendVoteView() {
           // Convert the object into an array
           const sharesHoldersArray = Object.values(data);
 
-          setListSharesHolders(sharesHoldersArray as IUserAccess[]);
+          setListSharesHolders(
+            sharesHoldersArray.filter((item: any) => item.trang_thai === 'Tham dự') as IUserAccess[]
+          );
         } else {
           console.log('No Data');
         }

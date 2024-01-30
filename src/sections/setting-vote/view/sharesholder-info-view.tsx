@@ -114,12 +114,10 @@ export default function SharesHolderInfoView() {
         }}
       >
         <Typography sx={{ fontWeight: 500 }}>
-          {' '}
-          - Tổng cổ phần sữ hữu: <b>{totalCpSoHuu}</b>
+          - Tổng cổ phần sữ hữu: <b>{totalCpSoHuu} CP</b>
         </Typography>
         <Typography sx={{ fontWeight: 500 }}>
-          {' '}
-          - Tổng cổ phần tham dự: <b>{totalCpThamDu}</b>{' '}
+          - Tổng cổ phần tham dự: <b>{totalCpThamDu} CP</b>{' '}
         </Typography>
       </Box>
     </Container>

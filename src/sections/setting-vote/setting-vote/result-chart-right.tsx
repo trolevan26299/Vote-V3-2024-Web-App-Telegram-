@@ -15,16 +15,14 @@ interface right_chart {
 }
 
 interface Props {
-  historySendPollData?: IHistorySendPoll[];
   pollDataByKey?: IQuestion;
   listResultByQuestion?: ISelectedAnswer[];
-  questionSelect?: string;
+  totalUserReceivedQuestion?: number;
 }
 export default function ResultChartRight({
-  historySendPollData,
   pollDataByKey,
   listResultByQuestion,
-  questionSelect,
+  totalUserReceivedQuestion,
 }: Props) {
   const chartRight: right_chart = {
     series:
@@ -40,47 +38,11 @@ export default function ResultChartRight({
       [],
   };
 
-  // ------------------ LOGIC tính đã gửi câu hỏi select đến bao nhiêu người và không được trùng lặp số người
-  const filteredArray =
-    historySendPollData &&
-    historySendPollData.filter(
-      (obj) => obj.ds_poll_id?.some((item) => item.key === questionSelect)
-    );
-  const uniqueGuiDenObjects: any = [];
-
-  filteredArray?.forEach((item: any) => {
-    item.gui_den.forEach((obj: any) => {
-      const exists = uniqueGuiDenObjects.some((uniqueObj: any) => uniqueObj.ma_cd === obj.ma_cd);
-      if (!exists) {
-        uniqueGuiDenObjects.push(obj);
-      }
-    });
-  });
-
-  //  tạo một Set để lưu trữ các ma_cd đã xuất hiện
-  const seenMaCd: string[] = [];
-
-  //  sử dụng phương thức reduce() để tính toán kết quả
-  const totalUserReceivedQuestion =
-    (filteredArray &&
-      filteredArray
-        .flatMap((obj) => obj.gui_den) // Chuyển mảng 2D thành mảng 1D
-        .filter((item) => {
-          // Nếu ma_cd đã xuất hiện, bỏ qua phần tử này
-          if (seenMaCd.includes(item?.ma_cd as string)) {
-            return false;
-          }
-          // Nếu chưa xuất hiện, thêm ma_cd vào mảng và giữ lại phần tử này
-          seenMaCd.push(item?.ma_cd as string);
-          return true;
-        }).length) ||
-    0;
-
   // Tính tổng value trong mảng
   const totalValue = chartRight.series.reduce((sum, item) => sum + item.value, 0);
   chartRight.series.push({
     label: 'Chưa bình chọn',
-    value: totalUserReceivedQuestion - totalValue,
+    value: (totalUserReceivedQuestion && totalUserReceivedQuestion - totalValue) || 0,
   });
   const { series, colors, options } = chartRight;
   const chartSeriesRight = series.map((i) => i.value);
