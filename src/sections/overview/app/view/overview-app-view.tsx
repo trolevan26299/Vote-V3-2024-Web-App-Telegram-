@@ -28,29 +28,6 @@ export default function OverviewAppView() {
             join_rate={user?.ty_le_cp_tham_du}
           />
         </Grid>
-
-        <Box sx={styles.box_btn_vote}>
-          <Button
-            variant="contained"
-            sx={{
-              ...styles.btn_vote,
-              backgroundColor: '#7e9dec',
-            }}
-            href={paths.dashboard.voteDH}
-          >
-            Bỏ phiếu đại hội
-          </Button>
-          <Button
-            variant="contained"
-            sx={{
-              ...styles.btn_vote,
-              backgroundColor: '#27D0B7',
-            }}
-            href={paths.dashboard.voteHD}
-          >
-            Bầu cử cổ đông
-          </Button>
-        </Box>
       </Grid>
     </Container>
   );

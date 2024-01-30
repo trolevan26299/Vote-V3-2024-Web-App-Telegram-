@@ -11,12 +11,13 @@ export const styles: { [key: string]: SxProps<Theme> } = {
     marginTop: { xs: '5%', md: '10%' },
   },
   btn_vote: {
-    width: '47%',
+    width: '100%',
+    marginTop: '50px',
     padding: { xs: '10px', md: '20px 80px' },
   },
 
   box_stack_info: {
-    height: { md: 1 },
+    height: '100vh',
     borderRadius: 2,
     position: 'relative',
     color: 'primary.darker',

@@ -287,12 +287,11 @@ export default function UserListView() {
                         onEditRow={() => handleEditRow(row.id)}
                       />
                     ))}
-
+                  No data returned.
                   <TableEmptyRows
                     height={denseHeight}
                     emptyRows={emptyRows(table.page, table.rowsPerPage, tableData.length)}
                   />
-
                   <TableNoData notFound={notFound} />
                 </TableBody>
               </Table>

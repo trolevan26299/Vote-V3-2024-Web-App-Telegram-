@@ -3,7 +3,8 @@ import Stack, { StackProps } from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import { alpha, useTheme } from '@mui/material/styles';
 // theme
-import { Box, Grid } from '@mui/material';
+import { Box, Button, Grid } from '@mui/material';
+import { paths } from 'src/routes/paths';
 import { bgGradient } from 'src/theme/css';
 import { styles } from './styles';
 
@@ -81,6 +82,18 @@ export default function AppWelcome({
             <Grid item xs={4} md={6} lg={8}>
               <Typography sx={{ fontWeight: 'bold' }}>{join_rate?.toFixed(5)} %</Typography>
             </Grid>
+          </Grid>
+          <Grid item xs={12} md={6} lg={6}>
+            <Button
+              variant="contained"
+              sx={{
+                ...styles.btn_vote,
+                backgroundColor: '#7e9dec',
+              }}
+              href={paths.dashboard.voteDH}
+            >
+              Bỏ phiếu đại hội
+            </Button>
           </Grid>
         </Box>
 
