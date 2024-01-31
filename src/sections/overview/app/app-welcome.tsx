@@ -57,11 +57,11 @@ export default function AppWelcome({
           textAlign: { xs: 'center', md: 'left' },
         }}
       >
-        <Typography variant="h4" sx={{ mb: 2, whiteSpace: 'pre-line' }}>
+        <Typography variant="h4" sx={{ mb: 1, whiteSpace: 'pre-line' }}>
           {title}
         </Typography>
 
-        <Box className="box_content" sx={{ marginTop: '50px' }}>
+        <Box className="box_content" sx={{ marginTop: '10px' }}>
           <Typography variant="h5">Thông tin cổ phần của bạn :</Typography>
           <Grid container spacing={2} sx={styles.grid_box}>
             <Grid item xs={8} md={6} lg={4}>
