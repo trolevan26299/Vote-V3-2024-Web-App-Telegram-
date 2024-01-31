@@ -6,16 +6,16 @@ import 'src/locales/i18n';
 import 'simplebar-react/dist/simplebar.min.css';
 
 // lightbox
-import 'yet-another-react-lightbox/styles.css';
 import 'yet-another-react-lightbox/plugins/captions.css';
 import 'yet-another-react-lightbox/plugins/thumbnails.css';
+import 'yet-another-react-lightbox/styles.css';
 
 // editor
 import 'react-quill/dist/quill.snow.css';
 
 // carousel
-import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
+import 'slick-carousel/slick/slick.css';
 
 // image
 import 'react-lazy-load-image-component/src/effects/blur.css';
@@ -28,15 +28,15 @@ import { LocalizationProvider } from 'src/locales';
 import ThemeProvider from 'src/theme';
 import { primaryFont } from 'src/theme/typography';
 // components
-import ProgressBar from 'src/components/progress-bar';
 import { MotionLazy } from 'src/components/animate/motion-lazy';
+import ProgressBar from 'src/components/progress-bar';
+import { SettingsDrawer, SettingsProvider } from 'src/components/settings';
 import SnackbarProvider from 'src/components/snackbar/snackbar-provider';
-import { SettingsProvider, SettingsDrawer } from 'src/components/settings';
 
 // auth
-import { AuthProvider, AuthConsumer } from 'src/auth/context/jwt';
-import { TelegramProvider } from 'src/telegram/telegram.provider';
 import { UserProvider } from 'src/firebase/user_accesss_provider';
+import { StringStateProvider } from 'src/stores/questionSelectUser.provider';
+import { TelegramProvider } from 'src/telegram/telegram.provider';
 
 // ----------------------------------------------------------------------
 
@@ -100,16 +100,18 @@ export default function RootLayout({ children }: Props) {
             <ThemeProvider>
               <TelegramProvider>
                 <UserProvider>
-                  <MotionLazy>
-                    <SnackbarProvider>
-                      <SettingsDrawer />
-                      <ProgressBar />
-                      {/* <AuthConsumer>
+                  <StringStateProvider>
+                    <MotionLazy>
+                      <SnackbarProvider>
+                        <SettingsDrawer />
+                        <ProgressBar />
+                        {/* <AuthConsumer>
                              {children}
                         </AuthConsumer> */}
-                      {children}
-                    </SnackbarProvider>
-                  </MotionLazy>
+                        {children}
+                      </SnackbarProvider>
+                    </MotionLazy>
+                  </StringStateProvider>
                 </UserProvider>
               </TelegramProvider>
             </ThemeProvider>

@@ -20,6 +20,7 @@ import { useSettingsContext } from 'src/components/settings';
 import { FIREBASE_COLLECTION } from 'src/constant/firebase_collection.constant';
 import { database } from 'src/firebase/firebase.config';
 import { useUser } from 'src/firebase/user_accesss_provider';
+import { useStringState } from 'src/stores/questionSelectUser.provider';
 import { IHistorySendPoll, IListSender, IQuestion } from 'src/types/setting';
 import { IDataQuestionSelect, IHistoryVoted } from 'src/types/votedh.types';
 import { bgGradient } from '../../../theme/css';
@@ -31,12 +32,14 @@ export default function ProcessDHView() {
   const settings = useSettingsContext();
   const theme = useTheme();
   const { user } = useUser();
+  const { stringValue, updateStringValue } = useStringState();
   // data from firebase state
   const [historySendPollData, setHistorySendPollData] = useState<IHistorySendPoll[]>([]);
   const [danhSachPollData, setDanhSachPollData] = useState<IQuestion[]>([]);
   const [listHistoryVoted, setListHistoryVoted] = useState<IHistoryVoted[]>([]);
   const [totalSharesHolder, setTotalSharesHolder] = useState<any>([]);
 
+  console.log('string value---------------------', stringValue);
   // CODE FOR SELECT QUESTION FROM FIREBASE
   const existingKeys = new Set<string>();
 
@@ -57,8 +60,7 @@ export default function ProcessDHView() {
   // CODE FOR SELECT QUESTION
   // Handle select question
   const [questionSelect, SetQuestionSelect] = useState<string>(questionSelectData[0]?.key || '');
-  console.log('questionSelectData :', questionSelectData[0]?.key);
-  console.log('questionSelect :', questionSelect);
+
   const handleChangeSelectQuestion = (event: SelectChangeEvent) => {
     SetQuestionSelect(event.target.value);
   };

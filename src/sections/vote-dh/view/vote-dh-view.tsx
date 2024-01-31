@@ -21,6 +21,7 @@ import { database } from 'src/firebase/firebase.config';
 import { useUser } from 'src/firebase/user_accesss_provider';
 import { useRouter } from 'src/routes/hooks';
 import { paths } from 'src/routes/paths';
+import { useStringState } from 'src/stores/questionSelectUser.provider';
 import { IHistorySendPoll, IQuestion } from 'src/types/setting';
 import { IHistoryVoted, ISelectedAnswer } from 'src/types/votedh.types';
 import { convertToMilliseconds } from 'src/utils/convertTimeStringToMiliSeconds';
@@ -33,6 +34,7 @@ export default function VoteDHView() {
   const theme = useTheme();
   const { user } = useUser();
   const router = useRouter();
+  const { updateStringValue } = useStringState();
   // LIST DATA SEND POLL FROM FIREBASE
 
   const [historySendPollData, setHistorySendPollData] = useState<IHistorySendPoll[]>([]);
@@ -53,7 +55,7 @@ export default function VoteDHView() {
       time: item.time_voted,
     };
   });
-
+  console.log('selected answer:', selectedAnswers);
   // handle change form
   const handleChange = (
     event: React.ChangeEvent<HTMLInputElement>,
@@ -114,8 +116,6 @@ export default function VoteDHView() {
     // Nếu không thỏa mãn điều kiện hoặc không có phần tử nào thỏa mãn trong gui_den, trả về false
     return false;
   });
-
-  console.log('------------------filtered data------------------ :', filteredData);
 
   // Tổng số câu hỏi mà user sẽ phải trả lời
   const numberQuestionNoVote = filteredData.reduce(
@@ -184,6 +184,7 @@ export default function VoteDHView() {
     })
       .then(() => {
         updateHistorySendPoll();
+
         enqueueSnackbar('Gửi ý kiến thành công  !', { variant: 'success' });
       })
       .catch((error) => {
