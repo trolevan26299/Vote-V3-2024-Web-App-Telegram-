@@ -19,6 +19,7 @@ import CustomBreadcrumbs from 'src/components/custom-breadcrumbs';
 import { useSettingsContext } from 'src/components/settings';
 import { FIREBASE_COLLECTION } from 'src/constant/firebase_collection.constant';
 import { database } from 'src/firebase/firebase.config';
+import { useUser } from 'src/firebase/user_accesss_provider';
 import { IHistorySendPoll, IListSender, IQuestion } from 'src/types/setting';
 import { IDataQuestionSelect, IHistoryVoted } from 'src/types/votedh.types';
 import { bgGradient } from '../../../theme/css';
@@ -29,7 +30,7 @@ import DHContentTable from '../dh-content-table';
 export default function ProcessDHView() {
   const settings = useSettingsContext();
   const theme = useTheme();
-
+  const { user } = useUser();
   // data from firebase state
   const [historySendPollData, setHistorySendPollData] = useState<IHistorySendPoll[]>([]);
   const [danhSachPollData, setDanhSachPollData] = useState<IQuestion[]>([]);
@@ -55,6 +56,7 @@ export default function ProcessDHView() {
 
   // CODE FOR SELECT QUESTION
   // Handle select question
+  console.log('questionSelectData :', questionSelectData[0]?.key);
   const [questionSelect, SetQuestionSelect] = useState<string>(questionSelectData[0]?.key || '');
   const handleChangeSelectQuestion = (event: SelectChangeEvent) => {
     SetQuestionSelect(event.target.value);
@@ -147,6 +149,7 @@ export default function ProcessDHView() {
         const ls_gui_poll = snapshot.val().ls_gui_poll ?? {};
         const danh_sach_poll = snapshot.val().danh_sach_poll ?? {};
         const ls_poll = snapshot.val().ls_poll ?? {};
+
         const listHistorySendPoll = Object.keys(ls_gui_poll).map((key) => ({
           key,
           ...snapshot.val().ls_gui_poll[key],
@@ -170,6 +173,26 @@ export default function ProcessDHView() {
       // Detach the listener
       unsubscribe();
     };
+  }, []);
+
+  useEffect(() => {
+    // get data từ firebase realtime
+    const userRef = ref(database, FIREBASE_COLLECTION.QUESTION_SHOW_BY_ADMIN);
+    const onDataChange = (snapshot: DataSnapshot) => {
+      const dataSnapShot = snapshot.exists();
+      if (dataSnapShot) {
+        const key_question_admin_show = snapshot.val().question_result_show_admin.key ?? '';
+        if (!user) {
+          SetQuestionSelect(key_question_admin_show);
+        }
+      }
+    };
+    const unsubscribe = onValue(userRef, onDataChange);
+    return () => {
+      // Detach the listener
+      unsubscribe();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
