@@ -54,7 +54,6 @@ export default function ProcessDHView() {
     });
     return result;
   }, [] as IHistorySendPoll[]);
-
   // CODE FOR SELECT QUESTION
   // Handle select question
   const [questionSelect, SetQuestionSelect] = useState<string>(questionSelectData[0]?.key || '');
@@ -62,6 +61,8 @@ export default function ProcessDHView() {
   const handleChangeSelectQuestion = (event: SelectChangeEvent) => {
     SetQuestionSelect(event.target.value);
   };
+  console.log('string value :', stringValue);
+  console.log('questionSelect:', questionSelect);
 
   const pollDataByKey = danhSachPollData.find((poll) => poll.key === questionSelect);
 
