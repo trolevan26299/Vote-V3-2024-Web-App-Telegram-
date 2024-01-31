@@ -56,8 +56,9 @@ export default function ProcessDHView() {
 
   // CODE FOR SELECT QUESTION
   // Handle select question
-  console.log('questionSelectData :', questionSelectData[0]?.key);
   const [questionSelect, SetQuestionSelect] = useState<string>(questionSelectData[0]?.key || '');
+  console.log('questionSelectData :', questionSelectData[0]?.key);
+  console.log('questionSelect :', questionSelect);
   const handleChangeSelectQuestion = (event: SelectChangeEvent) => {
     SetQuestionSelect(event.target.value);
   };
