@@ -9,7 +9,7 @@ export default function HomeView() {
   const router = useRouter();
   const { user } = useUser();
   useEffect(() => {
-    if (user) {
+    if (!user) {
       router.push(paths.dashboard.root);
     } else {
       router.push(paths.dashboard.settingVote.vote);

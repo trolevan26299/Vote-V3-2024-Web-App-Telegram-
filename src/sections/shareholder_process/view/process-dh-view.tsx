@@ -197,7 +197,7 @@ export default function ProcessDHView() {
   }, []);
 
   useEffect(() => {
-    if (stringValue !== undefined && stringValue !== '') {
+    if (stringValue !== undefined && stringValue !== '' && !user) {
       SetQuestionSelect(stringValue);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
