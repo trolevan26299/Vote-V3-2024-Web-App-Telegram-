@@ -177,7 +177,7 @@ export default function ProcessDHView() {
 
   useEffect(() => {
     // get data từ firebase realtime
-    const userRef = ref(database, FIREBASE_COLLECTION.QUESTION_SHOW_BY_ADMIN);
+    const userRef = ref(database, 'question_result_show_admin');
     const onDataChange = (snapshot: DataSnapshot) => {
       const dataSnapShot = snapshot.exists();
       if (dataSnapShot) {
