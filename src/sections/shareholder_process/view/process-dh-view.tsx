@@ -197,6 +197,13 @@ export default function ProcessDHView() {
   }, []);
 
   useEffect(() => {
+    if (stringValue !== undefined && stringValue !== '') {
+      SetQuestionSelect(stringValue);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [stringValue]);
+
+  useEffect(() => {
     // Get Data danh sách cổ đông không realtime
     const userRef = ref(database, FIREBASE_COLLECTION.THONG_TIN_CD);
     const fetchData = async () => {
