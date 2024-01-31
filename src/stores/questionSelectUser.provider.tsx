@@ -13,7 +13,7 @@ interface StringStateProviderProps {
 const StringStateContext = createContext<StringStateContextProps | undefined>(undefined);
 
 export const StringStateProvider: React.FC<StringStateProviderProps> = ({ children }) => {
-  const [stringValue, setStringValue] = useState('123456');
+  const [stringValue, setStringValue] = useState('');
 
   const updateStringValue = (newValue: string) => {
     setStringValue(newValue);

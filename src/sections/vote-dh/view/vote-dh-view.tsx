@@ -184,7 +184,7 @@ export default function VoteDHView() {
     })
       .then(() => {
         updateHistorySendPoll();
-
+        updateStringValue(selectedAnswers[0].key_question);
         enqueueSnackbar('Gửi ý kiến thành công  !', { variant: 'success' });
       })
       .catch((error) => {

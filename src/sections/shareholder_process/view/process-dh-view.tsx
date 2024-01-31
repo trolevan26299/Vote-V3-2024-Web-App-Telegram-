@@ -32,14 +32,12 @@ export default function ProcessDHView() {
   const settings = useSettingsContext();
   const theme = useTheme();
   const { user } = useUser();
-  const { stringValue, updateStringValue } = useStringState();
+  const { stringValue } = useStringState();
   // data from firebase state
   const [historySendPollData, setHistorySendPollData] = useState<IHistorySendPoll[]>([]);
   const [danhSachPollData, setDanhSachPollData] = useState<IQuestion[]>([]);
   const [listHistoryVoted, setListHistoryVoted] = useState<IHistoryVoted[]>([]);
   const [totalSharesHolder, setTotalSharesHolder] = useState<any>([]);
-
-  console.log('string value---------------------', stringValue);
   // CODE FOR SELECT QUESTION FROM FIREBASE
   const existingKeys = new Set<string>();
 

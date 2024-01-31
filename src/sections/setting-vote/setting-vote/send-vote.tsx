@@ -255,7 +255,7 @@ export default function SendVoteView() {
             options={[allOption, ...listSharesHolders]}
             getOptionLabel={(option) => option.ten_cd as string}
             renderInput={(params) => (
-              <TextField {...params} placeholder="Câu hỏi" label="Chọn câu hỏi" size="small" />
+              <TextField {...params} placeholder="Cổ đông" label="Chọn cổ đông" size="small" />
             )}
             sx={{ width: '50%' }}
             size="small"
