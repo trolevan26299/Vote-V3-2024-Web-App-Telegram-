@@ -22,7 +22,7 @@ import { database } from 'src/firebase/firebase.config';
 import { useUser } from 'src/firebase/user_accesss_provider';
 import { useStringState } from 'src/stores/questionSelectUser.provider';
 import { IHistorySendPoll, IListSender, IQuestion } from 'src/types/setting';
-import { IDataQuestionSelect, IHistoryVoted } from 'src/types/votedh.types';
+import { IHistoryVoted } from 'src/types/votedh.types';
 import { bgGradient } from '../../../theme/css';
 import DHContentLeft from '../dh-content-left';
 import DHContentRight from '../dh-content-right';
@@ -56,13 +56,11 @@ export default function ProcessDHView() {
   }, [] as IHistorySendPoll[]);
   // CODE FOR SELECT QUESTION
   // Handle select question
-  const [questionSelect, SetQuestionSelect] = useState<string>(questionSelectData[0]?.key || '');
+  const [questionSelect, SetQuestionSelect] = useState<string>(danhSachPollData[0]?.key || '');
 
   const handleChangeSelectQuestion = (event: SelectChangeEvent) => {
     SetQuestionSelect(event.target.value);
   };
-  console.log('string value :', stringValue);
-  console.log('questionSelect:', questionSelect);
 
   const pollDataByKey = danhSachPollData.find((poll) => poll.key === questionSelect);
 
@@ -183,9 +181,9 @@ export default function ProcessDHView() {
     const onDataChange = (snapshot: DataSnapshot) => {
       const dataSnapShot = snapshot.exists();
       if (dataSnapShot) {
-        const key_question_admin_show = snapshot.val().question_result_show_admin.key ?? '';
+        const key_question_admin_show = snapshot.val();
         if (!user) {
-          SetQuestionSelect(key_question_admin_show);
+          SetQuestionSelect(key_question_admin_show.key);
         }
       }
     };
@@ -259,7 +257,7 @@ export default function ProcessDHView() {
             onChange={handleChangeSelectQuestion}
             sx={{ minWidth: '100% !important' }}
           >
-            {questionSelectData.map((item: IDataQuestionSelect) => (
+            {danhSachPollData.map((item: IQuestion) => (
               <MenuItem value={item.key}>{item.ten_poll}</MenuItem>
             ))}
           </Select>

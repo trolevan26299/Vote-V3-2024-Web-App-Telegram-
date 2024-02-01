@@ -237,21 +237,6 @@ export default function ResultView() {
 
   // END Data Table thông tin cổ đông bầu cử
 
-  // hàm trình chiếu muốn show tiến trình bầu cử của câu hỏi
-  const handleShowResultQuestionForAdmin = () => {
-    const keyShowFirebaseRef = ref(database, 'question_result_show_admin');
-    const updateData = {
-      key: questionSelect,
-    };
-    update(keyShowFirebaseRef, updateData)
-      .then(() => {
-        console.log('Trình chiếu câu hỏi thành công !');
-      })
-      .catch((error) => {
-        console.log('Trình chiếu câu hỏi thất bại ,lỗi:', error);
-      });
-  };
-
   // GET DATA TỪ FIREBASE ---------------------------------------------------------------
   useEffect(() => {
     // get data từ firebase realtime
@@ -363,14 +348,6 @@ export default function ResultView() {
               </Typography>
             </Box>
           </Box>
-          <Button
-            variant="contained"
-            size="large"
-            sx={{ backgroundColor: alpha(theme.palette.primary.dark, 0.8) }}
-            onClick={() => handleShowResultQuestionForAdmin()}
-          >
-            Trình chiếu
-          </Button>
         </Box>
       </Box>
       <Box

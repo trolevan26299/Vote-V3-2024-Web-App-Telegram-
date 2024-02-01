@@ -18,7 +18,7 @@ import {
   Typography,
 } from '@mui/material';
 import { alpha, useTheme } from '@mui/material/styles';
-import { DataSnapshot, get, onValue, push, ref, set } from 'firebase/database';
+import { DataSnapshot, get, onValue, push, ref, set, update } from 'firebase/database';
 import { enqueueSnackbar } from 'notistack';
 import React, { useEffect, useState } from 'react';
 import { sendTelegramMessage } from 'src/api/sendTelegramMessage';
@@ -49,6 +49,7 @@ export default function SendVoteView() {
   const [inputValueTextAnswer, setInputValueTextAnswer] = useState('');
   const [answerSelect, setAnswerSelect] = React.useState<IQuestion[]>([]);
 
+  console.log('answer select:', answerSelect);
   // handle select shareholder
   const allOption: IUserAccess = {
     ten_cd: 'Tất cả',
@@ -92,8 +93,23 @@ export default function SendVoteView() {
     setShareHolderSelect([]);
     setExpireTime('');
   };
+
+  // hàm trình chiếu muốn show tiến trình bầu cử của câu hỏi
+  const handleShowResultQuestionForAdmin = () => {
+    const keyShowFirebaseRef = ref(database, 'question_result_show_admin');
+    const updateData = {
+      key: answerSelect[0].key,
+    };
+    update(keyShowFirebaseRef, updateData)
+      .then(() => {
+        console.log('Trình chiếu câu hỏi thành công !');
+      })
+      .catch((error) => {
+        console.log('Trình chiếu câu hỏi thất bại ,lỗi:', error);
+      });
+  };
   // ================================== HANDLER SUBMIT FORM =======================================
-  const handlerSubmitForm = async () => {
+  const handlerSubmitForm = async (type?: string) => {
     const historySendVoteRef = ref(database, 'poll_process/ls_gui_poll');
     const newRef = push(historySendVoteRef);
     await set(newRef, {
@@ -108,7 +124,7 @@ export default function SendVoteView() {
       thoi_gian_ket_thuc: ExpireTimeFunc(currentTimeUTC7, expireTime),
     })
       .then(() => {
-        enqueueSnackbar('Lưu Thành Công !', { variant: 'success' });
+        enqueueSnackbar('Gửi Thành Công !', { variant: 'success' });
         sendTelegramMessage(
           shareHolderSelect.map((item) => ({
             telegram_id: item.telegram_id as number,
@@ -119,6 +135,9 @@ export default function SendVoteView() {
 
           ExpireTimeFunc(currentTimeUTC7, expireTime)
         );
+        if (type) {
+          handleShowResultQuestionForAdmin();
+        }
         setInitFormWhenSubmit();
       })
       .catch((error) => {
@@ -291,11 +310,21 @@ export default function SendVoteView() {
           <Box sx={{ width: '15%' }} />
           <Button
             variant="contained"
+            color="info"
             disabled={answerSelect.length < 0 || shareHolderSelect.length < 0 || expireTime === ''}
-            sx={{ width: '50%' }}
+            sx={{ width: '24.5%' }}
             onClick={() => handlerSubmitForm()}
           >
             Gửi
+          </Button>
+          <Button
+            variant="contained"
+            color="success"
+            disabled={answerSelect.length < 0 || shareHolderSelect.length < 0 || expireTime === ''}
+            sx={{ width: '24.5%' }}
+            onClick={() => handlerSubmitForm('sentAndShow')}
+          >
+            Gửi & Trình Chiếu
           </Button>
         </Box>
       </Box>

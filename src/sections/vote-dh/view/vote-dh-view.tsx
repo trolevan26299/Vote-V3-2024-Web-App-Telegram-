@@ -55,7 +55,8 @@ export default function VoteDHView() {
       time: item.time_voted,
     };
   });
-  console.log('selected answer:', selectedAnswers);
+
+  console.log('================= user ==================== :', user);
   // handle change form
   const handleChange = (
     event: React.ChangeEvent<HTMLInputElement>,

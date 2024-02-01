@@ -1,15 +1,11 @@
 'use client';
 
-import { Box } from '@mui/material';
-import Button from '@mui/material/Button';
 import Container from '@mui/material/Container';
 import Grid from '@mui/material/Unstable_Grid2';
 
 import { SeoIllustration } from 'src/assets/illustrations';
 import { useUser } from 'src/firebase/user_accesss_provider';
-import { paths } from 'src/routes/paths';
 import AppWelcome from '../app-welcome';
-import { styles } from '../styles';
 
 // ----------------------------------------------------------------------
 
