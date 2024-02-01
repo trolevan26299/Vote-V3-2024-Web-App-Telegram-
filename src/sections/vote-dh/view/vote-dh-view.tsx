@@ -272,7 +272,7 @@ export default function VoteDHView() {
                         {danhSachPollData.find((item3) => item3.key === item2.key)?.ten_poll}
                       </Typography>
                       <Typography>
-                        Nội dung :{' '}
+                        {!user || user.nguoi_nuoc_ngoai === false ? 'Nội dung:' : 'Content:'}
                         {danhSachPollData.find((item3) => item3.key === item2.key)?.noi_dung}{' '}
                       </Typography>
                     </Box>
@@ -286,7 +286,9 @@ export default function VoteDHView() {
                       }}
                     >
                       <Typography sx={{ fontSize: '16px', fontWeight: 'bold' }}>
-                        Ý kiến của bạn :
+                        {!user || user.nguoi_nuoc_ngoai === false
+                          ? 'Ý kiến của bạn:'
+                          : 'Your answer:'}
                       </Typography>
                       <RadioGroup
                         aria-labelledby="demo-controlled-radio-buttons-group"
@@ -325,7 +327,7 @@ export default function VoteDHView() {
             onClick={() => handleSubmitVote()}
             disabled={numberQuestionNoVote !== selectedAnswers.length}
           >
-            Gửi ý kiến
+            {!user || user.nguoi_nuoc_ngoai === false ? 'Gửi ý kiến' : 'Submit your answer'}
           </Button>
         ) : (
           <Box
@@ -338,21 +340,39 @@ export default function VoteDHView() {
               alignItems: 'center',
             }}
           >
-            <Typography sx={{ fontWeight: 'bold' }}> Không có câu hỏi cần trả lời</Typography>
+            <Typography sx={{ fontWeight: 'bold' }}>
+              {!user || user.nguoi_nuoc_ngoai === false
+                ? 'Không có câu hỏi cần trả lời'
+                : 'No have question need answer'}
+            </Typography>
           </Box>
         )}
       </Box>
       <Box className="vote-history-table" sx={{ marginTop: '50px' }}>
         <Typography variant="h6" sx={{ pb: '10px' }}>
-          Lịch Sử Bỏ Phiếu Của Bạn :
+          {!user || user.nguoi_nuoc_ngoai === false
+            ? 'Lịch sử bỏ phiếu của bạn :'
+            : 'Your voting History :'}
         </Typography>
         <VoteDHTable
           tableData={arrayDataHistoryVoted}
           tableLabels={[
-            { id: 'question', label: 'Câu hỏi' },
-            { id: 'content', label: 'Nội dung' },
-            { id: 'answer', label: 'Câu trả lời' },
-            { id: 'time_send_vote', label: 'Thời gian gửi' },
+            {
+              id: 'question',
+              label: !user || user.nguoi_nuoc_ngoai === false ? 'Câu hỏi' : 'Question',
+            },
+            {
+              id: 'content',
+              label: !user || user.nguoi_nuoc_ngoai === false ? 'Nội dung' : 'Content',
+            },
+            {
+              id: 'answer',
+              label: !user || user.nguoi_nuoc_ngoai === false ? 'Câu trả lời' : 'Answer',
+            },
+            {
+              id: 'time_send_vote',
+              label: !user || user.nguoi_nuoc_ngoai === false ? 'Thời gian gửi' : 'Sending Time',
+            },
           ]}
         />
       </Box>
