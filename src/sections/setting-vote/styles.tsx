@@ -76,6 +76,6 @@ export const styles: { [key: string]: SxProps<Theme> } = {
     marginTop: '10px',
     padding: '10px',
     borderRadius: '10px',
-    width: '20%',
+    width: '35%',
   },
 };

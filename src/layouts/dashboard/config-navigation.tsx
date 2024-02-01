@@ -6,6 +6,7 @@ import { useLocales } from 'src/locales';
 // components
 
 import SvgColor from 'src/components/svg-color';
+import { useUser } from 'src/firebase/user_accesss_provider';
 
 // ----------------------------------------------------------------------
 
@@ -44,6 +45,8 @@ const ICONS = {
 
 export function useNavData() {
   const { t } = useLocales();
+  const { user } = useUser();
+  console.log('user menu:', user);
 
   const data = useMemo(
     () => [
