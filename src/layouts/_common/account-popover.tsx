@@ -19,30 +19,31 @@ import { useAuthContext } from 'src/auth/hooks';
 import { varHover } from 'src/components/animate';
 import { useSnackbar } from 'src/components/snackbar';
 import CustomPopover, { usePopover } from 'src/components/custom-popover';
+import { useUser } from 'src/firebase/user_accesss_provider';
 
 // ----------------------------------------------------------------------
-
-const OPTIONS = [
-  {
-    label: 'Home',
-    linkTo: '/',
-  },
-  {
-    label: 'Profile',
-    linkTo: paths.dashboard.user.profile,
-  },
-  {
-    label: 'Settings',
-    linkTo: paths.dashboard.user.account,
-  },
-];
 
 // ----------------------------------------------------------------------
 
 export default function AccountPopover() {
   const router = useRouter();
 
-  const { user } = useMockedUser();
+  const { user } = useUser();
+
+  const OPTIONS = [
+    {
+      label: user?.nguoi_nuoc_ngoai === true ? 'Total Shares :' : 'CP Tham Dự :',
+      value: user?.cp_tham_du,
+    },
+    {
+      label: 'Telegram ID :',
+      value: user?.telegram_id,
+    },
+    {
+      label: user?.nguoi_nuoc_ngoai === true ? 'Total Share :' : 'Tỷ lệ CP tham dự :',
+      value: user?.ty_le_cp_tham_du,
+    },
+  ];
 
   const { logout } = useAuthContext();
 
@@ -50,21 +51,21 @@ export default function AccountPopover() {
 
   const popover = usePopover();
 
-  const handleLogout = async () => {
-    try {
-      await logout();
-      popover.onClose();
-      router.replace('/');
-    } catch (error) {
-      console.error(error);
-      enqueueSnackbar('Unable to logout!', { variant: 'error' });
-    }
-  };
+  // const handleLogout = async () => {
+  //   try {
+  //     await logout();
+  //     popover.onClose();
+  //     router.replace('/');
+  //   } catch (error) {
+  //     console.error(error);
+  //     enqueueSnackbar('Unable to logout!', { variant: 'error' });
+  //   }
+  // };
 
-  const handleClickItem = (path: string) => {
-    popover.onClose();
-    router.push(path);
-  };
+  // const handleClickItem = (path: string) => {
+  //   popover.onClose();
+  //   router.push(path);
+  // };
 
   return (
     <>
@@ -85,26 +86,27 @@ export default function AccountPopover() {
         }}
       >
         <Avatar
-          src={user?.photoURL}
-          alt={user?.displayName}
+          src=""
+          alt={user?.ten_cd}
           sx={{
             width: 36,
             height: 36,
             border: (theme) => `solid 2px ${theme.palette.background.default}`,
           }}
         >
-          {user?.displayName.charAt(0).toUpperCase()}
+          {user?.ten_cd?.charAt(0).toUpperCase()}
         </Avatar>
       </IconButton>
 
       <CustomPopover open={popover.open} onClose={popover.onClose} sx={{ width: 200, p: 0 }}>
         <Box sx={{ p: 2, pb: 1.5 }}>
           <Typography variant="subtitle2" noWrap>
-            {user?.displayName}
+            {user?.ten_cd}
           </Typography>
 
           <Typography variant="body2" sx={{ color: 'text.secondary' }} noWrap>
-            {user?.email}
+            {user?.nguoi_nuoc_ngoai === true ? 'Code :' : 'Mã Cổ đông :'}
+            {user?.ma_cd}
           </Typography>
         </Box>
 
@@ -112,20 +114,21 @@ export default function AccountPopover() {
 
         <Stack sx={{ p: 1 }}>
           {OPTIONS.map((option) => (
-            <MenuItem key={option.label} onClick={() => handleClickItem(option.linkTo)}>
+            <MenuItem key={option.label}>
               {option.label}
+              {option.value}
             </MenuItem>
           ))}
         </Stack>
 
         <Divider sx={{ borderStyle: 'dashed' }} />
 
-        <MenuItem
+        {/* <MenuItem
           onClick={handleLogout}
           sx={{ m: 1, fontWeight: 'fontWeightBold', color: 'error.main' }}
         >
           Logout
-        </MenuItem>
+        </MenuItem> */}
       </CustomPopover>
     </>
   );

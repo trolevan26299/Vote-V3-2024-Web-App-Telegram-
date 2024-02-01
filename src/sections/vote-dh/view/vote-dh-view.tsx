@@ -232,7 +232,7 @@ export default function VoteDHView() {
   return (
     <Container sx={{ maxWidth: '100% !important' }}>
       <CustomBreadcrumbs
-        heading="Bỏ phiếu đại hội"
+        heading={!user || user.nguoi_nuoc_ngoai === false ? 'Bỏ phiếu đại hội' : 'Congress Poll'}
         links={[{ name: '' }]}
         sx={{
           mb: { xs: 1, md: 1 },
