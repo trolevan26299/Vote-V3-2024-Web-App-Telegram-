@@ -40,7 +40,7 @@ export default function AccountPopover() {
       value: user?.telegram_id,
     },
     {
-      label: user?.nguoi_nuoc_ngoai === true ? 'Total Share :' : 'Tỷ lệ CP tham dự :',
+      label: user?.nguoi_nuoc_ngoai === true ? 'Rate Shares :' : 'Tỷ lệ CP tham dự :',
       value: user?.ty_le_cp_tham_du?.toFixed(6),
     },
   ];
@@ -115,7 +115,7 @@ export default function AccountPopover() {
         <Stack sx={{ p: 1 }}>
           {OPTIONS.map((option) => (
             <MenuItem key={option.label}>
-              <b>{option.label}</b>
+              <b>{option.label} </b>
               {option.value}
             </MenuItem>
           ))}
