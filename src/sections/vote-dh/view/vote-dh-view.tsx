@@ -46,12 +46,15 @@ export default function VoteDHView() {
     listHistoryVoted.find((item) => item.ma_cd === user?.ma_cd)?.detail || []
   ).map((item) => {
     const pollInfo = danhSachPollData.find((poll) => poll.key === item.key_question) || {};
-    const { ten_poll, noi_dung, dap_an } = pollInfo;
+    const { ten_poll, ten_poll_en, noi_dung, noi_dung_en, dap_an } = pollInfo;
 
     return {
-      question: ten_poll,
-      content: noi_dung,
-      answer: dap_an?.find((dap_an_item) => dap_an_item.id === Number(item.answer_select_id))?.vi,
+      question: !user || user.nguoi_nuoc_ngoai === false ? ten_poll : ten_poll_en,
+      content: !user || user.nguoi_nuoc_ngoai === false ? noi_dung : noi_dung_en,
+      answer:
+        !user || user.nguoi_nuoc_ngoai === false
+          ? dap_an?.find((dap_an_item) => dap_an_item.id === Number(item.answer_select_id))?.vi
+          : dap_an?.find((dap_an_item) => dap_an_item.id === Number(item.answer_select_id))?.en,
       time: item.time_voted,
     };
   });
@@ -269,11 +272,15 @@ export default function VoteDHView() {
                   <FormControl>
                     <Box marginBottom={1.5}>
                       <Typography sx={{ fontSize: '18px', fontWeight: '600' }}>
-                        {danhSachPollData.find((item3) => item3.key === item2.key)?.ten_poll}
+                        {!user || user.nguoi_nuoc_ngoai === false
+                          ? danhSachPollData.find((item3) => item3.key === item2.key)?.ten_poll
+                          : danhSachPollData.find((item3) => item3.key === item2.key)?.ten_poll_en}
                       </Typography>
                       <Typography>
                         {!user || user.nguoi_nuoc_ngoai === false ? 'Nội dung:' : 'Content:'}
-                        {danhSachPollData.find((item3) => item3.key === item2.key)?.noi_dung}{' '}
+                        {!user || user.nguoi_nuoc_ngoai === false
+                          ? danhSachPollData.find((item3) => item3.key === item2.key)?.noi_dung
+                          : danhSachPollData.find((item3) => item3.key === item2.key)?.noi_dung_en}
                       </Typography>
                     </Box>
                     <Box
