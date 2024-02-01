@@ -41,7 +41,7 @@ export default function AccountPopover() {
     },
     {
       label: user?.nguoi_nuoc_ngoai === true ? 'Total Share :' : 'Tỷ lệ CP tham dự :',
-      value: user?.ty_le_cp_tham_du,
+      value: user?.ty_le_cp_tham_du?.toFixed(6),
     },
   ];
 
@@ -101,11 +101,11 @@ export default function AccountPopover() {
       <CustomPopover open={popover.open} onClose={popover.onClose} sx={{ width: 200, p: 0 }}>
         <Box sx={{ p: 2, pb: 1.5 }}>
           <Typography variant="subtitle2" noWrap>
-            {user?.ten_cd}
+            <b> {user?.ten_cd}</b>
           </Typography>
 
           <Typography variant="body2" sx={{ color: 'text.secondary' }} noWrap>
-            {user?.nguoi_nuoc_ngoai === true ? 'Code :' : 'Mã Cổ đông :'}
+            <b> {user?.nguoi_nuoc_ngoai === true ? 'Code :' : 'Mã Cổ đông :'}</b>
             {user?.ma_cd}
           </Typography>
         </Box>
@@ -115,7 +115,7 @@ export default function AccountPopover() {
         <Stack sx={{ p: 1 }}>
           {OPTIONS.map((option) => (
             <MenuItem key={option.label}>
-              {option.label}
+              <b>{option.label}</b>
               {option.value}
             </MenuItem>
           ))}
