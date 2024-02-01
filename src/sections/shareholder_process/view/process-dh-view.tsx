@@ -1,3 +1,5 @@
+/* eslint-disable no-nested-ternary */
+
 'use client';
 
 import {
@@ -131,7 +133,12 @@ export default function ProcessDHView() {
   const dataTable =
     (pollDataByKey &&
       pollDataByKey?.dap_an?.map((item) => ({
-        answer: item?.vi || '',
+        answer:
+          ((!user
+            ? `${item.vi}(${item.en})`
+            : user.nguoi_nuoc_ngoai === true
+            ? item.en
+            : item.vi) as string) || '',
         turn: listResultByQuestion.filter(
           (item2: any) => item2.answer_select_id === String(item.id)
         ).length,
@@ -227,13 +234,17 @@ export default function ProcessDHView() {
   return (
     <Container sx={{ maxWidth: '100% !important' }}>
       <CustomBreadcrumbs
-        heading="Tiến trình bầu cử Đại Hội"
+        heading={(!user
+          ? 'Tiến trình bỏ phiếu nội dung Đại Hội Cổ Đông (Polling process for shareholder meeting content)'
+          : user.nguoi_nuoc_ngoai === true
+          ? 'Polling process for shareholder meeting content'
+          : 'Tiến trình bỏ phiếu nội dung Đại Hội Cổ Đông'
+        )?.toString()}
         links={[{ name: '' }]}
         sx={{
           mb: { xs: 1, md: 1 },
         }}
       />
-
       <Alert
         sx={{
           ...bgGradient({
@@ -247,7 +258,11 @@ export default function ProcessDHView() {
       >
         <FormControl sx={{ width: '100% !important' }} size="small">
           <InputLabel id="demo-simple-select-label" sx={{ width: '100%' }} size="small">
-            Chọn câu hỏi
+            {!user
+              ? 'Chọn câu hỏi (Select Question)'
+              : user.nguoi_nuoc_ngoai === true
+              ? 'Select answer'
+              : 'Chọn câu hỏi'}
           </InputLabel>
           <Select
             labelId="demo-simple-select-label"
@@ -258,13 +273,27 @@ export default function ProcessDHView() {
             sx={{ minWidth: '100% !important' }}
           >
             {danhSachPollData.map((item: IQuestion) => (
-              <MenuItem value={item.key}>{item.ten_poll}</MenuItem>
+              <MenuItem value={item.key}>
+                {!user
+                  ? `${item.ten_poll} (${item.ten_poll_en})`
+                  : user.nguoi_nuoc_ngoai === true
+                  ? item.ten_poll_en
+                  : item.ten_poll}
+              </MenuItem>
             ))}
           </Select>
         </FormControl>
 
         <Typography color="#000" mt={2}>
-          Nội dung : {danhSachPollData.find((item) => item.key === questionSelect)?.noi_dung}
+          {!user
+            ? `Nội dung (Content) : ${danhSachPollData.find((item) => item.key === questionSelect)
+                ?.noi_dung} (${danhSachPollData.find((item) => item.key === questionSelect)
+                ?.noi_dung_en})`
+            : user.nguoi_nuoc_ngoai === true
+            ? `Content : ${danhSachPollData.find((item) => item.key === questionSelect)
+                ?.noi_dung_en}`
+            : `Nội dung : ${danhSachPollData.find((item) => item.key === questionSelect)
+                ?.noi_dung}`}
         </Typography>
       </Alert>
       <Box
@@ -299,9 +328,30 @@ export default function ProcessDHView() {
               tableData={dataTable}
               tableLabels={[
                 { id: 'top', label: 'Top' },
-                { id: 'answer', label: 'Đáp án' },
-                { id: 'turn', label: 'Lượt bầu' },
-                { id: 'numberCP', label: 'Số CP' },
+                {
+                  id: 'answer',
+                  label: !user
+                    ? 'Đáp án (Answers)'
+                    : user.nguoi_nuoc_ngoai === true
+                    ? 'Answers'
+                    : 'Đáp án',
+                },
+                {
+                  id: 'turn',
+                  label: !user
+                    ? 'Lượt bầu (Votes)'
+                    : user.nguoi_nuoc_ngoai === true
+                    ? 'Votes'
+                    : 'Lượt bầu',
+                },
+                {
+                  id: 'numberCP',
+                  label: !user
+                    ? 'Số cổ phần (Number of shares)'
+                    : user.nguoi_nuoc_ngoai === true
+                    ? 'Number of shares'
+                    : 'Số cổ phần',
+                },
                 { id: 'percent', label: '%' },
               ]}
             />

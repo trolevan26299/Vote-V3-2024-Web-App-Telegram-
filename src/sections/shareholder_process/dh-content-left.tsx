@@ -1,7 +1,9 @@
+/* eslint-disable no-nested-ternary */
 import { Box, LinearProgress, Stack, Typography } from '@mui/material';
 import { alpha, styled, useTheme } from '@mui/material/styles';
 import { ApexOptions } from 'apexcharts';
 import Chart, { useChart } from 'src/components/chart';
+import { useUser } from 'src/firebase/user_accesss_provider';
 import { bgGradient } from 'src/theme/css';
 import { IQuestion } from 'src/types/setting';
 import { fNumber } from 'src/utils/format-number';
@@ -44,12 +46,18 @@ export default function DHContentLeft({
   calculateTotalCP,
 }: Props) {
   const theme = useTheme();
+  const { user } = useUser();
 
   const chart: left_chart = {
     series:
       (pollDataByKey &&
         pollDataByKey?.dap_an?.map((item) => ({
-          label: item?.vi || '',
+          label:
+            ((!user
+              ? `${item.vi}(${item.en})`
+              : user.nguoi_nuoc_ngoai === true
+              ? item.en
+              : item.vi) as string) || '',
           value: calculateTotalCP(item.id as number),
         }))) ||
       [],
@@ -113,7 +121,13 @@ export default function DHContentLeft({
         height: '100%',
       }}
     >
-      <Typography variant="h6">Tiến trình gửi</Typography>
+      <Typography variant="h6">
+        {!user
+          ? 'Tiến trình gửi (Sending Process)'
+          : user.nguoi_nuoc_ngoai === true
+          ? 'Sending Process'
+          : 'Tiến trình gửi'}
+      </Typography>
       <Stack spacing={3} sx={{ pt: 1 }}>
         <Stack key="success">
           <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 1 }}>
@@ -131,7 +145,17 @@ export default function DHContentLeft({
             }}
           />
           <Typography sx={{ marginTop: '20px', fontWeight: '600', fontSize: '16px' }}>
-            Biểu đồ cổ phần số lượng bình chọn
+            {!user ? (
+              <>
+                Biểu đồ cổ phần số lượng bình chọn
+                <br />
+                (Chart of the number of shared voted)
+              </>
+            ) : user.nguoi_nuoc_ngoai === true ? (
+              'Chart of the number of shared voted'
+            ) : (
+              'Biểu đồ cổ phần số lượng bình chọn'
+            )}
           </Typography>
           <StyledChart
             dir="ltr"

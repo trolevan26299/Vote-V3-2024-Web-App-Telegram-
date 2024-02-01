@@ -1,8 +1,10 @@
+/* eslint-disable no-nested-ternary */
 import { Box, LinearProgress, Stack, Typography } from '@mui/material';
 import { alpha, useTheme } from '@mui/material/styles';
 import { ApexOptions } from 'apexcharts';
 import Chart, { useChart } from 'src/components/chart';
-import { IQuestion, IHistorySendPoll } from 'src/types/setting';
+import { useUser } from 'src/firebase/user_accesss_provider';
+import { IHistorySendPoll, IQuestion } from 'src/types/setting';
 import { ISelectedAnswer } from 'src/types/votedh.types';
 import { fNumber } from 'src/utils/format-number';
 import { bgGradient } from '../../theme/css';
@@ -29,6 +31,7 @@ export default function DHContentRight({
   listResultByQuestion,
   questionSelect,
 }: Props) {
+  const { user } = useUser();
   const theme = useTheme();
   // ------------------ LOGIC tính đã gửi câu hỏi select đến bao nhiêu người và không được trùng lặp số người
   const filteredArray =
@@ -77,7 +80,12 @@ export default function DHContentRight({
     series:
       (pollDataByKey &&
         pollDataByKey?.dap_an?.map((item) => ({
-          label: item?.vi || '',
+          label:
+            ((!user
+              ? `${item.vi}(${item.en})`
+              : user.nguoi_nuoc_ngoai === true
+              ? item.en
+              : item.vi) as string) || '',
           value:
             (listResultByQuestion &&
               listResultByQuestion.filter((item2) => item2?.answer_select_id === String(item?.id))
@@ -89,7 +97,14 @@ export default function DHContentRight({
 
   // Tính tổng value trong mảng
   const totalValue = chart.series.reduce((sum, item) => sum + item.value, 0);
-  chart.series.push({ label: 'Chưa bình chọn', value: totalUserReceivedQuestion - totalValue });
+  chart.series.push({
+    label: !user
+      ? 'Chưa bình chọn (No Vote)'
+      : user.nguoi_nuoc_ngoai === true
+      ? 'No Vote'
+      : 'Chưa bình chọn',
+    value: totalUserReceivedQuestion - totalValue,
+  });
 
   const { series, colors, options } = chart;
   const chartSeries = series.map((i) => i.value);
@@ -132,7 +147,13 @@ export default function DHContentRight({
         height: '100%',
       }}
     >
-      <Typography variant="h6">Tiến trình bình chọn</Typography>
+      <Typography variant="h6">
+        {!user
+          ? 'Tiến trình bình chọn (Polling Process)'
+          : user.nguoi_nuoc_ngoai === true
+          ? 'Polling Process'
+          : 'Tiến trình bình chọn'}
+      </Typography>
       <Stack spacing={3} sx={{ pt: 1 }}>
         <Stack key="success">
           <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 1 }}>
@@ -150,7 +171,17 @@ export default function DHContentRight({
             }}
           />
           <Typography sx={{ marginTop: '20px', fontWeight: '600', fontSize: '16px' }}>
-            Biểu đồ cổ đông bình chọn
+            {!user ? (
+              <>
+                Biểu đồ cổ đông bình chọn
+                <br />
+                (Chart of shareholder votes)
+              </>
+            ) : user.nguoi_nuoc_ngoai === true ? (
+              'Chart of shareholder votes'
+            ) : (
+              'Biểu đồ cổ đông bình chọn'
+            )}
           </Typography>
           <Chart
             type="bar"

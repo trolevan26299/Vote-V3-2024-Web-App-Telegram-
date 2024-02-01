@@ -1,5 +1,3 @@
-/* eslint-disable no-nested-ternary */
-
 'use client';
 
 import {
@@ -340,13 +338,7 @@ export default function VoteDHView() {
               alignItems: 'center',
             }}
           >
-            <Typography sx={{ fontWeight: 'bold' }}>
-              {!user
-                ? 'Không có câu trả lời (No have question to answer)'
-                : user.nguoi_nuoc_ngoai === true
-                ? 'no have question need answer'
-                : 'Không có câu trả lời'}
-            </Typography>
+            <Typography sx={{ fontWeight: 'bold' }}> Không có câu hỏi cần trả lời</Typography>
           </Box>
         )}
       </Box>

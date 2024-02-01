@@ -49,7 +49,6 @@ export default function SendVoteView() {
   const [inputValueTextAnswer, setInputValueTextAnswer] = useState('');
   const [answerSelect, setAnswerSelect] = React.useState<IQuestion[]>([]);
 
-  console.log('answer select:', answerSelect);
   // handle select shareholder
   const allOption: IUserAccess = {
     ten_cd: 'Tất cả',
