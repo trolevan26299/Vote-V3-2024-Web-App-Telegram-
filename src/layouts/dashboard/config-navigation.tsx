@@ -48,46 +48,17 @@ export function useNavData() {
   const { user } = useUser();
   console.log('user menu:', user);
 
-  const data = useMemo(
-    () => [
-      // OVERVIEW
-      // ----------------------------------------------------------------------
+  const data = useMemo(() => {
+    const adminMenu = [
       {
         subheader: '',
         items: [
-          {
-            title: 'Trang chủ',
-            path: paths.dashboard.root,
-            icon: ICONS.dashboard,
-          },
-          // {
-          //   title: 'Tiến trình bầu cử',
-          //   path: paths.dashboard.process.dh,
-          //   icon: ICONS.ecommerce,
-          //   children: [
-          //     { title: 'Bỏ phiếu đại hội', path: paths.dashboard.process.dh },
-          //     {
-          //       title: 'Bầu cử hội đồng',
-          //       path: paths.dashboard.process.hd,
-          //     },
-          //   ],
-          // },
           {
             title: 'Tiến trình bỏ phiếu',
             path: paths.dashboard.process.dh,
             icon: ICONS.ecommerce,
             // children: [],
           },
-          {
-            title: 'Bỏ phiếu đại hội',
-            path: paths.dashboard.voteDH,
-            icon: ICONS.analytics,
-          },
-          // {
-          //   title: 'Bầu cử hội đồng',
-          //   path: paths.dashboard.voteHD,
-          //   icon: ICONS.banking,
-          // },
           {
             title: 'Quản Lý',
             icon: ICONS.booking,
@@ -106,10 +77,37 @@ export function useNavData() {
           },
         ],
       },
-    ],
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [t]
-  );
+    ];
 
+    const userMenu = [
+      {
+        subheader: '',
+        items: [
+          {
+            title: user?.nguoi_nuoc_ngoai === true ? 'Dashboard' : 'Dashboard thông tin',
+            path: paths.dashboard.root,
+            icon: ICONS.dashboard,
+          },
+          {
+            title:
+              user?.nguoi_nuoc_ngoai === true
+                ? 'Congress Poll Process'
+                : 'Tiến trình bỏ phiếu đại hội',
+            path: paths.dashboard.process.dh,
+            icon: ICONS.ecommerce,
+            // children: [],
+          },
+          {
+            title: user?.nguoi_nuoc_ngoai === true ? 'Congress Poll' : 'Bỏ phiếu đại hội',
+            path: paths.dashboard.voteDH,
+            icon: ICONS.analytics,
+          },
+        ],
+      },
+    ];
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    return user ? [...userMenu] : [...adminMenu];
+  }, [user]);
   return data;
 }
