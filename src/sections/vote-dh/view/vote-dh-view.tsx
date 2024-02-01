@@ -310,7 +310,11 @@ export default function VoteDHView() {
                               key={itemAnswer.id}
                               value={itemAnswer.id}
                               control={<Radio />}
-                              label={itemAnswer.vi}
+                              label={
+                                !user || user.nguoi_nuoc_ngoai === false
+                                  ? itemAnswer.vi
+                                  : itemAnswer.en
+                              }
                             />
                           ))}
                       </RadioGroup>
