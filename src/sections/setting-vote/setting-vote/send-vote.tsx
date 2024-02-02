@@ -295,14 +295,18 @@ export default function SendVoteView() {
               <MenuItem value="">
                 <em>Vui lòng chọn thời gian</em>
               </MenuItem>
-              <MenuItem value={1}>1 Giờ</MenuItem>
-              <MenuItem value={2}>2 Giờ </MenuItem>
-              <MenuItem value={3}>3 Giờ</MenuItem>
-              <MenuItem value={4}>4 Giờ</MenuItem>
-              <MenuItem value={5}>5 Giờ</MenuItem>
-              <MenuItem value={6}>6 Giờ</MenuItem>
-              <MenuItem value={12}>12 Giờ</MenuItem>
-              <MenuItem value={24}>24 Giờ</MenuItem>
+              <MenuItem value={15}>15 Phút</MenuItem>
+              <MenuItem value={30}>30 Phút</MenuItem>
+              <MenuItem value={45}>45 Phút</MenuItem>
+              <MenuItem value={60}>1 Giờ</MenuItem>
+              <MenuItem value={90}>1 Giờ 30 Phút</MenuItem>
+              <MenuItem value={120}>2 Giờ</MenuItem>
+              <MenuItem value={180}>3 Giờ</MenuItem>
+              <MenuItem value={240}>4 Giờ</MenuItem>
+              <MenuItem value={300}>5 Giờ</MenuItem>
+              <MenuItem value={360}>6 Giờ</MenuItem>
+              <MenuItem value={720}>12 Giờ</MenuItem>
+              <MenuItem value={1440}>24 Giờ</MenuItem>
             </Select>
           </FormControl>
         </Box>
