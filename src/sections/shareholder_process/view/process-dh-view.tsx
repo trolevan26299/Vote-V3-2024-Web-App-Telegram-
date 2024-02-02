@@ -253,7 +253,7 @@ export default function ProcessDHView() {
             endColor: alpha(theme.palette.primary.main, 0.2),
           }),
           color: '#000',
-          minWidth: '100% !important',
+          minWidth: '80% !important',
         }}
       >
         <FormControl sx={{ minWidth: '100% !important' }} size="small">
