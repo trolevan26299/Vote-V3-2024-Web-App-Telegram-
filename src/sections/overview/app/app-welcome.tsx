@@ -51,7 +51,7 @@ export default function AppWelcome({
         alignItems={{ xs: 'center', md: 'flex-start' }}
         sx={{
           p: {
-            xs: theme.spacing(5, 3, 0, 3),
+            xs: theme.spacing(2, 3, 0, 3),
             md: theme.spacing(15),
           },
           textAlign: { xs: 'center', md: 'left' },
