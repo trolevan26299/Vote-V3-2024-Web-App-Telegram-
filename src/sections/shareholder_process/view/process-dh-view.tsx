@@ -58,7 +58,7 @@ export default function ProcessDHView() {
   }, [] as IHistorySendPoll[]);
   // CODE FOR SELECT QUESTION
   // Handle select question
-  const [questionSelect, SetQuestionSelect] = useState<string>(danhSachPollData[0]?.key || '');
+  const [questionSelect, SetQuestionSelect] = useState<string>('');
 
   const handleChangeSelectQuestion = (event: SelectChangeEvent) => {
     SetQuestionSelect(event.target.value);
@@ -208,6 +208,13 @@ export default function ProcessDHView() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [stringValue]);
+
+  useEffect(() => {
+    // Kiểm tra xem danhSachPollData có phần tử hay không
+    if (danhSachPollData.length > 0) {
+      SetQuestionSelect(danhSachPollData[0]?.key || '');
+    }
+  }, [danhSachPollData]);
 
   useEffect(() => {
     // Get Data danh sách cổ đông không realtime
