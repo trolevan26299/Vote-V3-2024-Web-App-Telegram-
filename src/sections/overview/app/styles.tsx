@@ -25,7 +25,7 @@ export const styles: { [key: string]: SxProps<Theme> } = {
   },
   grid_box: {
     textAlign: 'left',
-    marginTop: '10px',
+    marginTop: '5px',
     paddingLeft: { xs: '10px', md: '0px' },
   },
   box_img: {
