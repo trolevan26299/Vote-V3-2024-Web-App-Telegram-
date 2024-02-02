@@ -4,6 +4,7 @@ import Typography from '@mui/material/Typography';
 import { alpha, useTheme } from '@mui/material/styles';
 // theme
 import { Box, Button, Grid } from '@mui/material';
+import { useRouter } from 'src/routes/hooks';
 import { paths } from 'src/routes/paths';
 import { bgGradient } from 'src/theme/css';
 import { styles } from './styles';
@@ -31,6 +32,7 @@ export default function AppWelcome({
   ...other
 }: Props) {
   const theme = useTheme();
+  const router = useRouter();
 
   return (
     <Stack
@@ -90,7 +92,7 @@ export default function AppWelcome({
                 ...styles.btn_vote,
                 backgroundColor: '#7e9dec',
               }}
-              href={paths.dashboard.voteDH}
+              onClick={() => router.push(paths.dashboard.voteDH)}
             >
               Bỏ phiếu đại hội
             </Button>
