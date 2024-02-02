@@ -11,7 +11,7 @@ export const sendTelegramMessage = async (
   expireTime: string
 ) => {
   try {
-    const botToken = '6872762324:AAGptEaYwW5EQB7q7qLZbc9HYOsawXK1DTg';
+    const botToken = '6708017268:AAH6tuMNYB4Yh3qBRDHvBThEmRsXzKd3wO4';
     const TELEGRAM_API_URL = `https://api.telegram.org/bot${botToken}/sendMessage`;
 
     const messageContent = `
@@ -25,18 +25,19 @@ export const sendTelegramMessage = async (
 
 It's time to vote: : *${questionEng}*
 *Due time :* ${expireTime}
+[Please click here to vote](https://t.me/voteV3_2024_bot/voteApp)
 `;
     // Inline keyboard button
-    const inlineKeyboard = {
-      inline_keyboard: [
-        [
-          {
-            text: 'Click here to open mini app',
-            switch_inline_query_current_chat: 'voteV3', // Đặt command của mini-app của bạn ở đây
-          },
-        ],
-      ],
-    };
+    // const inlineKeyboard = {
+    //   inline_keyboard: [
+    //     [
+    //       {
+    //         text: 'Click here to open mini app',
+    //         switch_inline_query_current_chat: 'voteV3', // Đặt command của mini-app của bạn ở đây
+    //       },
+    //     ],
+    //   ],
+    // };
 
     // Gửi tin nhắn cho từng chat ID trong mảng
     const sendMessages = chatIds.map(async (item) => {
@@ -44,7 +45,7 @@ It's time to vote: : *${questionEng}*
         chat_id: item.telegram_id,
         text: item.nguoi_nuoc_ngoai === true ? messageContentEng : messageContent,
         parse_mode: 'MarkdownV2',
-        reply_markup: JSON.stringify(inlineKeyboard),
+        // reply_markup: JSON.stringify(inlineKeyboard),
       };
 
       // Gửi yêu cầu POST sử dụng Axios
