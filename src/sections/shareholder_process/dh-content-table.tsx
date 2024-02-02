@@ -62,7 +62,7 @@ type ProcessVoteRowProps = {
 function ProcessVoteTableRow({ row }: ProcessVoteRowProps) {
   return (
     <TableRow>
-      <TableCell align="left">
+      <TableCell>
         <Label
           variant="soft"
           color={(row.top === 'Top 1' && 'primary') || (row.top === 'Top 2' && 'info') || 'error'}

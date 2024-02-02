@@ -158,7 +158,7 @@ export default function DHContentRight({
         <Stack key="success">
           <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 1 }}>
             <Box sx={{ typography: 'overline' }}>pending</Box>
-            <Box sx={{ typography: 'subtitle1' }}>{percentUserVoted} %</Box>
+            <Box sx={{ typography: 'subtitle1' }}>{percentUserVoted.toFixed(2)} %</Box>
           </Stack>
 
           <LinearProgress
