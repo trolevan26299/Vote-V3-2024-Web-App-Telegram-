@@ -58,9 +58,8 @@ export default function SendVoteView() {
 
   // handle select time expired
   const [expireTime, setExpireTime] = React.useState<string>('');
-  console.log('expireTime', expireTime);
-  console.log('current time utc 7', currentTimeUTC7);
-  console.log('Thời gian hết hạn :', ExpireTimeFunc(currentTimeUTC7, expireTime));
+
+  // console.log('Thời gian hết hạn :', ExpireTimeFunc(currentTimeUTC7, expireTime));
 
   // list history send poll from firebase
   const [historySendPoll, setHistorySendPoll] = useState<IHistorySendPoll[]>([]);
@@ -82,7 +81,7 @@ export default function SendVoteView() {
   // handle select time
 
   const handleChangeSelectExpireTime = (event: SelectChangeEvent) => {
-    setExpireTime(event.target.value);
+    setExpireTime(String(event.target.value));
   };
 
   // Onchange for answer select

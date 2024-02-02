@@ -253,10 +253,10 @@ export default function ProcessDHView() {
             endColor: alpha(theme.palette.primary.main, 0.2),
           }),
           color: '#000',
-          width: '100% !important',
+          minWidth: '100% !important',
         }}
       >
-        <FormControl sx={{ width: '100% !important' }} size="small">
+        <FormControl sx={{ minWidth: '100% !important' }} size="small">
           <InputLabel id="demo-simple-select-label" sx={{ width: '100%' }} size="small">
             {!user
               ? 'Chọn câu hỏi (Select Question)'
@@ -273,7 +273,7 @@ export default function ProcessDHView() {
             sx={{ minWidth: '100% !important' }}
           >
             {danhSachPollData.map((item: IQuestion) => (
-              <MenuItem value={item.key}>
+              <MenuItem value={item.key} sx={{ minWidth: '100% important' }}>
                 {!user
                   ? `${item.ten_poll} (${item.ten_poll_en})`
                   : user.nguoi_nuoc_ngoai === true
