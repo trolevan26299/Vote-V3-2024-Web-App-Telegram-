@@ -253,10 +253,10 @@ export default function ProcessDHView() {
             endColor: alpha(theme.palette.primary.main, 0.2),
           }),
           color: '#000',
-          minWidth: '80% !important',
+          minWidth: '100% !important',
         }}
       >
-        <FormControl sx={{ minWidth: '100% !important' }} size="small">
+        <FormControl sx={{ minWidth: '100% !important' }} size="small" fullWidth>
           <InputLabel id="demo-simple-select-label" sx={{ width: '100%' }} size="small">
             {!user
               ? 'Chọn câu hỏi (Select Question)'
@@ -271,6 +271,7 @@ export default function ProcessDHView() {
             label="Chọn Câu Hỏi"
             onChange={handleChangeSelectQuestion}
             sx={{ minWidth: '100% !important' }}
+            fullWidth
           >
             {danhSachPollData.map((item: IQuestion) => (
               <MenuItem value={item.key} sx={{ minWidth: '100% important' }}>
