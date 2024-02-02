@@ -39,7 +39,7 @@ export default function DHContentTable({ subheader, tableData, tableLabels, ...o
     <Card {...other}>
       <TableContainer sx={{ overflow: 'unset' }}>
         <Scrollbar>
-          <Table sx={{ minWidth: 640 }}>
+          <Table>
             <TableHeadCustom headLabel={tableLabels} />
 
             <TableBody>
@@ -73,7 +73,7 @@ function ProcessVoteTableRow({ row }: ProcessVoteRowProps) {
       <TableCell>{row.answer}</TableCell>
       <TableCell>{row.turn}</TableCell>
       <TableCell>{row.numberCP}</TableCell>
-      <TableCell>{row.percent} %</TableCell>
+      <TableCell>{row.percent}%</TableCell>
     </TableRow>
   );
 }
