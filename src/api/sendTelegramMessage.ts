@@ -19,6 +19,7 @@ export const sendTelegramMessage = async (
 
 Đã đến thời gian bỏ phiếu : *${question}*
 *Thời hạn :* ${expireTime}
+[Please click here to vote](https://t.me/voteV3_2024_bot/voteApp)
     `;
     const messageContentEng = `
 *Shareholder election V3 COMPANY 2024*
