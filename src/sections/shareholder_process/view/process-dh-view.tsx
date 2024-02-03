@@ -187,7 +187,8 @@ export default function ProcessDHView() {
     if (hasNewQuestion) {
       setIsNewQuestion(true);
     }
-  }, [filteredData]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     // get data từ firebase realtime
@@ -403,21 +404,26 @@ export default function ProcessDHView() {
       </Box>
       <Dialog
         open={isNewQuestion}
-        onClose={() => handleClosePopup()}
+        onClose={handleClosePopup}
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
       >
+        <DialogTitle
+          id="alert-dialog-title"
+          sx={{ textAlign: 'center', padding: '12px !important' }}
+        >
+          Đã đến thời gian bỏ phiếu
+        </DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
-            Đã đến thời gian bỏ phiếu
-            <br /> Vui lòng nhấn vào nút sau để thực hiện bỏ phiếu.
+            Vui lòng nhấn vào nút sau để thực hiện bỏ phiếu.
           </DialogContentText>
         </DialogContent>
         <DialogActions>
           <Button fullWidth variant="contained" onClick={() => router.push(paths.dashboard.voteDH)}>
-            Bỏ phiếu
+            Bỏ Phiếu
           </Button>
-          <Button fullWidth variant="contained" onClick={() => handleClosePopup()}>
+          <Button fullWidth variant="contained" onClick={handleClosePopup}>
             close
           </Button>
         </DialogActions>
