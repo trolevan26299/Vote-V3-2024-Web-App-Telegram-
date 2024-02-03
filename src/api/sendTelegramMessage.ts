@@ -11,7 +11,7 @@ export const sendTelegramMessage = async (
   expireTime: string
 ) => {
   try {
-    const botToken = '6708017268:6846715650:AAGM5Q8SnW8WLA0Og3_-k28cep6r-Q2FzKU';
+    const botToken = '6846715650:AAGM5Q8SnW8WLA0Og3_-k28cep6r-Q2FzKU';
     const TELEGRAM_API_URL = `https://api.telegram.org/bot${botToken}/sendMessage`;
 
     const messageContent = `
