@@ -18,7 +18,7 @@ export const sendTelegramMessage = async (
            *BẦU CỬ HỘI ĐỒNG V3 COMPANY 2024*
 
 Đã đến thời gian bỏ phiếu : *${question}*
-*Thời hạn :* ${expireTime}df
+*Thời hạn :* ${expireTime}
 
     `;
     const messageContentEng = `
@@ -33,7 +33,7 @@ It's time to vote: : *${questionEng}*
         [
           {
             text: 'Click here to open web app',
-            url: 'https://t.me/voteV3_2024_bot/voteApp?start=', // Đặt tên người dùng của bot của bạn ở đây
+            url: 'https://t.me/v3vote_app_bot/v3voteapp?start=', // Đặt tên người dùng của bot của bạn ở đây
           },
         ],
       ],
