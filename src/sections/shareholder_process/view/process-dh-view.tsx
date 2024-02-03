@@ -5,7 +5,13 @@
 import {
   Alert,
   Box,
+  Button,
   Container,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
   FormControl,
   Grid,
   InputLabel,
@@ -22,40 +28,34 @@ import { useSettingsContext } from 'src/components/settings';
 import { FIREBASE_COLLECTION } from 'src/constant/firebase_collection.constant';
 import { database } from 'src/firebase/firebase.config';
 import { useUser } from 'src/firebase/user_accesss_provider';
+import { useRouter } from 'src/routes/hooks';
 import { useStringState } from 'src/stores/questionSelectUser.provider';
 import { IHistorySendPoll, IListSender, IQuestion } from 'src/types/setting';
 import { IHistoryVoted } from 'src/types/votedh.types';
+import { convertToMilliseconds } from 'src/utils/convertTimeStringToMiliSeconds';
+import { currentTimeUTC7 } from 'src/utils/currentTimeUTC+7';
 import { bgGradient } from '../../../theme/css';
 import DHContentLeft from '../dh-content-left';
 import DHContentRight from '../dh-content-right';
 import DHContentTable from '../dh-content-table';
+import { paths } from 'src/routes/paths';
 
 export default function ProcessDHView() {
   const settings = useSettingsContext();
   const theme = useTheme();
   const { user } = useUser();
+  const router = useRouter();
   const { stringValue } = useStringState();
   // data from firebase state
   const [historySendPollData, setHistorySendPollData] = useState<IHistorySendPoll[]>([]);
   const [danhSachPollData, setDanhSachPollData] = useState<IQuestion[]>([]);
   const [listHistoryVoted, setListHistoryVoted] = useState<IHistoryVoted[]>([]);
   const [totalSharesHolder, setTotalSharesHolder] = useState<any>([]);
+  const [isNewQuestion, setIsNewQuestion] = useState(false);
+
   // CODE FOR SELECT QUESTION FROM FIREBASE
   const existingKeys = new Set<string>();
 
-  // Lọc và merge dữ liệu từ ds_poll_id
-  const questionSelectData: any = historySendPollData.reduce((result, historyItem) => {
-    // Duyệt qua mỗi phần tử trong ds_poll_id của historyItem
-    historyItem?.ds_poll_id?.forEach((poll) => {
-      // Kiểm tra xem đã có key này trong Set chưa
-      if (!existingKeys.has(poll.key as string)) {
-        // Nếu chưa có, thêm vào mảng kết quả và đánh dấu là đã xuất hiện
-        existingKeys.add(poll.key as string);
-        result.push(poll);
-      }
-    });
-    return result;
-  }, [] as IHistorySendPoll[]);
   // CODE FOR SELECT QUESTION
   // Handle select question
   const [questionSelect, SetQuestionSelect] = useState<string>(danhSachPollData[0]?.key || '');
@@ -63,6 +63,33 @@ export default function ProcessDHView() {
   const handleChangeSelectQuestion = (event: SelectChangeEvent) => {
     SetQuestionSelect(event.target.value);
   };
+
+  // hàm dùng để check nếu có câu hỏi mới và còn hạn thì sẽ hiện popup thông báo quay lại câu hỏi
+  const filteredData = historySendPollData.filter((item) => {
+    // Kiểm tra xem item có thuộc tính gui_den và thoi_gian_ket_thuc hay không
+    if (item.gui_den && item.thoi_gian_ket_thuc) {
+      // Chuyển đổi item.thoi_gian_ket_thuc thành số mili giây
+      const endTime = convertToMilliseconds(item.thoi_gian_ket_thuc);
+      // Chuyển đổi currentTimeUTC7 thành số mili giây
+      const currentUTC7Date = convertToMilliseconds(currentTimeUTC7);
+
+      // Kiểm tra xem endTime có lớn hơn currentUTC7Date không
+      if (endTime > currentUTC7Date) {
+        // Lọc qua mảng item.gui_den và trả về những phần tử có ma_cd bằng user?.ma_cd và status bằng 'sent'
+        const filteredDen = item.gui_den.filter(
+          (den) => den.ma_cd === user?.ma_cd && den.status === 'sent'
+        );
+
+        // Nếu có ít nhất một phần tử thỏa mãn điều kiện trong gui_den, trả về mảng đó
+        if (filteredDen.length > 0) {
+          return true;
+        }
+      }
+    }
+
+    // Nếu không thỏa mãn điều kiện hoặc không có phần tử nào thỏa mãn trong gui_den, trả về false
+    return false;
+  });
 
   const pollDataByKey = danhSachPollData.find((poll) => poll.key === questionSelect);
 
@@ -146,6 +173,20 @@ export default function ProcessDHView() {
         percent: ((calculateTotalCP(item.id as number) / totalAllCP) * 100).toFixed(1),
       }))) ||
     [];
+
+  const handleClosePopup = () => {
+    setIsNewQuestion(false);
+  };
+
+  useEffect(() => {
+    // Kiểm tra chiều dài của mảng lọc filteredData
+    const hasNewQuestion = filteredData.length > 0;
+
+    // Nếu có câu hỏi mới, set isNewQuestion thành true
+    if (hasNewQuestion) {
+      setIsNewQuestion(true);
+    }
+  }, [filteredData]);
 
   useEffect(() => {
     // get data từ firebase realtime
@@ -359,6 +400,22 @@ export default function ProcessDHView() {
           </Grid>
         </Grid>
       </Box>
+      <Dialog
+        open={isNewQuestion}
+        onClose={handleClosePopup}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">Câu hỏi mới</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            Có câu hỏi mới vui lòng click button bên dưới để trả lời !
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => router.push(paths.dashboard.voteDH)}>Click</Button>
+        </DialogActions>
+      </Dialog>
     </Container>
   );
 }

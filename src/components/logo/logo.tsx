@@ -77,7 +77,7 @@ const Logo = forwardRef<HTMLDivElement, LogoProps>(
             />
           </g>
         </svg> */}
-        <img src="/logo/v3newpng.png" width="100%" height="100%" alt="logov3" />
+        <img src="/logo/v3newpng3.png" width="100%" height="100%" alt="logov3" />
       </Box>
     );
 

@@ -19,26 +19,25 @@ export const sendTelegramMessage = async (
 
 Đã đến thời gian bỏ phiếu : *${question}*
 *Thời hạn :* ${expireTime}
-[Please click here to vote](https://t.me/voteV3_2024_bot/voteApp)
+
     `;
     const messageContentEng = `
 *Shareholder election V3 COMPANY 2024*
 
 It's time to vote: : *${questionEng}*
 *Due time :* ${expireTime}
-[Please click here to vote](https://t.me/voteV3_2024_bot/voteApp)
+
 `;
-    // Inline keyboard button
-    // const inlineKeyboard = {
-    //   inline_keyboard: [
-    //     [
-    //       {
-    //         text: 'Click here to open mini app',
-    //         switch_inline_query_current_chat: 'voteV3', // Đặt command của mini-app của bạn ở đây
-    //       },
-    //     ],
-    //   ],
-    // };
+    const inlineKeyboard = {
+      inline_keyboard: [
+        [
+          {
+            text: 'Click here to open web app',
+            url: 'https://t.me/voteV3_2024_bot/voteApp?start=', // Đặt tên người dùng của bot của bạn ở đây
+          },
+        ],
+      ],
+    };
 
     // Gửi tin nhắn cho từng chat ID trong mảng
     const sendMessages = chatIds.map(async (item) => {
@@ -46,6 +45,7 @@ It's time to vote: : *${questionEng}*
         chat_id: item.telegram_id,
         text: item.nguoi_nuoc_ngoai === true ? messageContentEng : messageContent,
         parse_mode: 'MarkdownV2',
+        reply_markup: JSON.stringify(inlineKeyboard),
         // reply_markup: JSON.stringify(inlineKeyboard),
       };
 

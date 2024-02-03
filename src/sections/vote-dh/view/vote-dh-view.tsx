@@ -188,7 +188,10 @@ export default function VoteDHView() {
       .then(() => {
         updateHistorySendPoll();
         updateStringValue(selectedAnswers[0].key_question);
-        enqueueSnackbar('Gửi ý kiến thành công  !', { variant: 'success' });
+        enqueueSnackbar(
+          user && user.nguoi_nuoc_ngoai === true ? 'Send Success !' : 'Gửi ý kiến thành công  !',
+          { variant: 'success' }
+        );
       })
       .catch((error) => {
         enqueueSnackbar('Gửi ý kiến lỗi !', { variant: 'error' });
