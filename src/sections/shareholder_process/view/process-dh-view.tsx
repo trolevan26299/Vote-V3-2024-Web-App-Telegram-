@@ -29,6 +29,7 @@ import { FIREBASE_COLLECTION } from 'src/constant/firebase_collection.constant';
 import { database } from 'src/firebase/firebase.config';
 import { useUser } from 'src/firebase/user_accesss_provider';
 import { useRouter } from 'src/routes/hooks';
+import { paths } from 'src/routes/paths';
 import { useStringState } from 'src/stores/questionSelectUser.provider';
 import { IHistorySendPoll, IListSender, IQuestion } from 'src/types/setting';
 import { IHistoryVoted } from 'src/types/votedh.types';
@@ -38,7 +39,6 @@ import { bgGradient } from '../../../theme/css';
 import DHContentLeft from '../dh-content-left';
 import DHContentRight from '../dh-content-right';
 import DHContentTable from '../dh-content-table';
-import { paths } from 'src/routes/paths';
 
 export default function ProcessDHView() {
   const settings = useSettingsContext();
