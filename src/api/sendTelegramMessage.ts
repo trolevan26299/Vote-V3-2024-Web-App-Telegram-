@@ -11,14 +11,14 @@ export const sendTelegramMessage = async (
   expireTime: string
 ) => {
   try {
-    const botToken = '6708017268:AAH6tuMNYB4Yh3qBRDHvBThEmRsXzKd3wO4';
+    const botToken = '6708017268:6846715650:AAGM5Q8SnW8WLA0Og3_-k28cep6r-Q2FzKU';
     const TELEGRAM_API_URL = `https://api.telegram.org/bot${botToken}/sendMessage`;
 
     const messageContent = `
            *BẦU CỬ HỘI ĐỒNG V3 COMPANY 2024*
 
 Đã đến thời gian bỏ phiếu : *${question}*
-*Thời hạn :* ${expireTime}
+*Thời hạn :* ${expireTime}df
 
     `;
     const messageContentEng = `
