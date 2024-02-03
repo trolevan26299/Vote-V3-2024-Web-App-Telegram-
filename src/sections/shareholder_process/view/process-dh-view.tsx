@@ -421,6 +421,9 @@ export default function ProcessDHView() {
           <Button fullWidth variant="contained" onClick={() => router.push(paths.dashboard.voteDH)}>
             Bình Chọn
           </Button>
+          <Button fullWidth variant="contained" onClick={handleClosePopup}>
+            close
+          </Button>
         </DialogActions>
       </Dialog>
     </Container>
