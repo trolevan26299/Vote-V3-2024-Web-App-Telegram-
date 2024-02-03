@@ -403,26 +403,21 @@ export default function ProcessDHView() {
       </Box>
       <Dialog
         open={isNewQuestion}
-        onClose={handleClosePopup}
+        onClose={() => handleClosePopup()}
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
       >
-        <DialogTitle
-          id="alert-dialog-title"
-          sx={{ textAlign: 'center', padding: '12px !important' }}
-        >
-          Câu hỏi mới
-        </DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
-            Có câu hỏi mới vui lòng click button bên dưới để đến trang bình chọn !
+            Đã đến thời gian bỏ phiếu
+            <br /> Vui lòng nhấn vào nút sau để thực hiện bỏ phiếu.
           </DialogContentText>
         </DialogContent>
         <DialogActions>
           <Button fullWidth variant="contained" onClick={() => router.push(paths.dashboard.voteDH)}>
-            Bình Chọn
+            Bỏ phiếu
           </Button>
-          <Button fullWidth variant="contained" onClick={handleClosePopup}>
+          <Button fullWidth variant="contained" onClick={() => handleClosePopup()}>
             close
           </Button>
         </DialogActions>
