@@ -187,8 +187,7 @@ export default function ProcessDHView() {
     if (hasNewQuestion) {
       setIsNewQuestion(true);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [filteredData]);
 
   useEffect(() => {
     // get data từ firebase realtime
