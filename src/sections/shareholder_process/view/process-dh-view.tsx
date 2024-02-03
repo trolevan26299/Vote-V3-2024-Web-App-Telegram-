@@ -406,14 +406,21 @@ export default function ProcessDHView() {
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
       >
-        <DialogTitle id="alert-dialog-title">Câu hỏi mới</DialogTitle>
+        <DialogTitle
+          id="alert-dialog-title"
+          sx={{ textAlign: 'center', padding: '12px !important' }}
+        >
+          Câu hỏi mới
+        </DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
-            Có câu hỏi mới vui lòng click button bên dưới để trả lời !
+            Có câu hỏi mới vui lòng click button bên dưới để đến trang bình chọn !
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => router.push(paths.dashboard.voteDH)}>Click</Button>
+          <Button fullWidth variant="contained" onClick={() => router.push(paths.dashboard.voteDH)}>
+            Bình Chọn
+          </Button>
         </DialogActions>
       </Dialog>
     </Container>
