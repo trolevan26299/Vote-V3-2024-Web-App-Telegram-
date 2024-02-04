@@ -409,7 +409,7 @@ export default function ProcessDHView() {
           }}
         >
           <Typography sx={{ width: '90%', fontWeight: 600, fontSize: '18px' }}>
-            Đã đến thời gian bỏ phiếu
+            {user?.nguoi_nuoc_ngoai === true ? "It's time to vote" : ' Đã đến thời gian bỏ phiếu !'}
           </Typography>
           <Icon
             style={{ width: '10%', textAlign: 'center', fontSize: '30px', cursor: 'pointer' }}
@@ -418,13 +418,15 @@ export default function ProcessDHView() {
           />
         </DialogTitle>
         <DialogContent>
-          <DialogContentText id="alert-dialog-description">
-            Vui lòng nhấn vào nút sau để thực hiện bỏ phiếu.
+          <DialogContentText id="alert-dialog-description" sx={{ textAlign: 'center' }}>
+            {user?.nguoi_nuoc_ngoai === true
+              ? 'Please click the following button to vote.'
+              : 'Vui lòng nhấn vào nút sau để thực hiện bỏ phiếu.'}
           </DialogContentText>
         </DialogContent>
         <DialogActions>
           <Button fullWidth variant="contained" onClick={() => router.push(paths.dashboard.voteDH)}>
-            Bỏ Phiếu
+            {user?.nguoi_nuoc_ngoai === true ? 'Vote' : 'Bỏ Phiếu'}
           </Button>
         </DialogActions>
       </Dialog>
