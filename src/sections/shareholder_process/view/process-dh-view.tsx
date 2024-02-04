@@ -14,6 +14,7 @@ import {
   DialogTitle,
   FormControl,
   Grid,
+  IconButton,
   InputLabel,
   MenuItem,
   Select,
@@ -76,13 +77,9 @@ export default function ProcessDHView() {
         if (dsPollItem.key === questionSelect) {
           // Chấm đến thuộc tính gui_den và lọc để kiểm tra sự tồn tại
           const guiDenArray = item.gui_den || [];
-          let isExisting = false;
-
-          guiDenArray.forEach((guiDenItem) => {
-            if (newArray.some((i) => i.ma_cd === guiDenItem.ma_cd)) {
-              isExisting = true;
-            }
-          });
+          const isExisting = guiDenArray.some((guiDenItem) =>
+            newArray.some((i) => i.ma_cd === guiDenItem.ma_cd)
+          );
 
           // Nếu không tồn tại thì thêm vào mảng mới
           if (!isExisting) {
@@ -145,9 +142,6 @@ export default function ProcessDHView() {
     [];
   console.log('state isNewQuestion', isNewQuestion);
   const handleClosePopup = () => {
-    console.log(
-      '=========== có vào hàm close =============,This web app is used for the V3 Company 2024 election'
-    );
     setIsNewQuestion(false);
   };
 
@@ -406,9 +400,17 @@ export default function ProcessDHView() {
       >
         <DialogTitle
           id="alert-dialog-title"
-          sx={{ textAlign: 'center', padding: '12px !important' }}
+          sx={{
+            textAlign: 'center',
+            padding: '12px !important',
+            display: 'flex',
+            justifyContent: 'space-between',
+          }}
         >
-          Đã đến thời gian bỏ phiếu
+          <Typography>Đã đến thời gian bỏ phiếu</Typography>
+          <IconButton onClick={handleClosePopup} color="inherit" edge="end">
+            X
+          </IconButton>
         </DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
