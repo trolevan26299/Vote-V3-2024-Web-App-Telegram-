@@ -52,7 +52,6 @@ export default function ProcessDHView() {
   const [listHistoryVoted, setListHistoryVoted] = useState<IHistoryVoted[]>([]);
   const [totalSharesHolder, setTotalSharesHolder] = useState<any>([]);
   const [isNewQuestion, setIsNewQuestion] = useState(false);
-  const [initialCount, setInitialCount] = useState<number | null>(null);
 
   // CODE FOR SELECT QUESTION
   // Handle select question
@@ -61,34 +60,6 @@ export default function ProcessDHView() {
   const handleChangeSelectQuestion = (event: SelectChangeEvent) => {
     SetQuestionSelect(event.target.value);
   };
-
-  // hàm dùng để check nếu có câu hỏi mới và còn hạn thì sẽ hiện popup thông báo quay lại câu hỏi
-  const filteredData = historySendPollData.filter((item) => {
-    // Kiểm tra xem item có thuộc tính gui_den và thoi_gian_ket_thuc hay không
-    if (item.gui_den && item.thoi_gian_ket_thuc) {
-      // Chuyển đổi item.thoi_gian_ket_thuc thành số mili giây
-      const endTime = convertToMilliseconds(item.thoi_gian_ket_thuc);
-      // Chuyển đổi currentTimeUTC7 thành số mili giây
-      const currentUTC7Date = convertToMilliseconds(currentTimeUTC7);
-
-      // Kiểm tra xem endTime có lớn hơn currentUTC7Date không
-      if (endTime > currentUTC7Date) {
-        // Lọc qua mảng item.gui_den và trả về những phần tử có ma_cd bằng user?.ma_cd và status bằng 'sent'
-        const filteredDen = item.gui_den.filter(
-          (den) => den.ma_cd === user?.ma_cd && den.status === 'sent'
-        );
-
-        // Nếu có ít nhất một phần tử thỏa mãn điều kiện trong gui_den, trả về mảng đó
-        if (filteredDen.length > 0) {
-          return true;
-        }
-      }
-    }
-
-    // Nếu không thỏa mãn điều kiện hoặc không có phần tử nào thỏa mãn trong gui_den, trả về false
-    return false;
-  });
-  console.log('-------------------------filteredData:', filteredData);
 
   const pollDataByKey = danhSachPollData.find((poll) => poll.key === questionSelect);
 
@@ -177,20 +148,43 @@ export default function ProcessDHView() {
     console.log(
       '=========== có vào hàm close =============,This web app is used for the V3 Company 2024 election'
     );
-    setIsNewQuestion((prevState) => false);
+    setIsNewQuestion(false);
   };
 
   useEffect(() => {
-    if (filteredData) {
-      // Kiểm tra chiều dài của mảng lọc filteredData
-      const hasNewQuestion = filteredData.length > 0;
+    // hàm dùng để check nếu có câu hỏi mới và còn hạn thì sẽ hiện popup thông báo quay lại câu hỏi
+    const filteredData = historySendPollData.filter((item) => {
+      // Kiểm tra xem item có thuộc tính gui_den và thoi_gian_ket_thuc hay không
+      if (item.gui_den && item.thoi_gian_ket_thuc) {
+        // Chuyển đổi item.thoi_gian_ket_thuc thành số mili giây
+        const endTime = convertToMilliseconds(item.thoi_gian_ket_thuc);
+        // Chuyển đổi currentTimeUTC7 thành số mili giây
+        const currentUTC7Date = convertToMilliseconds(currentTimeUTC7);
 
-      // Nếu có câu hỏi mới, set isNewQuestion thành true
-      if (hasNewQuestion) {
-        setIsNewQuestion(true);
+        // Kiểm tra xem endTime có lớn hơn currentUTC7Date không
+        if (endTime > currentUTC7Date) {
+          // Lọc qua mảng item.gui_den và trả về những phần tử có ma_cd bằng user?.ma_cd và status bằng 'sent'
+          const filteredDen = item.gui_den.filter(
+            (den) => den.ma_cd === user?.ma_cd && den.status === 'sent'
+          );
+
+          // Nếu có ít nhất một phần tử thỏa mãn điều kiện trong gui_den, trả về mảng đó
+          if (filteredDen.length > 0) {
+            return true;
+          }
+        }
       }
+
+      // Nếu không thỏa mãn điều kiện hoặc không có phần tử nào thỏa mãn trong gui_den, trả về false
+      return false;
+    });
+    if (filteredData.length > 0) {
+      setIsNewQuestion(true);
+    } else {
+      setIsNewQuestion(false);
     }
-  }, [filteredData]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [historySendPollData]);
 
   useEffect(() => {
     // get data từ firebase realtime
