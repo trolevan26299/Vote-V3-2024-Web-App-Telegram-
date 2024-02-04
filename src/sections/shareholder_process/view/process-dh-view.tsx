@@ -53,9 +53,6 @@ export default function ProcessDHView() {
   const [totalSharesHolder, setTotalSharesHolder] = useState<any>([]);
   const [isNewQuestion, setIsNewQuestion] = useState(false);
 
-  // CODE FOR SELECT QUESTION FROM FIREBASE
-  const existingKeys = new Set<string>();
-
   // CODE FOR SELECT QUESTION
   // Handle select question
   const [questionSelect, SetQuestionSelect] = useState<string>(danhSachPollData[0]?.key || '');
