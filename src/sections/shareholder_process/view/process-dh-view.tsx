@@ -52,6 +52,7 @@ export default function ProcessDHView() {
   const [listHistoryVoted, setListHistoryVoted] = useState<IHistoryVoted[]>([]);
   const [totalSharesHolder, setTotalSharesHolder] = useState<any>([]);
   const [isNewQuestion, setIsNewQuestion] = useState(false);
+  const [initialCount, setInitialCount] = useState<number | null>(null);
 
   // CODE FOR SELECT QUESTION
   // Handle select question
@@ -185,9 +186,15 @@ export default function ProcessDHView() {
 
     // Nếu có câu hỏi mới, set isNewQuestion thành true
     if (hasNewQuestion) {
-      setIsNewQuestion(true);
+      // Check if the initialCount is not set or the current count increased by more than 1
+      if (initialCount === null || filteredData.length - initialCount > 1) {
+        setIsNewQuestion(true);
+      }
+    } else {
+      // Reset initialCount when there are no new questions
+      setInitialCount(null);
     }
-  }, [filteredData]);
+  }, [filteredData, initialCount]);
 
   useEffect(() => {
     // get data từ firebase realtime
