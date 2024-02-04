@@ -169,6 +169,7 @@ export default function VoteDHView() {
     );
   };
 
+  console.log('selected answer ---------------------:', selectedAnswers);
   const handleSubmitVote = async () => {
     const dataExist =
       listHistoryVoted.length > 0
