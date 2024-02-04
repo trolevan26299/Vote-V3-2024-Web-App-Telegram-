@@ -40,6 +40,7 @@ import { bgGradient } from '../../../theme/css';
 import DHContentLeft from '../dh-content-left';
 import DHContentRight from '../dh-content-right';
 import DHContentTable from '../dh-content-table';
+import { Icon } from '@iconify/react';
 
 export default function ProcessDHView() {
   const settings = useSettingsContext();
@@ -404,13 +405,16 @@ export default function ProcessDHView() {
             textAlign: 'center',
             padding: '12px !important',
             display: 'flex',
-            justifyContent: 'space-between',
+            flexDirection: 'row',
+            width: '100%',
           }}
         >
-          <Typography>Đã đến thời gian bỏ phiếu</Typography>
-          <IconButton onClick={handleClosePopup} color="inherit" edge="end">
-            X
-          </IconButton>
+          <Typography sx={{ width: '85%' }}>Đã đến thời gian bỏ phiếu</Typography>
+          <Icon
+            style={{ width: '15%', textAlign: 'center' }}
+            icon="ic:outline-close"
+            onClick={() => handleClosePopup()}
+          />
         </DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
@@ -420,9 +424,6 @@ export default function ProcessDHView() {
         <DialogActions>
           <Button fullWidth variant="contained" onClick={() => router.push(paths.dashboard.voteDH)}>
             Bỏ Phiếu
-          </Button>
-          <Button fullWidth variant="contained" onClick={handleClosePopup}>
-            close
           </Button>
         </DialogActions>
       </Dialog>
