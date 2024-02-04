@@ -46,7 +46,6 @@ It's time to vote: : *${questionEng}*
         text: item.nguoi_nuoc_ngoai === true ? messageContentEng : messageContent,
         parse_mode: 'MarkdownV2',
         reply_markup: JSON.stringify(inlineKeyboard),
-        // reply_markup: JSON.stringify(inlineKeyboard),
       };
 
       // Gửi yêu cầu POST sử dụng Axios
