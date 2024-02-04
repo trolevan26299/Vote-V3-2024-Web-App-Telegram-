@@ -2,6 +2,7 @@
 
 'use client';
 
+import { Icon } from '@iconify/react';
 import {
   Alert,
   Box,
@@ -14,7 +15,6 @@ import {
   DialogTitle,
   FormControl,
   Grid,
-  IconButton,
   InputLabel,
   MenuItem,
   Select,
@@ -40,7 +40,6 @@ import { bgGradient } from '../../../theme/css';
 import DHContentLeft from '../dh-content-left';
 import DHContentRight from '../dh-content-right';
 import DHContentTable from '../dh-content-table';
-import { Icon } from '@iconify/react';
 
 export default function ProcessDHView() {
   const settings = useSettingsContext();
