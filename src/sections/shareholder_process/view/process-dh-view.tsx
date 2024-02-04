@@ -181,20 +181,16 @@ export default function ProcessDHView() {
   };
 
   useEffect(() => {
-    // Kiểm tra chiều dài của mảng lọc filteredData
-    const hasNewQuestion = filteredData.length > 0;
+    if (filteredData) {
+      // Kiểm tra chiều dài của mảng lọc filteredData
+      const hasNewQuestion = filteredData.length > 0;
 
-    // Nếu có câu hỏi mới, set isNewQuestion thành true
-    if (hasNewQuestion) {
-      // Check if the initialCount is not set or the current count increased by more than 1
-      if (initialCount === null || filteredData.length - initialCount > 1) {
+      // Nếu có câu hỏi mới, set isNewQuestion thành true
+      if (hasNewQuestion) {
         setIsNewQuestion(true);
       }
-    } else {
-      // Reset initialCount when there are no new questions
-      setInitialCount(null);
     }
-  }, [filteredData, initialCount]);
+  }, [filteredData]);
 
   useEffect(() => {
     // get data từ firebase realtime
