@@ -90,6 +90,7 @@ export default function ProcessDHView() {
     // Nếu không thỏa mãn điều kiện hoặc không có phần tử nào thỏa mãn trong gui_den, trả về false
     return false;
   });
+  console.log('-------------------------', filteredData);
 
   const pollDataByKey = danhSachPollData.find((poll) => poll.key === questionSelect);
 
