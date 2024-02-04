@@ -40,7 +40,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
           // Lặp qua từng đối tượng trong collection
           snapshot.forEach((childSnapshot) => {
             const data = childSnapshot.val();
-            if (data && data.telegram_id === userAccess) {
+            if (data && String(data.telegram_id) === String(userAccess)) {
               setUser(data);
               console.log(data);
             }
