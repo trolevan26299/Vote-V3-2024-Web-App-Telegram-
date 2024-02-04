@@ -140,7 +140,7 @@ export default function ProcessDHView() {
         percent: ((calculateTotalCP(item.id as number) / totalAllCP) * 100).toFixed(1),
       }))) ||
     [];
-  console.log('state isNewQuestion', isNewQuestion);
+
   const handleClosePopup = () => {
     setIsNewQuestion(false);
   };
