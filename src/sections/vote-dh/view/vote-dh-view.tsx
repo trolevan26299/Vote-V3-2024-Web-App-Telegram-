@@ -170,6 +170,19 @@ export default function VoteDHView() {
   };
 
   console.log('selected answer ---------------------:', selectedAnswers);
+  const dataExistA = selectedAnswers
+    .map((item) => {
+      const keyQuestion = item.key_question;
+      const matchingHistorySendPoll = historySendPollData.find((historyItem) => {
+        const dsPollIdArray = historyItem.ds_poll_id || [];
+        return dsPollIdArray.some((dsPollItem) => dsPollItem.key === keyQuestion);
+      });
+
+      return matchingHistorySendPoll;
+    })
+    .filter(Boolean);
+  console.log('dataExistA ---------------------:', dataExistA);
+
   const handleSubmitVote = async () => {
     const dataExist =
       listHistoryVoted.length > 0
