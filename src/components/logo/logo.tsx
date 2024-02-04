@@ -37,8 +37,8 @@ const Logo = forwardRef<HTMLDivElement, LogoProps>(
         ref={ref}
         component="div"
         sx={{
-          width: 100,
-          height: 100,
+          width: 80,
+          height: 60,
           display: 'inline-flex',
           ...sx,
         }}
@@ -77,7 +77,7 @@ const Logo = forwardRef<HTMLDivElement, LogoProps>(
             />
           </g>
         </svg> */}
-        <img src="/logo/v3newpng2.png" width="100%" height="100%" alt="logov3" />
+        <img src="/logo/v3newpng3.png" width="100%" height="100%" alt="logov3" />
       </Box>
     );
 
