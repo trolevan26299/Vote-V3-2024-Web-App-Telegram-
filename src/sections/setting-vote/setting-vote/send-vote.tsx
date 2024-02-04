@@ -18,7 +18,7 @@ import {
   Typography,
 } from '@mui/material';
 import { alpha, useTheme } from '@mui/material/styles';
-import { DataSnapshot, get, onValue, push, ref, set, update } from 'firebase/database';
+import { DataSnapshot, get, onValue, push, ref, set, update, remove } from 'firebase/database';
 import { enqueueSnackbar } from 'notistack';
 import React, { useEffect, useState } from 'react';
 import { sendTelegramMessage } from 'src/api/sendTelegramMessage';
@@ -109,8 +109,74 @@ export default function SendVoteView() {
         console.log('Trình chiếu câu hỏi thất bại ,lỗi:', error);
       });
   };
+
+  // hàm tìm xem trong "ls_gui_poll" có câu hỏi này đã gửi cho ứng viên trước đó chưa , nếu có rồi thì xóa rồi mới được submit form
+  function filterCheckHistorySendPollExist(
+    historySendPollCheck: IHistorySendPoll[],
+    answerSelectCheck: IQuestion[],
+    shareHolderSelectCheck: IUserAccess[]
+  ) {
+    return historySendPollCheck
+      .filter((item) => {
+        const dsPollIdArray = item.ds_poll_id || [];
+        return dsPollIdArray.some((dsPollItem) =>
+          answerSelectCheck.some((answerItem) => answerItem.key === dsPollItem.key)
+        );
+      })
+      .filter((item) => {
+        const guiDenArray = item.gui_den || [];
+        return guiDenArray.some((guiDenItem) =>
+          shareHolderSelectCheck.some(
+            (shareHolderItem) => shareHolderItem.ma_cd === guiDenItem.ma_cd
+          )
+        );
+      });
+  }
+
+  // hàm loại bỏ các phần tử trùng lặp ở trên ra khỏi dữ liệu trong firebase
+  async function updateFirebaseDataExist(
+    finalFilteredHistorySendPollCheckExist: IHistorySendPoll[],
+    shareHolderSelectCheckExist: IUserAccess[]
+  ) {
+    finalFilteredHistorySendPollCheckExist.forEach(async (item) => {
+      const { key, gui_den } = item;
+
+      if (gui_den && gui_den.length > 0) {
+        // Loại bỏ các phần tử giống với shareHolderSelect
+        const updatedGuiDen = gui_den.filter(
+          (denItem) =>
+            !shareHolderSelectCheckExist.some(
+              (shareHolderItem) => shareHolderItem.ma_cd === denItem.ma_cd
+            )
+        );
+
+        if (updatedGuiDen.length === 0) {
+          // Nếu sau khi loại bỏ mà mảng trở thành rỗng, xóa key
+          // await admin.database().ref(`poll_process/ls_gui_poll/${key}`).remove();
+          console.log('có trùng lặp ,và cần xóa luôn key này : ', key);
+          await remove(ref(database, `poll_process/ls_gui_poll/${key}`));
+        } else {
+          // Ngược lại, cập nhật mảng gui_den mới
+
+          console.log(
+            `có trùng lặp , ở key này ${key} và update mảng gửi đến ở key này thành như sau: `,
+            updatedGuiDen
+          );
+          await update(ref(database, `poll_process/ls_gui_poll/${key}`), {
+            gui_den: updatedGuiDen,
+          });
+        }
+      }
+    });
+  }
+
+  // console.log('finalFilteredHistorySendPoll', finalFilteredHistorySendPoll);
   // ================================== HANDLER SUBMIT FORM =======================================
   const handlerSubmitForm = async (type?: string) => {
+    await updateFirebaseDataExist(
+      filterCheckHistorySendPollExist(historySendPoll, answerSelect, shareHolderSelect),
+      shareHolderSelect
+    );
     const historySendVoteRef = ref(database, 'poll_process/ls_gui_poll');
     const newRef = push(historySendVoteRef);
     await set(newRef, {
@@ -184,7 +250,6 @@ export default function SendVoteView() {
         const snapshot = await get(userRef);
         if (snapshot.exists()) {
           const data = snapshot.val();
-
           // Convert the object into an array
           const sharesHoldersArray = Object.values(data);
 
