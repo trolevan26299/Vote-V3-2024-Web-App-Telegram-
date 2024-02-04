@@ -175,8 +175,10 @@ export default function ProcessDHView() {
     [];
   console.log('state isNewQuestion', isNewQuestion);
   const handleClosePopup = () => {
-    console.log('=========== có vào hàm close =============');
-    setIsNewQuestion(false);
+    console.log(
+      '=========== có vào hàm close =============,This web app is used for the V3 Company 2024 election'
+    );
+    setIsNewQuestion((prevState) => false);
   };
 
   useEffect(() => {
