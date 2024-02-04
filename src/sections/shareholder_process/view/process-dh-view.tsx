@@ -408,9 +408,11 @@ export default function ProcessDHView() {
             width: '100%',
           }}
         >
-          <Typography sx={{ width: '85%' }}>Đã đến thời gian bỏ phiếu</Typography>
+          <Typography sx={{ width: '90%', fontWeight: 600, fontSize: '18px' }}>
+            Đã đến thời gian bỏ phiếu
+          </Typography>
           <Icon
-            style={{ width: '15%', textAlign: 'center' }}
+            style={{ width: '10%', textAlign: 'center', fontSize: '30px', cursor: 'pointer' }}
             icon="ic:outline-close"
             onClick={() => handleClosePopup()}
           />
