@@ -319,7 +319,7 @@ export default function ProcessDHView() {
             ))}
           </Select>
         </FormControl>
-        <Typography color="#000" mt={2}>
+        <Typography sx={{ color: theme.palette.text.primary }} mt={2}>
           {!user ? (
             <>
               <Box fontWeight="fontWeightBold" display="inline">
