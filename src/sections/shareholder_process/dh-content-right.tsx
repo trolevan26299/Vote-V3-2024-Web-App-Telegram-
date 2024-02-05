@@ -77,6 +77,7 @@ export default function DHContentRight({
   // ------------------ END LOGIC tính đã gửi câu hỏi select đến bao nhiêu người và không được trùng lặp số
 
   const chart: chart = {
+    // colors: [],
     series:
       (pollDataByKey &&
         pollDataByKey?.dap_an?.map((item) => ({
@@ -110,6 +111,12 @@ export default function DHContentRight({
   const chartSeries = series.map((i) => i.value);
 
   const chartOptions = useChart({
+    dataLabels: {
+      enabled: true,
+      dropShadow: {
+        enabled: false,
+      },
+    },
     colors,
     tooltip: {
       marker: { show: false },
@@ -129,6 +136,13 @@ export default function DHContentRight({
     },
     xaxis: {
       categories: series.map((i) => i.label),
+      labels: {
+        style: {
+          colors: theme.palette.text.primary,
+          fontSize: '13px',
+          fontWeight: 'bold',
+        },
+      },
     },
     ...options,
   });
