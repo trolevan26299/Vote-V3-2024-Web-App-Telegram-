@@ -276,6 +276,7 @@ export default function ProcessDHView() {
         links={[{ name: '' }]}
         sx={{
           mb: { xs: 1, md: 1 },
+          textAlign: typeof user === 'undefined' ? 'center' : undefined,
         }}
       />
       <Alert
@@ -317,17 +318,30 @@ export default function ProcessDHView() {
             ))}
           </Select>
         </FormControl>
-
         <Typography color="#000" mt={2}>
-          {!user
-            ? `Nội dung (Content) : ${danhSachPollData.find((item) => item.key === questionSelect)
-                ?.noi_dung} (${danhSachPollData.find((item) => item.key === questionSelect)
-                ?.noi_dung_en})`
-            : user.nguoi_nuoc_ngoai === true
-            ? `Content : ${danhSachPollData.find((item) => item.key === questionSelect)
-                ?.noi_dung_en}`
-            : `Nội dung : ${danhSachPollData.find((item) => item.key === questionSelect)
-                ?.noi_dung}`}
+          {!user ? (
+            <>
+              <Box fontWeight="fontWeightBold" display="inline">
+                Nội dung (Content) :
+              </Box>
+              {danhSachPollData.find((item) => item.key === questionSelect)?.noi_dung} (
+              {danhSachPollData.find((item) => item.key === questionSelect)?.noi_dung_en})
+            </>
+          ) : user.nguoi_nuoc_ngoai === true ? (
+            <>
+              <Box fontWeight="fontWeightBold" display="inline">
+                Content
+              </Box>
+              : {danhSachPollData.find((item) => item.key === questionSelect)?.noi_dung_en}
+            </>
+          ) : (
+            <>
+              <Box fontWeight="fontWeightBold" display="inline">
+                Nội dung
+              </Box>
+              : {danhSachPollData.find((item) => item.key === questionSelect)?.noi_dung}
+            </>
+          )}
         </Typography>
       </Alert>
       <Box
