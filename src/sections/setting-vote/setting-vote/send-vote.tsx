@@ -18,7 +18,7 @@ import {
   Typography,
 } from '@mui/material';
 import { alpha, useTheme } from '@mui/material/styles';
-import { DataSnapshot, get, onValue, push, ref, set, update, remove } from 'firebase/database';
+import { DataSnapshot, get, onValue, push, ref, remove, set, update } from 'firebase/database';
 import { enqueueSnackbar } from 'notistack';
 import React, { useEffect, useState } from 'react';
 import { sendTelegramMessage } from 'src/api/sendTelegramMessage';
@@ -30,6 +30,7 @@ import { FIREBASE_COLLECTION } from 'src/constant/firebase_collection.constant';
 import { database } from 'src/firebase/firebase.config';
 import { IHistorySendPoll, IQuestion } from 'src/types/setting';
 import { IUserAccess } from 'src/types/userAccess.types';
+import { IHistoryVoted } from 'src/types/votedh.types';
 import { ExpireTimeFunc } from 'src/utils/calculatorTimeExpire';
 import { currentTimeUTC7 } from 'src/utils/currentTimeUTC+7';
 import { styles } from '../styles';
@@ -37,6 +38,8 @@ import { styles } from '../styles';
 export default function SendVoteView() {
   const settings = useSettingsContext();
   const theme = useTheme();
+
+  console.log('currentTimeUTC7:', currentTimeUTC7);
 
   const tableLabels = [
     { id: 'name_question', label: 'Tên nội dung' },
@@ -69,6 +72,9 @@ export default function SendVoteView() {
 
   // listSharesHolders from firebase
   const [listSharesHolders, setListSharesHolders] = useState<IUserAccess[]>([]);
+
+  // list Hitsory Poll
+  const [listHistoryPoll, setListHistoryPoll] = useState<IHistoryVoted[]>([]);
 
   const handleChangeSelectShareHolder = (event: React.SyntheticEvent, values: any) => {
     if (values.some((value: IUserAccess) => value.ten_cd === 'Tất cả')) {
@@ -103,14 +109,15 @@ export default function SendVoteView() {
     };
     update(keyShowFirebaseRef, updateData)
       .then(() => {
-        console.log('Trình chiếu câu hỏi thành công !');
+        enqueueSnackbar('Trình chiếu thành công !', { variant: 'success' });
       })
       .catch((error) => {
         console.log('Trình chiếu câu hỏi thất bại ,lỗi:', error);
+        enqueueSnackbar('Trình chiếu thất bại !', { variant: 'default' });
       });
   };
 
-  // hàm tìm xem trong "ls_gui_poll" có câu hỏi này đã gửi cho ứng viên trước đó chưa , nếu có rồi thì xóa rồi mới được submit form
+  // hàm tìm xem trong "ls_gui_poll" có câu hỏi này đã gửi cho ứng viên trước đó chưa , trả ra mảng các phần tử có trong historySendPoll trùng lặp
   function filterCheckHistorySendPollExist(
     historySendPollCheck: IHistorySendPoll[],
     answerSelectCheck: IQuestion[],
@@ -132,6 +139,28 @@ export default function SendVoteView() {
         );
       });
   }
+  // hàm check xem những câu hỏi gửi đi ,trong list user thì user đó đã trả lời chưa?
+  // nếu trả lời rồi thì loại bỏ kết quả vote của user đó ra khỏi ls_poll
+
+  async function checkAndDeleteAnswerPoll() {
+    shareHolderSelect.forEach(async (shareHolder) => {
+      const shareholderHistory = listHistoryPoll.find(
+        (history) => history.ma_cd === shareHolder.ma_cd
+      );
+
+      if (shareholderHistory) {
+        const filteredDetails = shareholderHistory.detail.filter(
+          (detail) => !answerSelect.some((answer) => answer.key === detail.key_question)
+        );
+        const shareholderRef = ref(database, `poll_process/ls_poll/${shareholderHistory.key}`);
+        if (filteredDetails.length > 0) {
+          await update(shareholderRef, { detail: filteredDetails });
+        } else {
+          await remove(shareholderRef);
+        }
+      }
+    });
+  }
 
   // hàm loại bỏ các phần tử trùng lặp ở trên ra khỏi dữ liệu trong firebase
   async function updateFirebaseDataExist(
@@ -140,7 +169,6 @@ export default function SendVoteView() {
   ) {
     finalFilteredHistorySendPollCheckExist.forEach(async (item) => {
       const { key, gui_den } = item;
-
       if (gui_den && gui_den.length > 0) {
         // Loại bỏ các phần tử giống với shareHolderSelect
         const updatedGuiDen = gui_den.filter(
@@ -153,15 +181,9 @@ export default function SendVoteView() {
         if (updatedGuiDen.length === 0) {
           // Nếu sau khi loại bỏ mà mảng trở thành rỗng, xóa key
           // await admin.database().ref(`poll_process/ls_gui_poll/${key}`).remove();
-          console.log('có trùng lặp ,và cần xóa luôn key này : ', key);
           await remove(ref(database, `poll_process/ls_gui_poll/${key}`));
         } else {
           // Ngược lại, cập nhật mảng gui_den mới
-
-          console.log(
-            `có trùng lặp , ở key này ${key} và update mảng gửi đến ở key này thành như sau: `,
-            updatedGuiDen
-          );
           await update(ref(database, `poll_process/ls_gui_poll/${key}`), {
             gui_den: updatedGuiDen,
           });
@@ -173,10 +195,12 @@ export default function SendVoteView() {
   // console.log('finalFilteredHistorySendPoll', finalFilteredHistorySendPoll);
   // ================================== HANDLER SUBMIT FORM =======================================
   const handlerSubmitForm = async (type?: string) => {
+    await checkAndDeleteAnswerPoll();
     await updateFirebaseDataExist(
       filterCheckHistorySendPollExist(historySendPoll, answerSelect, shareHolderSelect),
       shareHolderSelect
     );
+
     const historySendVoteRef = ref(database, 'poll_process/ls_gui_poll');
     const newRef = push(historySendVoteRef);
     await set(newRef, {
@@ -187,8 +211,8 @@ export default function SendVoteView() {
         status: 'sent',
       })),
       is_active: true,
-      thoi_gian_gui: currentTimeUTC7,
-      thoi_gian_ket_thuc: ExpireTimeFunc(currentTimeUTC7, expireTime),
+      thoi_gian_gui: currentTimeUTC7(),
+      thoi_gian_ket_thuc: ExpireTimeFunc(currentTimeUTC7(), expireTime),
     })
       .then(() => {
         enqueueSnackbar('Gửi Thành Công !', { variant: 'success' });
@@ -200,7 +224,7 @@ export default function SendVoteView() {
           answerSelect.map((item) => item.ten_poll as string),
           answerSelect.map((item) => item.ten_poll_en as string),
 
-          ExpireTimeFunc(currentTimeUTC7, expireTime)
+          ExpireTimeFunc(currentTimeUTC7(), expireTime)
         );
         if (type) {
           handleShowResultQuestionForAdmin();
@@ -220,6 +244,7 @@ export default function SendVoteView() {
       if (dataSnapShot) {
         const danh_sach_poll = snapshot.val().danh_sach_poll ?? {};
         const ls_gui_poll = snapshot.val().ls_gui_poll ?? {};
+        const ls_poll = snapshot.val().ls_poll ?? {};
         const listQuestionWithKeys = Object.keys(danh_sach_poll).map((key) => ({
           key,
           ...danh_sach_poll[key],
@@ -228,8 +253,13 @@ export default function SendVoteView() {
           key,
           ...snapshot.val().ls_gui_poll[key],
         }));
+        const listHistoryPollData = Object.keys(ls_poll).map((key) => ({
+          key,
+          ...snapshot.val().ls_poll[key],
+        }));
         setListQuestion(listQuestionWithKeys);
         setHistorySendPoll(listHistorySendPoll);
+        setListHistoryPoll(listHistoryPollData);
       } else {
         console.log('No data available');
       }

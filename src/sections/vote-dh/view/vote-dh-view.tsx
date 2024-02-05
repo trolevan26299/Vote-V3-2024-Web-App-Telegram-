@@ -76,7 +76,7 @@ export default function VoteDHView() {
     if (existingAnswerIndex !== -1) {
       const updatedSelectedAnswers = [...selectedAnswers];
       updatedSelectedAnswers[existingAnswerIndex].answer_select_id = selectedAnswerId;
-      updatedSelectedAnswers[existingAnswerIndex].time_voted = currentTimeUTC7;
+      updatedSelectedAnswers[existingAnswerIndex].time_voted = currentTimeUTC7();
       updatedSelectedAnswers[existingAnswerIndex].key_history_send_poll = key_history_send_poll;
       setSelectedAnswers(updatedSelectedAnswers);
     } else {
@@ -86,7 +86,7 @@ export default function VoteDHView() {
         {
           key_question: questionKey,
           answer_select_id: selectedAnswerId,
-          time_voted: currentTimeUTC7,
+          time_voted: currentTimeUTC7(),
           key_history_send_poll,
         },
       ]);
@@ -100,7 +100,7 @@ export default function VoteDHView() {
       // Chuyển đổi item.thoi_gian_ket_thuc thành số mili giây
       const endTime = convertToMilliseconds(item.thoi_gian_ket_thuc);
       // Chuyển đổi currentTimeUTC7 thành số mili giây
-      const currentUTC7Date = convertToMilliseconds(currentTimeUTC7);
+      const currentUTC7Date = convertToMilliseconds(currentTimeUTC7());
 
       // Kiểm tra xem endTime có lớn hơn currentUTC7Date không
       if (endTime > currentUTC7Date) {

@@ -1,1 +1,1 @@
-export const numberWithCommas = (number: number) => number.toLocaleString('vi-VN');
+export const numberWithCommas = (number: number) => number?.toLocaleString('vi-VN');
