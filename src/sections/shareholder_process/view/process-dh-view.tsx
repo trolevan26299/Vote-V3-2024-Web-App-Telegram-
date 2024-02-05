@@ -274,6 +274,7 @@ export default function ProcessDHView() {
           : 'Tiến trình bỏ phiếu nội dung Đại Hội Cổ Đông'
         )?.toString()}
         links={[{ name: '' }]}
+        sizeHeader={user ? 'h4' : 'h3'}
         sx={{
           mb: { xs: 1, md: 1 },
           textAlign: typeof user === 'undefined' ? 'center' : undefined,

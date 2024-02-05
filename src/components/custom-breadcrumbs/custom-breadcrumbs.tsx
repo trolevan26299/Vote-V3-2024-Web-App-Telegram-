@@ -5,7 +5,8 @@ import Link from '@mui/material/Link';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 //
-import { useUser } from 'src/firebase/user_accesss_provider';
+
+import { Variant } from '@mui/material/styles/createTypography';
 import LinkItem from './link-item';
 import { CustomBreadcrumbsProps } from './types';
 
@@ -17,11 +18,11 @@ export default function CustomBreadcrumbs({
   heading,
   moreLink,
   activeLast,
+  sizeHeader,
   sx,
   ...other
 }: CustomBreadcrumbsProps) {
   const lastLink = links[links.length - 1].name;
-  const { user } = useUser();
 
   return (
     <Box sx={{ ...sx }}>
@@ -29,7 +30,7 @@ export default function CustomBreadcrumbs({
         <Box sx={{ flexGrow: 1 }}>
           {/* HEADING */}
           {heading && (
-            <Typography variant={user ? 'h4' : 'h3'} gutterBottom>
+            <Typography variant={(sizeHeader as Variant) || ('h4' as Variant)} gutterBottom>
               {heading}
             </Typography>
           )}
