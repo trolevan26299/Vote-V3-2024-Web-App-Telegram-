@@ -153,7 +153,7 @@ export default function ProcessDHView() {
         // Chuyển đổi item.thoi_gian_ket_thuc thành số mili giây
         const endTime = convertToMilliseconds(item.thoi_gian_ket_thuc);
         // Chuyển đổi currentTimeUTC7 thành số mili giây
-        const currentUTC7Date = convertToMilliseconds(currentTimeUTC7);
+        const currentUTC7Date = convertToMilliseconds(currentTimeUTC7());
 
         // Kiểm tra xem endTime có lớn hơn currentUTC7Date không
         if (endTime > currentUTC7Date) {

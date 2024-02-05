@@ -39,8 +39,6 @@ export default function SendVoteView() {
   const settings = useSettingsContext();
   const theme = useTheme();
 
-  console.log('currentTimeUTC7:', currentTimeUTC7);
-
   const tableLabels = [
     { id: 'name_question', label: 'Tên nội dung' },
     { id: 'receiver', label: 'Gửi đến' },
@@ -61,8 +59,6 @@ export default function SendVoteView() {
 
   // handle select time expired
   const [expireTime, setExpireTime] = React.useState<string>('');
-
-  // console.log('Thời gian hết hạn :', ExpireTimeFunc(currentTimeUTC7, expireTime));
 
   // list history send poll from firebase
   const [historySendPoll, setHistorySendPoll] = useState<IHistorySendPoll[]>([]);
