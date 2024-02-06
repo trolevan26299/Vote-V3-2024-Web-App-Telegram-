@@ -137,7 +137,7 @@ export default function ProcessDHView() {
           (item2: any) => item2.answer_select_id === String(item.id)
         ).length,
         numberCP: calculateTotalCP(item.id as number),
-        percent: ((calculateTotalCP(item.id as number) / totalAllCP) * 100).toFixed(1),
+        percent: ((calculateTotalCP(item.id as number) / totalAllCP || 0) * 100).toFixed(1),
       }))) ||
     [];
 

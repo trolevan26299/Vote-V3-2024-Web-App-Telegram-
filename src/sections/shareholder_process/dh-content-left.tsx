@@ -131,7 +131,7 @@ export default function DHContentLeft({
       <Stack spacing={3} sx={{ pt: 1 }}>
         <Stack key="success">
           <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 1 }}>
-            <Box sx={{ typography: 'overline' }}>pending</Box>
+            {/* <Box sx={{ typography: 'overline' }}>pending</Box> */}
             <Box sx={{ typography: 'subtitle1' }}>{percentSendPollData.toFixed(2)}%</Box>
           </Stack>
 
@@ -144,7 +144,7 @@ export default function DHContentLeft({
               bgcolor: (theme2) => alpha(theme2.palette.grey[500], 0.16),
             }}
           />
-          <Typography sx={{ marginTop: '20px', fontWeight: '600', fontSize: '16px' }}>
+          <Typography sx={{ marginTop: '20px' }} variant="h6">
             {!user ? (
               <>
                 Biểu đồ cổ phần số lượng bình chọn

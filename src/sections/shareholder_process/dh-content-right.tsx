@@ -53,7 +53,7 @@ export default function DHContentRight({
   const numberUserVoted = uniqueGuiDenObjects.filter(
     (itemUserVoted: any) => itemUserVoted.status === 'voted'
   ).length;
-  const percentUserVoted = (numberUserVoted / uniqueGuiDenObjects.length) * 100;
+  const percentUserVoted = (numberUserVoted / uniqueGuiDenObjects.length) * 100 || 0;
 
   //  tạo một Set để lưu trữ các ma_cd đã xuất hiện
   const seenMaCd: string[] = [];
@@ -140,7 +140,7 @@ export default function DHContentRight({
         style: {
           colors: theme.palette.text.primary,
           fontSize: '13px',
-          fontWeight: 'bold',
+          fontWeight: '500',
         },
       },
     },
@@ -171,8 +171,8 @@ export default function DHContentRight({
       <Stack spacing={3} sx={{ pt: 1 }}>
         <Stack key="success">
           <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 1 }}>
-            <Box sx={{ typography: 'overline' }}>pending</Box>
-            <Box sx={{ typography: 'subtitle1' }}>{percentUserVoted.toFixed(2)} %</Box>
+            {/* <Box sx={{ typography: 'overline' }}>pending</Box> */}
+            <Box sx={{ typography: 'subtitle1' }}>{percentUserVoted.toFixed(2) || 0} %</Box>
           </Stack>
 
           <LinearProgress
@@ -184,7 +184,7 @@ export default function DHContentRight({
               bgcolor: (theme2) => alpha(theme2.palette.grey[500], 0.16),
             }}
           />
-          <Typography sx={{ marginTop: '20px', fontWeight: '600', fontSize: '16px' }}>
+          <Typography sx={{ marginTop: '20px' }} variant="h6">
             {!user ? (
               <>
                 Biểu đồ cổ đông bình chọn
