@@ -6,11 +6,12 @@ import { useResponsive } from 'src/hooks/use-responsive';
 // components
 import { useSettingsContext } from 'src/components/settings';
 //
-import Main from './main';
+import { useUser } from 'src/firebase/user_accesss_provider';
 import Header from './header';
+import Main from './main';
+import NavHorizontal from './nav-horizontal';
 import NavMini from './nav-mini';
 import NavVertical from './nav-vertical';
-import NavHorizontal from './nav-horizontal';
 
 // ----------------------------------------------------------------------
 
@@ -20,6 +21,7 @@ type Props = {
 
 export default function DashboardLayout({ children }: Props) {
   const settings = useSettingsContext();
+  const { user } = useUser();
 
   const lgUp = useResponsive('up', 'lg');
 
@@ -38,8 +40,7 @@ export default function DashboardLayout({ children }: Props) {
   if (isHorizontal) {
     return (
       <>
-        <Header onOpenNav={nav.onTrue} />
-
+        {user && <Header onOpenNav={nav.onTrue} />}
         {lgUp ? renderHorizontal : renderNavVertical}
 
         <Main>{children}</Main>
@@ -50,7 +51,7 @@ export default function DashboardLayout({ children }: Props) {
   if (isMini) {
     return (
       <>
-        <Header onOpenNav={nav.onTrue} />
+        {user && <Header onOpenNav={nav.onTrue} />}
 
         <Box
           sx={{
