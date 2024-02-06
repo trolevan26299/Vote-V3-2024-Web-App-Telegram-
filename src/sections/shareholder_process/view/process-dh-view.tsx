@@ -92,7 +92,10 @@ export default function ProcessDHView() {
     return newArray;
   };
   const numberSendPoll = numberProcessSendPoll();
-  const percentSendPollData = ((numberSendPoll.length || 0) / totalSharesHolder.length) * 100;
+  const percentSendPollData =
+    ((numberSendPoll.length || 0) /
+      totalSharesHolder.filter((item: any) => item.trang_thai === 'Tham dự').length) *
+    100;
 
   // List result by question
   const listResultByQuestion: any = [];
