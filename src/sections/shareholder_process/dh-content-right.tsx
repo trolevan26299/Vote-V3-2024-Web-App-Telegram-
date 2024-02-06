@@ -115,6 +115,7 @@ export default function DHContentRight({
       enabled: true,
       dropShadow: {
         enabled: false,
+        blur: 1,
       },
     },
     colors,
