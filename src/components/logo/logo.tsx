@@ -85,11 +85,7 @@ const Logo = forwardRef<HTMLDivElement, LogoProps>(
       return logo;
     }
 
-    return (
-      <Link component={RouterLink} href="/" sx={{ display: 'contents' }}>
-        {logo}
-      </Link>
-    );
+    return <Box>{logo}</Box>;
   }
 );
 
