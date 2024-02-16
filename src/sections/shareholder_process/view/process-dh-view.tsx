@@ -64,47 +64,14 @@ export default function ProcessDHView() {
 
   const pollDataByKey = danhSachPollData.find((poll) => poll.key === questionSelect);
 
-  // Tiến trình gửi : hàm check xem câu hỏi được select đã gửi đến bao nhiêu người rồi ,và thấy thông tin những người được gửi không trùng nhau
-  const numberProcessSendPoll = () => {
-    const newArray: IListSender[] = [];
-
-    historySendPollData.forEach((item) => {
-      // Lọc qua từng phần tử và chấm đến thuộc tính ds_poll_id
-      const dsPollIdArray = item.ds_poll_id || [];
-
-      dsPollIdArray.forEach((dsPollItem) => {
-        // Kiểm tra nếu có object nào có key === questionSelect
-        if (dsPollItem.key === questionSelect) {
-          // Chấm đến thuộc tính gui_den và lọc để kiểm tra sự tồn tại
-          const guiDenArray = item.gui_den || [];
-          const isExisting = guiDenArray.some((guiDenItem) =>
-            newArray.some((i) => i.ma_cd === guiDenItem.ma_cd)
-          );
-
-          // Nếu không tồn tại thì thêm vào mảng mới
-          if (!isExisting) {
-            newArray.push(...guiDenArray);
-          }
-        }
-      });
-    });
-
-    return newArray;
-  };
-  const numberSendPoll = numberProcessSendPoll();
-  const percentSendPollData =
-    ((numberSendPoll.length || 0) /
-      totalSharesHolder.filter((item: any) => item.trang_thai === 'Tham dự').length) *
-    100;
-
   // List result by question
   const listResultByQuestion: any = [];
   // eslint-disable-next-line no-restricted-syntax
   for (const obj of listHistoryVoted) {
-    // Bạn lọc các object trong thuộc tính detail theo điều kiện của bạn
+    //  lọc các object trong thuộc tính detail theo điều kiện
     let filteredArray = obj.detail.filter((item) => item.key_question === questionSelect);
     filteredArray = filteredArray.map((item) => ({ ...item, ma_cd: obj.ma_cd }));
-    // Bạn push các object trong filteredArray vào result
+    //  push các object trong filteredArray vào result
     listResultByQuestion.push(...filteredArray);
   }
 
@@ -360,11 +327,7 @@ export default function ProcessDHView() {
           sx={{ textAlign: 'center', paddingLeft: { xs: '0px', md: '0px' } }}
         >
           <Grid item xs={12} md={6} lg={6}>
-            <DHContentLeft
-              percentSendPollData={percentSendPollData}
-              calculateTotalCP={calculateTotalCP}
-              pollDataByKey={pollDataByKey}
-            />
+            <DHContentLeft calculateTotalCP={calculateTotalCP} pollDataByKey={pollDataByKey} />
           </Grid>
 
           <Grid item xs={12} md={6} lg={6}>

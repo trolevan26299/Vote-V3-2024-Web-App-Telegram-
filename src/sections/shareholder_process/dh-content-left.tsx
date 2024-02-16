@@ -2,6 +2,7 @@
 import { Box, LinearProgress, Stack, Typography } from '@mui/material';
 import { alpha, styled, useTheme } from '@mui/material/styles';
 import { ApexOptions } from 'apexcharts';
+import { useEffect, useState } from 'react';
 import Chart, { useChart } from 'src/components/chart';
 import { useUser } from 'src/firebase/user_accesss_provider';
 import { bgGradient } from 'src/theme/css';
@@ -31,7 +32,6 @@ interface left_chart {
   options?: ApexOptions;
 }
 interface Props {
-  percentSendPollData: number;
   pollDataByKey?: IQuestion;
   // listResultByQuestion?: ISelectedAnswer[];
   // totalSharesHolder?: any[];
@@ -39,7 +39,6 @@ interface Props {
 }
 
 export default function DHContentLeft({
-  percentSendPollData,
   pollDataByKey,
   // listResultByQuestion,
   // totalSharesHolder,
@@ -107,6 +106,7 @@ export default function DHContentLeft({
     },
     ...options,
   });
+
   return (
     <Box
       width={1}
@@ -132,12 +132,12 @@ export default function DHContentLeft({
         <Stack key="success">
           <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 1 }}>
             {/* <Box sx={{ typography: 'overline' }}>pending</Box> */}
-            <Box sx={{ typography: 'subtitle1' }}>{percentSendPollData.toFixed(2)}%</Box>
+            <Box sx={{ typography: 'subtitle1' }}>100%</Box>
           </Stack>
 
           <LinearProgress
             variant="determinate"
-            value={percentSendPollData}
+            value={100}
             sx={{
               height: 8,
               color: (theme3) => alpha(theme3.palette.primary.light, 0.2),
