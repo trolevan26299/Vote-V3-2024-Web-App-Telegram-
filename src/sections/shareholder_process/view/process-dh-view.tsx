@@ -185,6 +185,7 @@ export default function ProcessDHView() {
       // Detach the listener
       unsubscribe();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
