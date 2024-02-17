@@ -32,7 +32,7 @@ import { useUser } from 'src/firebase/user_accesss_provider';
 import { useRouter } from 'src/routes/hooks';
 import { paths } from 'src/routes/paths';
 import { useStringState } from 'src/stores/questionSelectUser.provider';
-import { IHistorySendPoll, IListSender, IQuestion } from 'src/types/setting';
+import { IHistorySendPoll, IQuestion } from 'src/types/setting';
 import { IHistoryVoted } from 'src/types/votedh.types';
 import { convertToMilliseconds } from 'src/utils/convertTimeStringToMiliSeconds';
 import { currentTimeUTC7 } from 'src/utils/currentTimeUTC+7';
@@ -258,11 +258,11 @@ export default function ProcessDHView() {
             endColor: alpha(theme.palette.primary.main, 0.2),
           }),
           color: '#000',
-          minWidth: '100% !important',
+          width: '100% !important',
         }}
       >
-        <FormControl sx={{ minWidth: '100% !important' }} size="small" fullWidth>
-          <InputLabel id="demo-simple-select-label" sx={{ width: '100%' }} size="small">
+        <FormControl sx={{ width: user ? '100% !important' : '700px' }} size="small" fullWidth>
+          <InputLabel id="demo-simple-select-label" sx={{ width: '100% !important' }} size="small">
             {!user
               ? 'Chọn câu hỏi (Select Question)'
               : user.nguoi_nuoc_ngoai === true
