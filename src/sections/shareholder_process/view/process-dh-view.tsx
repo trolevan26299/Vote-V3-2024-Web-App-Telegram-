@@ -261,7 +261,7 @@ export default function ProcessDHView() {
           width: '100% !important',
         }}
       >
-        <FormControl sx={{ minWidth: user ? '230px !important' : '700px' }} size="small" fullWidth>
+        <FormControl sx={{ width: user ? '230px !important' : '700px' }} size="small" fullWidth>
           <InputLabel id="demo-simple-select-label" sx={{ width: '100% !important' }} size="small">
             {!user
               ? 'Chọn câu hỏi (Select Question)'
