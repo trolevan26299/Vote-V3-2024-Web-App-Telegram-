@@ -172,8 +172,8 @@ export default function ProcessDHView() {
           key,
           ...snapshot.val().ls_poll[key],
         }));
-        if (user) {
-          SetQuestionSelect(listPoll[0]?.key);
+        if (user && listPoll && listPoll.length > 0) {
+          SetQuestionSelect(listPoll[listPoll.length - 1]?.key);
         }
         setHistorySendPollData(listHistorySendPoll);
         setDanhSachPollData(listPoll);
