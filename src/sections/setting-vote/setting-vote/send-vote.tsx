@@ -220,8 +220,8 @@ export default function SendVoteView() {
 
           answerSelect.map((item) => item.ten_poll as string),
           answerSelect.map((item) => item.ten_poll_en as string),
-
-          ExpireTimeFunc(currentTimeUTC7(), expireTime)
+          ExpireTimeFunc(currentTimeUTC7(), expireTime),
+          answerSelect.map((item) => item.key) as string[]
         );
         if (type) {
           handleShowResultQuestionForAdmin();
@@ -305,127 +305,178 @@ export default function SendVoteView() {
       />
       <Box
         sx={{
+          width: '100%',
+          display: 'flex',
+          flexDirection: 'row',
+          justifyContent: 'flex-start',
           border: `3px solid ${alpha(theme.palette.primary.light, 0.2)}`,
           backgroundColor: alpha(theme.palette.primary.lighter, 0.3),
           ...styles.box_form_setting_vote_setting,
         }}
       >
-        <Box className="name-content" sx={{ ...styles.box_name_content }}>
-          <Typography sx={{ width: '15%' }}>Chọn câu hỏi:</Typography>
-          <Autocomplete
-            multiple
-            limitTags={4}
-            value={answerSelect}
-            onChange={handleActionSelectAnswer}
-            inputValue={inputValueTextAnswer}
-            onInputChange={(event, newInputValue) => {
-              setInputValueTextAnswer(newInputValue);
-            }}
-            id="controllable-states-demo"
-            options={listQuestion}
-            getOptionLabel={(option) => option.ten_poll as string}
-            renderInput={(params) => (
-              <TextField {...params} placeholder="Câu hỏi" label="Chọn câu hỏi" size="small" />
-            )}
-            sx={{ width: '50%' }}
-            size="small"
-          />
-        </Box>
-
-        <Box className="name-content" sx={{ ...styles.box_name_content }}>
-          <Typography sx={{ width: '15%' }}>Nội dung câu hỏi:</Typography>
-          {answerSelect.length > 0 && (
-            <Box
-              sx={{
-                width: '50%',
-                border: '1px solid #dbeae4',
-                borderRadius: '8px',
-                padding: '8.5px 14px',
+        <Box sx={{ width: '70%' }}>
+          <Box className="name-content" sx={{ ...styles.box_name_content }}>
+            <Typography sx={{ width: '15%' }}>Chọn câu hỏi:</Typography>
+            <Autocomplete
+              multiple
+              limitTags={4}
+              value={answerSelect}
+              onChange={handleActionSelectAnswer}
+              inputValue={inputValueTextAnswer}
+              onInputChange={(event, newInputValue) => {
+                setInputValueTextAnswer(newInputValue);
               }}
-            >
-              {answerSelect.map((item) => (
-                <Typography sx={{ width: '100%' }}>
-                  - {item.ten_poll} : {item.noi_dung}
-                </Typography>
-              ))}
-            </Box>
-          )}
-        </Box>
+              id="controllable-states-demo"
+              options={listQuestion}
+              getOptionLabel={(option) => option.ten_poll as string}
+              renderInput={(params) => (
+                <TextField {...params} placeholder="Câu hỏi" label="Chọn câu hỏi" size="small" />
+              )}
+              sx={{ width: '70%' }}
+              size="small"
+            />
+          </Box>
 
-        <Box className="name-content" sx={styles.box_name_content}>
-          <Typography sx={{ width: '15%' }}>Chọn Cổ Đông gửi :</Typography>
-          <Autocomplete
-            multiple
-            limitTags={4}
-            value={shareHolderSelect}
-            onChange={handleChangeSelectShareHolder}
-            inputValue={inputValueTextShareHolder}
-            onInputChange={(event, newInputValue) => {
-              setInputValueTextShareHolder(newInputValue);
-            }}
-            id="controllable-states-demo"
-            options={[allOption, ...listSharesHolders]}
-            getOptionLabel={(option) => option.ten_cd as string}
-            renderInput={(params) => (
-              <TextField {...params} placeholder="Cổ đông" label="Chọn cổ đông" size="small" />
+          <Box className="name-content" sx={{ ...styles.box_name_content }}>
+            <Typography sx={{ width: '15%' }}>Nội dung câu hỏi:</Typography>
+            {answerSelect.length > 0 && (
+              <Box
+                sx={{
+                  width: '70%',
+                  border: '1px solid #dbeae4',
+                  borderRadius: '8px',
+                  padding: '8.5px 14px',
+                }}
+              >
+                {answerSelect.map((item) => (
+                  <Typography sx={{ width: '100%' }}>
+                    - {item.ten_poll} : {item.noi_dung}
+                  </Typography>
+                ))}
+              </Box>
             )}
-            sx={{ width: '50%' }}
-            size="small"
-          />
+          </Box>
+
+          <Box className="name-content" sx={styles.box_name_content}>
+            <Typography sx={{ width: '15%' }}>Chọn Cổ Đông gửi :</Typography>
+            <Autocomplete
+              multiple
+              limitTags={4}
+              value={shareHolderSelect}
+              onChange={handleChangeSelectShareHolder}
+              inputValue={inputValueTextShareHolder}
+              onInputChange={(event, newInputValue) => {
+                setInputValueTextShareHolder(newInputValue);
+              }}
+              id="controllable-states-demo"
+              options={[allOption, ...listSharesHolders]}
+              getOptionLabel={(option) => option.ten_cd as string}
+              renderInput={(params) => (
+                <TextField {...params} placeholder="Cổ đông" label="Chọn cổ đông" size="small" />
+              )}
+              sx={{ width: '70%' }}
+              size="small"
+            />
+          </Box>
+          <Box className="name-content" sx={{ ...styles.box_name_content, mt: '30px' }}>
+            <Typography sx={{ width: '15%' }}>Thời gian giới hạn :</Typography>
+            <FormControl sx={{ width: '70%' }} size="small">
+              <InputLabel id="demo-select-small-label">Thời gian giới hạn</InputLabel>
+              <Select
+                labelId="demo-select-small-label"
+                id="demo-select-small"
+                value={expireTime}
+                label="Câu hỏi"
+                onChange={handleChangeSelectExpireTime}
+              >
+                <MenuItem value="">
+                  <em>Vui lòng chọn thời gian</em>
+                </MenuItem>
+                <MenuItem value={15}>15 Phút</MenuItem>
+                <MenuItem value={30}>30 Phút</MenuItem>
+                <MenuItem value={45}>45 Phút</MenuItem>
+                <MenuItem value={60}>1 Giờ</MenuItem>
+                <MenuItem value={90}>1 Giờ 30 Phút</MenuItem>
+                <MenuItem value={120}>2 Giờ</MenuItem>
+                <MenuItem value={180}>3 Giờ</MenuItem>
+                <MenuItem value={240}>4 Giờ</MenuItem>
+                <MenuItem value={300}>5 Giờ</MenuItem>
+                <MenuItem value={360}>6 Giờ</MenuItem>
+                <MenuItem value={720}>12 Giờ</MenuItem>
+                <MenuItem value={1440}>24 Giờ</MenuItem>
+              </Select>
+            </FormControl>
+          </Box>
+
+          <Box className="name-content" sx={{ ...styles.box_name_content, marginTop: '50px' }}>
+            <Box sx={{ width: '15%' }} />
+            <Button
+              variant="contained"
+              color="info"
+              disabled={
+                answerSelect.length < 0 || shareHolderSelect.length < 0 || expireTime === ''
+              }
+              sx={{ width: '34%' }}
+              onClick={() => handlerSubmitForm()}
+            >
+              Gửi
+            </Button>
+            <Button
+              variant="contained"
+              color="success"
+              disabled={
+                answerSelect.length < 0 || shareHolderSelect.length < 0 || expireTime === ''
+              }
+              sx={{ width: '34%' }}
+              onClick={() => handlerSubmitForm('sentAndShow')}
+            >
+              Gửi & Trình Chiếu
+            </Button>
+          </Box>
         </Box>
-        <Box className="name-content" sx={{ ...styles.box_name_content, mt: '30px' }}>
-          <Typography sx={{ width: '15%' }}>Thời gian giới hạn :</Typography>
-          <FormControl sx={{ width: '50%' }} size="small">
-            <InputLabel id="demo-select-small-label">Thời gian giới hạn</InputLabel>
+        <Box
+          sx={{
+            width: '30%',
+            border: '1px solid #212b36',
+            padding: '10px 10px',
+            borderRadius: '10px',
+          }}
+        >
+          <Typography sx={{ textAlign: 'center', fontWeight: 'bold', paddingBottom: '10px' }}>
+            Check Logs Gửi
+          </Typography>
+          <FormControl sx={{ width: '70%' }} size="small">
+            <InputLabel id="demo-select-small-label" sx={{ width: '100%' }}>
+              Thời gian giới hạn
+            </InputLabel>
             <Select
               labelId="demo-select-small-label"
               id="demo-select-small"
               value={expireTime}
               label="Câu hỏi"
               onChange={handleChangeSelectExpireTime}
+              sx={{ width: '100% !important' }}
             >
-              <MenuItem value="">
-                <em>Vui lòng chọn thời gian</em>
-              </MenuItem>
-              <MenuItem value={15}>15 Phút</MenuItem>
-              <MenuItem value={30}>30 Phút</MenuItem>
-              <MenuItem value={45}>45 Phút</MenuItem>
-              <MenuItem value={60}>1 Giờ</MenuItem>
-              <MenuItem value={90}>1 Giờ 30 Phút</MenuItem>
-              <MenuItem value={120}>2 Giờ</MenuItem>
-              <MenuItem value={180}>3 Giờ</MenuItem>
-              <MenuItem value={240}>4 Giờ</MenuItem>
-              <MenuItem value={300}>5 Giờ</MenuItem>
-              <MenuItem value={360}>6 Giờ</MenuItem>
-              <MenuItem value={720}>12 Giờ</MenuItem>
-              <MenuItem value={1440}>24 Giờ</MenuItem>
+              {listQuestion.map((item) => (
+                <MenuItem sx={{ width: '100% !important' }} value={item.key}>
+                  {item.ten_poll}
+                </MenuItem>
+              ))}
             </Select>
           </FormControl>
-        </Box>
-
-        <Box className="name-content" sx={{ ...styles.box_name_content, marginTop: '50px' }}>
-          <Box sx={{ width: '15%' }} />
-          <Button
-            variant="contained"
-            color="info"
-            disabled={answerSelect.length < 0 || shareHolderSelect.length < 0 || expireTime === ''}
-            sx={{ width: '24.5%' }}
-            onClick={() => handlerSubmitForm()}
-          >
-            Gửi
-          </Button>
-          <Button
-            variant="contained"
-            color="success"
-            disabled={answerSelect.length < 0 || shareHolderSelect.length < 0 || expireTime === ''}
-            sx={{ width: '24.5%' }}
-            onClick={() => handlerSubmitForm('sentAndShow')}
-          >
-            Gửi & Trình Chiếu
-          </Button>
+          <Box sx={{ paddingTop: '20px' }}>
+            <Typography>
+              <b>Thành Công :</b> abc,dsadas,sdsada
+            </Typography>
+          </Box>
+          <Box sx={{ paddingTop: '20px' }}>
+            <Typography>
+              <b>Thất Bại :</b> abc,dsadas,sdsada
+            </Typography>
+          </Box>
         </Box>
       </Box>
-      <Box className="list_question" sx={{ marginTop: '20px' }}>
+      <Box className="list_question" sx={{ marginTop: '30px' }}>
         <Typography variant="h6" sx={{ mb: 2 }}>
           Lịch sử gửi
         </Typography>

@@ -2,7 +2,6 @@
 import { Box, LinearProgress, Stack, Typography } from '@mui/material';
 import { alpha, styled, useTheme } from '@mui/material/styles';
 import { ApexOptions } from 'apexcharts';
-import { useEffect, useState } from 'react';
 import Chart, { useChart } from 'src/components/chart';
 import { useUser } from 'src/firebase/user_accesss_provider';
 import { bgGradient } from 'src/theme/css';
