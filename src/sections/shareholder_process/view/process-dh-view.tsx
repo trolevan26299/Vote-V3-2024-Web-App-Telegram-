@@ -56,7 +56,7 @@ export default function ProcessDHView() {
 
   // CODE FOR SELECT QUESTION
   // Handle select question
-  const [questionSelect, SetQuestionSelect] = useState<string>('');
+  const [questionSelect, SetQuestionSelect] = useState<string>(danhSachPollData[0]?.key || '');
 
   const handleChangeSelectQuestion = (event: SelectChangeEvent) => {
     SetQuestionSelect(event.target.value);
@@ -172,9 +172,10 @@ export default function ProcessDHView() {
           key,
           ...snapshot.val().ls_poll[key],
         }));
-        if (user && listPoll && listPoll.length > 0) {
-          SetQuestionSelect(listPoll[listPoll.length - 1]?.key);
-        }
+        // if (user && listPoll && listPoll.length > 0) {
+        //   SetQuestionSelect(listPoll[listPoll.length - 1]?.key);
+        // }
+
         setHistorySendPollData(listHistorySendPoll);
         setDanhSachPollData(listPoll);
         setListHistoryVoted(lsVoted);
