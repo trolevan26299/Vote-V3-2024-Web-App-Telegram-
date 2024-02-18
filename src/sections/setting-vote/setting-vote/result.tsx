@@ -505,7 +505,7 @@ export default function ResultView() {
                       <TableCell>{item.ma_cd}</TableCell>
                       <TableCell>{item.ten_cd}</TableCell>
                       <TableCell>{numberWithCommas(item.cp_tham_du)}</TableCell>
-                      <TableCell>{item.ty_le_cp_tham_du.toFixed(6)}</TableCell>
+                      <TableCell>{item.ty_le_cp_tham_du?.toFixed(6)}</TableCell>
                       <TableCell>{item.answerVoted}</TableCell>
                       <TableCell>{item.time_voted}</TableCell>
                     </TableRow>

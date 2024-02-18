@@ -217,6 +217,7 @@ export default function SendVoteView() {
             telegram_id: item.telegram_id as number,
             nguoi_nuoc_ngoai: item.nguoi_nuoc_ngoai as boolean,
           })),
+
           answerSelect.map((item) => item.ten_poll as string),
           answerSelect.map((item) => item.ten_poll_en as string),
 
