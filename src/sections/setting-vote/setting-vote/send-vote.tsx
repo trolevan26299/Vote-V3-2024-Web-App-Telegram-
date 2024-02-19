@@ -524,7 +524,7 @@ export default function SendVoteView() {
           </Typography>
           <FormControl sx={{ width: '100%' }} size="small">
             <InputLabel id="demo-select-small-label" sx={{ width: '100%' }}>
-              Thời gian giới hạn
+              Chọn câu hỏi
             </InputLabel>
             <Select
               labelId="demo-select-small-label"
