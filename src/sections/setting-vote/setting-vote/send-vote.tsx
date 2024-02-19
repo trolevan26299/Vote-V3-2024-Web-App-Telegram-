@@ -144,7 +144,7 @@ export default function SendVoteView() {
 
   // hàm trình chiếu muốn show tiến trình bầu cử của câu hỏi
   const handleShowResultQuestionForAdmin = () => {
-    const keyShowFirebaseRef = ref(database, 'question_result_show_admin');
+    const keyShowFirebaseRef = ref(database, FIREBASE_COLLECTION.QUESTION_SHOW_BY_ADMIN);
     const updateData = {
       key: answerSelect[0].key,
     };

@@ -1,12 +1,76 @@
+/* eslint-disable no-await-in-loop */
+/* eslint-disable no-restricted-syntax */
 import { Box, Button, Typography } from '@mui/material';
 import { alpha, useTheme } from '@mui/material/styles';
-import React from 'react';
+import axios from 'axios';
+import { DatabaseReference, get, ref } from 'firebase/database';
+import { remove } from 'lodash';
+import React, { useEffect, useState } from 'react';
 import { ConfirmDialog } from 'src/components/custom-dialog';
+import { FIREBASE_COLLECTION } from 'src/constant/firebase_collection.constant';
+import { database } from 'src/firebase/firebase.config';
 import { useBoolean } from 'src/hooks/use-boolean';
 
+interface IHistorySendMessage {
+  chatId: number;
+  messageId: number;
+}
 export default function DeleteMessageTelegram() {
   const theme = useTheme();
   const confirm = useBoolean();
+  const [historySendMessageList, setHistorySendMessageList] = useState<IHistorySendMessage[]>([]);
+  const botToken = process.env.NEXT_PUBLIC_BOT_TOKEN;
+
+  const handleDeleteMessageAll = async () => {
+    console.log('Delete all messages');
+    try {
+      // Lặp qua mỗi tin nhắn trong historySendMessageList và gửi yêu cầu xóa đến Telegram API
+      const deleteMessagePromises = historySendMessageList.map(async (message) => {
+        const { chatId, messageId } = message;
+        await axios.post(`https://api.telegram.org/bot${botToken}/deleteMessage`, {
+          chat_id: chatId,
+          message_id: messageId,
+        });
+        console.log(`Deleted message with ID ${messageId} for chat ID ${chatId}`);
+      });
+
+      // Chờ cho tất cả các promise hoàn thành
+      await Promise.all(deleteMessagePromises);
+
+      // Xóa tất cả các tin nhắn từ Firebase
+      const messagesRef: DatabaseReference = ref(
+        database,
+        FIREBASE_COLLECTION.HISTORY_SEND_MESSAGE_BOT
+      ); // Định rõ kiểu DatabaseReference
+      remove([messagesRef]);
+
+      confirm.onFalse();
+    } catch (error) {
+      console.error('Error deleting messages:', error);
+    }
+  };
+  console.log('historySendMessageList:', historySendMessageList);
+  useEffect(() => {
+    const userRef = ref(database, FIREBASE_COLLECTION.HISTORY_SEND_MESSAGE_BOT);
+    const fetchData = async () => {
+      try {
+        const snapshot = await get(userRef);
+        if (snapshot.exists()) {
+          const data = snapshot.val();
+          // Convert the object into an array
+          const historySendMessageArray = Object.values(data);
+
+          setHistorySendMessageList(historySendMessageArray as IHistorySendMessage[]);
+        } else {
+          console.log('No Data');
+        }
+      } catch (error) {
+        console.error('Error when get data :', error);
+      }
+    };
+
+    fetchData();
+  }, []);
   return (
     <Box>
       <Box
@@ -42,7 +106,7 @@ export default function DeleteMessageTelegram() {
         title="Xóa Toàn Bộ Tin Nhắn"
         content="Bạn có chắc chắn muốn xóa tất cả tin nhắn không ? "
         action={
-          <Button variant="contained" color="warning">
+          <Button variant="contained" color="warning" onClick={handleDeleteMessageAll}>
             Xóa
           </Button>
         }

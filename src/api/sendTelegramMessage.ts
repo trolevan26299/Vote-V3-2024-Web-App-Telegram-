@@ -3,10 +3,11 @@
 // api/sendTelegramMessage.js
 import axios from 'axios';
 import { child, get, push, ref, set } from 'firebase/database';
+import { FIREBASE_COLLECTION } from 'src/constant/firebase_collection.constant';
 import { database } from 'src/firebase/firebase.config';
 
 const saveLogsStatusSendMessageTelegram = async (chatId: number, keyQuestions: string[]) => {
-  const saveLogStatusSendPollRef = ref(database, 'save_logs_status_send_poll_telegram');
+  const saveLogStatusSendPollRef = ref(database, FIREBASE_COLLECTION.LOGS_STATUS_SEND_POLL);
   for (const keyQuestion of keyQuestions) {
     const keyQuestionPath = `${keyQuestion}/`;
     // Kiểm tra xem keyQuestion đã tồn tại trong collection chưa
@@ -34,6 +35,27 @@ const saveLogsStatusSendMessageTelegram = async (chatId: number, keyQuestions: s
         listUserSentSuccess: [chatId],
       });
     }
+  }
+};
+const saveHistorySendMessageBot = async (messageId: number, chatId: number) => {
+  const saveLogStatusSendPollRef = ref(database, FIREBASE_COLLECTION.HISTORY_SEND_MESSAGE_BOT);
+
+  try {
+    // Tạo một reference mới cho mỗi dữ liệu được lưu
+    const newMessageRef = push(saveLogStatusSendPollRef);
+
+    // Định nghĩa dữ liệu mới để lưu vào Firebase
+    const newMessageData = {
+      messageId,
+      chatId,
+    };
+
+    // Sử dụng set() để lưu dữ liệu mới vào Firebase
+    await set(newMessageRef, newMessageData);
+
+    console.log('Message history saved successfully:', newMessageData);
+  } catch (error) {
+    console.error('Error saving message history:', error);
   }
 };
 
@@ -87,7 +109,7 @@ export const sendTelegramMessage = async (
         console.log(`Response khi gửi tin nhắn đến ${item.telegram_id}:`, response);
         // Lưu log
         // await saveLogsStatusSendMessageTelegram(item.telegram_id, keyQuestion);
-        return { chatId: item.telegram_id, response };
+        return { chatId: item.telegram_id, message_id: response.data.result.message_id };
       } catch (error) {
         console.error(`Error sending message to chatId ${item.telegram_id}:`, error);
         return { chatId: item.telegram_id, error };
@@ -97,9 +119,10 @@ export const sendTelegramMessage = async (
     // Đợi cho tất cả các tin nhắn được gửi
     const results = await Promise.all(sendMessagesQueue);
     for (const result of results) {
-      const { chatId, response, error } = result;
+      const { chatId, message_id, error } = result;
       if (!error) {
         await saveLogsStatusSendMessageTelegram(chatId, keyQuestion);
+        await saveHistorySendMessageBot(message_id, chatId);
       }
     }
   } catch (error) {
