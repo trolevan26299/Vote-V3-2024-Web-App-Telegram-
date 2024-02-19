@@ -47,30 +47,25 @@ export const sendTelegramMessage = async (
   expireTime: string,
   keyQuestion: string[]
 ) => {
+  const botToken = process.env.NEXT_PUBLIC_BOT_TOKEN;
+  const TELEGRAM_API_URL = `https://api.telegram.org/bot${botToken}/sendMessage`;
+
+  const messageContent = `
+    *BẦU CỬ HỘI ĐỒNG V3 COMPANY 2024*
+
+    Đã đến thời gian bỏ phiếu : *${question}*
+    *Thời hạn :* ${expireTime}
+  `;
+  const messageContentEng = `
+    *Shareholder election V3 COMPANY 2024*
+
+    It's time to vote: : *${questionEng}*
+    *Due time :* ${expireTime}
+  `;
+
   try {
-    const botToken = process.env.NEXT_PUBLIC_BOT_TOKEN;
-    const TELEGRAM_API_URL = `https://api.telegram.org/bot${botToken}/sendMessage`;
-
-    const messageContent = `
-           *BẦU CỬ HỘI ĐỒNG V3 COMPANY 2024*
-
-Đã đến thời gian bỏ phiếu : *${question}*
-*Thời hạn :* ${expireTime}
-
-    `;
-    const messageContentEng = `
-*Shareholder election V3 COMPANY 2024*
-
-It's time to vote: : *${questionEng}*
-*Due time :* ${expireTime}
-
-`;
-
-    // Tạo một hàng đợi để lưu tất cả các tin nhắn được gửi đi
-    const sendMessagesQueue = [];
-
-    // Thêm các tin nhắn vào hàng đợi
-    for (const item of chatIds) {
+    // hàng đợi để gửi tin nhắn và lưu log
+    const sendMessagesQueue = chatIds.map(async (item) => {
       const button = {
         text: item.nguoi_nuoc_ngoai === true ? 'Click To Vote' : 'Click để bỏ phiếu',
         web_app: { url: 'https://vote-v3.vercel.app' },
@@ -86,21 +81,20 @@ It's time to vote: : *${questionEng}*
         reply_markup: JSON.stringify(keyboard),
       };
 
-      // Thêm request gửi tin nhắn vào hàng đợi
-      sendMessagesQueue.push(axios.post(TELEGRAM_API_URL, data));
-    }
+      try {
+        // Gửi tin nhắn và chờ phản hồi
+        const response = await axios.post(TELEGRAM_API_URL, data);
+        console.log(`Response khi gửi tin nhắn đến ${item.telegram_id}:`, response);
+        // Lưu log
+        await saveLogsStatusSendMessageTelegram(item.telegram_id, keyQuestion);
+      } catch (error) {
+        console.error(`Error sending message to chatId ${item.telegram_id}:`, error);
+      }
+    });
 
-    // Gửi tất cả các tin nhắn đồng thời
-    const responses = await Promise.all(sendMessagesQueue);
-
-    // Xử lý phản hồi từ API Telegram và lưu logs vào Firebase
-    for (let i = 0; i < chatIds.length; i += 1) {
-      const chatId = chatIds[i].telegram_id;
-      const response = responses[i];
-      await saveLogsStatusSendMessageTelegram(response.data.result.chat.id, keyQuestion);
-      console.log(`response khi gửi tin nhắn đến ${chatId}:`, response);
-    }
+    // Đợi cho tất cả các tin nhắn được gửi
+    await Promise.all(sendMessagesQueue);
   } catch (error) {
-    console.error('Error sending message to Telegram:', error);
+    console.error('Error sending messages to Telegram:', error);
   }
 };

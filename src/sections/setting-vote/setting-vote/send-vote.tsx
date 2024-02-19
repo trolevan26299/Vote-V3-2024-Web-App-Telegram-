@@ -28,7 +28,7 @@ import { useSettingsContext } from 'src/components/settings';
 import { TableHeadCustom } from 'src/components/table';
 import { FIREBASE_COLLECTION } from 'src/constant/firebase_collection.constant';
 import { database } from 'src/firebase/firebase.config';
-import { IHistorySendPoll, IQuestion } from 'src/types/setting';
+import { IHistorySendPoll, IQuestion, ISendPollStatusSuccess } from 'src/types/setting';
 import { IUserAccess } from 'src/types/userAccess.types';
 import { IHistoryVoted } from 'src/types/votedh.types';
 import { ExpireTimeFunc } from 'src/utils/calculatorTimeExpire';
@@ -60,17 +60,58 @@ export default function SendVoteView() {
   // handle select time expired
   const [expireTime, setExpireTime] = React.useState<string>('');
 
+  // handle change Choose question for check logs
+  const [questionCheckLog, setQuestionCheckLog] = React.useState<string>('');
+
+  const [listSendPollStatusSuccess, setListSendPollStatusSuccess] = useState<
+    ISendPollStatusSuccess[]
+  >([]);
+
   // list history send poll from firebase
   const [historySendPoll, setHistorySendPoll] = useState<IHistorySendPoll[]>([]);
 
   // list question from firebase
   const [listQuestion, setListQuestion] = useState<IQuestion[]>([]);
-
   // listSharesHolders from firebase
   const [listSharesHolders, setListSharesHolders] = useState<IUserAccess[]>([]);
 
   // list Hitsory Poll
   const [listHistoryPoll, setListHistoryPoll] = useState<IHistoryVoted[]>([]);
+
+  // list ma_cd send poll success
+  const listCDSendPollSuccess = listSendPollStatusSuccess
+    .filter((item) => item.keyQuestion === questionCheckLog)
+    .flatMap((item) => {
+      const listUserSentSuccess = item.listUserSentSuccess.toString();
+      return listSharesHolders
+        .filter(
+          (holder) =>
+            holder.telegram_id !== undefined &&
+            listUserSentSuccess.includes(holder.telegram_id.toString())
+        )
+        .map((holder) => holder.ten_cd);
+    });
+
+  // Code lấy ra list cổ đông đã gửi poll theo câu hỏi ==================================
+  const filteredArray =
+    historySendPoll &&
+    historySendPoll.filter((obj) => obj.ds_poll_id?.some((item) => item.key === questionCheckLog));
+  const uniqueGuiDenObjects: any = [];
+  filteredArray?.forEach((item: any) => {
+    item.gui_den.forEach((obj: any) => {
+      const exists = uniqueGuiDenObjects.some((uniqueObj: any) => uniqueObj.ma_cd === obj.ma_cd);
+      if (!exists) {
+        uniqueGuiDenObjects.push(obj);
+      }
+    });
+  });
+
+  // list ma_cd send poll fail
+  const missingPollList = uniqueGuiDenObjects.filter(
+    (obj: any) =>
+      // Kiểm tra xem obj.ten_cd có trong listCDSendPollSuccess không
+      !listCDSendPollSuccess.some((name) => name === obj.ten_cd)
+  );
 
   const handleChangeSelectShareHolder = (event: React.SyntheticEvent, values: any) => {
     if (values.some((value: IUserAccess) => value.ten_cd === 'Tất cả')) {
@@ -84,6 +125,9 @@ export default function SendVoteView() {
 
   const handleChangeSelectExpireTime = (event: SelectChangeEvent) => {
     setExpireTime(String(event.target.value));
+  };
+  const handleChangeQuestionCheckLogs = (event: SelectChangeEvent) => {
+    setQuestionCheckLog(String(event.target.value));
   };
 
   // Onchange for answer select
@@ -214,7 +258,7 @@ export default function SendVoteView() {
         enqueueSnackbar('Gửi Thành Công !', { variant: 'success' });
         sendTelegramMessage(
           shareHolderSelect.map((item) => ({
-            telegram_id: item.telegram_id as number,
+            telegram_id: Number(item.telegram_id),
             nguoi_nuoc_ngoai: item.nguoi_nuoc_ngoai as boolean,
           })),
 
@@ -223,6 +267,7 @@ export default function SendVoteView() {
           ExpireTimeFunc(currentTimeUTC7(), expireTime),
           answerSelect.map((item) => item.key) as string[]
         );
+        setQuestionCheckLog(answerSelect[0].key as string);
         if (type) {
           handleShowResultQuestionForAdmin();
         }
@@ -257,6 +302,30 @@ export default function SendVoteView() {
         setListQuestion(listQuestionWithKeys);
         setHistorySendPoll(listHistorySendPoll);
         setListHistoryPoll(listHistoryPollData);
+      } else {
+        console.log('No data available');
+      }
+    };
+    const unsubscribe = onValue(userRef, onDataChange);
+
+    // Clean up the listener when the component unmounts
+    return () => {
+      // Detach the listener
+      unsubscribe();
+    };
+  }, []);
+  useEffect(() => {
+    const userRef = ref(database, FIREBASE_COLLECTION.LOGS_STATUS_SEND_POLL);
+    const onDataChange = (snapshot: DataSnapshot) => {
+      const dataSnapShot = snapshot.exists();
+      if (dataSnapShot) {
+        const logs_status_send_poll = snapshot.val();
+        const logStatusSendPollWithKeys = Object.keys(logs_status_send_poll).map((key) => ({
+          key,
+          ...logs_status_send_poll[key],
+        }));
+
+        setListSendPollStatusSuccess(logStatusSendPollWithKeys);
       } else {
         console.log('No data available');
       }
@@ -442,19 +511,26 @@ export default function SendVoteView() {
             borderRadius: '10px',
           }}
         >
-          <Typography sx={{ textAlign: 'center', fontWeight: 'bold', paddingBottom: '10px' }}>
+          <Typography
+            sx={{
+              textAlign: 'center',
+              fontWeight: 'bold',
+              paddingBottom: '10px',
+              fontSize: '18px',
+            }}
+          >
             Check Logs Gửi
           </Typography>
-          <FormControl sx={{ width: '70%' }} size="small">
+          <FormControl sx={{ width: '100%' }} size="small">
             <InputLabel id="demo-select-small-label" sx={{ width: '100%' }}>
               Thời gian giới hạn
             </InputLabel>
             <Select
               labelId="demo-select-small-label"
               id="demo-select-small"
-              value={expireTime}
+              value={questionCheckLog}
               label="Câu hỏi"
-              onChange={handleChangeSelectExpireTime}
+              onChange={handleChangeQuestionCheckLogs}
               sx={{ width: '100% !important' }}
             >
               {listQuestion.map((item) => (
@@ -466,12 +542,18 @@ export default function SendVoteView() {
           </FormControl>
           <Box sx={{ paddingTop: '20px' }}>
             <Typography>
-              <b>Thành Công :</b> abc,dsadas,sdsada
+              <b>Thành Công :</b> {listCDSendPollSuccess.join(' | ')}
             </Typography>
           </Box>
           <Box sx={{ paddingTop: '20px' }}>
             <Typography>
-              <b>Thất Bại :</b> abc,dsadas,sdsada
+              <b>Thất Bại :</b>{' '}
+              {missingPollList.map((item: any, index: number) => (
+                <span key={index} style={{ color: 'red' }}>
+                  {item.ten_cd}
+                  {index < missingPollList.length - 1 ? '|' : ''}
+                </span>
+              ))}
             </Typography>
           </Box>
         </Box>

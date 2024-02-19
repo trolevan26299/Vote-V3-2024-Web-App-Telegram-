@@ -32,3 +32,9 @@ export interface IHistorySendPoll {
   thoi_gian_ket_thuc?: string;
   trang_thai?: string;
 }
+
+export interface ISendPollStatusSuccess {
+  key: string;
+  keyQuestion: string;
+  listUserSentSuccess: number[] || [];
+}
