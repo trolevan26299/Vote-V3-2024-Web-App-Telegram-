@@ -46,6 +46,12 @@ interface info_holder_vote {
   answerVoted: string;
   time_voted: string;
 }
+interface info_holder_no_vote {
+  ma_cd: string;
+  ten_cd: string;
+  cp_tham_du: number;
+  ty_le_cp_tham_du: number;
+}
 
 export default function ResultView() {
   const settings = useSettingsContext();
@@ -67,6 +73,14 @@ export default function ResultView() {
     { id: 'percent_holding', label: '% Nắm giữ' },
     { id: 'answer', label: 'Câu trả lời' },
     { id: 'answer_time', label: 'Thời gian trả lời' },
+  ];
+
+  const tableLabelsInfoShareHolderNoVote = [
+    { id: 'stt', label: 'STT' },
+    { id: 'code', label: 'Mã CD' },
+    { id: 'name', label: 'Tên CĐ' },
+    { id: 'share', label: 'Cổ phần' },
+    { id: 'percent_holding', label: '% Nắm giữ' },
   ];
 
   // CODE
@@ -134,6 +148,7 @@ export default function ResultView() {
     historySendPollData.filter(
       (obj) => obj.ds_poll_id?.some((item) => item.key === questionSelect)
     );
+
   const uniqueGuiDenObjects: any = [];
 
   filteredArray?.forEach((item: any) => {
@@ -147,6 +162,7 @@ export default function ResultView() {
   //  tạo một Set để lưu trữ các ma_cd đã xuất hiện
   const seenMaCd: string[] = [];
 
+  console.log('uniqueGuiDenObjects', uniqueGuiDenObjects);
   //  Tổng số user nhận được câu hỏi
   const totalUserReceivedQuestion =
     (filteredArray &&
@@ -219,6 +235,7 @@ export default function ResultView() {
   // END Data Table kết quả bầu cử
 
   // Data Table thông tin cổ đông bầu cử
+
   const dataTableInfoVoted = listResultByQuestion.map((item: any) => {
     const sharesHolder = infoListSharesHolder.find((item2: any) => item.ma_cd === item2.ma_cd);
     const answerVoted = pollDataByKey?.dap_an?.find(
@@ -236,6 +253,20 @@ export default function ResultView() {
   });
 
   // END Data Table thông tin cổ đông bầu cử
+
+  // Data Table No Vote
+
+  const dataTableInfoNoVote = uniqueGuiDenObjects
+    .filter((data: any) => data.status === 'sent')
+    .map((item: any) => {
+      const sharesHolder = infoListSharesHolder.find((item2: any) => item.ma_cd === item2.ma_cd);
+      return {
+        ma_cd: item.ma_cd,
+        ten_cd: item.ten_cd,
+        cp_tham_du: sharesHolder?.cp_tham_du,
+        ty_le_cp_tham_du: sharesHolder?.ty_le_cp_tham_du,
+      };
+    });
 
   // GET DATA TỪ FIREBASE ---------------------------------------------------------------
   useEffect(() => {
@@ -508,6 +539,38 @@ export default function ResultView() {
                       <TableCell>{item.ty_le_cp_tham_du?.toFixed(6)}</TableCell>
                       <TableCell>{item.answerVoted}</TableCell>
                       <TableCell>{item.time_voted}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </Scrollbar>
+          </TableContainer>
+        </Card>
+      </Box>
+      <Box
+        sx={{
+          marginTop: '5px',
+          border: `3px solid ${alpha(theme.palette.primary.light, 0.2)}`,
+          backgroundColor: alpha(theme.palette.primary.lighter, 0.3),
+          p: 2,
+          justifyContent: 'center',
+          borderRadius: '10px',
+        }}
+      >
+        <Typography variant="h6">Thông tin cổ đông chưa bầu cử :</Typography>
+        <Card>
+          <TableContainer sx={{ overflow: 'unset' }}>
+            <Scrollbar>
+              <Table size="small">
+                <TableHeadCustom headLabel={tableLabelsInfoShareHolderNoVote} />
+                <TableBody>
+                  {dataTableInfoNoVote.map((item: info_holder_no_vote, index: number) => (
+                    <TableRow key={index}>
+                      <TableCell>{index + 1}</TableCell>
+                      <TableCell>{item.ma_cd}</TableCell>
+                      <TableCell>{item.ten_cd}</TableCell>
+                      <TableCell>{numberWithCommas(item.cp_tham_du)}</TableCell>
+                      <TableCell>{item.ty_le_cp_tham_du?.toFixed(6)}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
