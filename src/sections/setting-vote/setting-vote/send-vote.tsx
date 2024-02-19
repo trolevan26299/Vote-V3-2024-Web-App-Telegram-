@@ -91,7 +91,7 @@ export default function SendVoteView() {
         )
         .map((holder) => holder.ten_cd);
     });
-
+  console.log('listCDSendPollSuccess:', listCDSendPollSuccess);
   // Code lấy ra list cổ đông đã gửi poll theo câu hỏi ==================================
   const filteredArray =
     historySendPoll &&
@@ -105,6 +105,7 @@ export default function SendVoteView() {
       }
     });
   });
+  console.log('uniqueGuiDenObjects:', uniqueGuiDenObjects);
 
   // list ma_cd send poll fail
   const missingPollList = uniqueGuiDenObjects.filter(
@@ -542,7 +543,10 @@ export default function SendVoteView() {
           </FormControl>
           <Box sx={{ paddingTop: '20px' }}>
             <Typography>
-              <b>Thành Công :</b> {listCDSendPollSuccess.join(' | ')}
+              <b>Thành Công :</b>{' '}
+              {listCDSendPollSuccess.length === uniqueGuiDenObjects.length
+                ? 'Tất Cả'
+                : listCDSendPollSuccess.join(' | ')}
             </Typography>
           </Box>
           <Box sx={{ paddingTop: '20px' }}>
