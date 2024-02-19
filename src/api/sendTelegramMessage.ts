@@ -86,14 +86,22 @@ export const sendTelegramMessage = async (
         const response = await axios.post(TELEGRAM_API_URL, data);
         console.log(`Response khi gửi tin nhắn đến ${item.telegram_id}:`, response);
         // Lưu log
-        await saveLogsStatusSendMessageTelegram(item.telegram_id, keyQuestion);
+        // await saveLogsStatusSendMessageTelegram(item.telegram_id, keyQuestion);
+        return { chatId: item.telegram_id, response };
       } catch (error) {
         console.error(`Error sending message to chatId ${item.telegram_id}:`, error);
+        return { chatId: item.telegram_id, error };
       }
     });
 
     // Đợi cho tất cả các tin nhắn được gửi
-    await Promise.all(sendMessagesQueue);
+    const results = await Promise.all(sendMessagesQueue);
+    for (const result of results) {
+      const { chatId, response, error } = result;
+      if (!error) {
+        await saveLogsStatusSendMessageTelegram(chatId, keyQuestion);
+      }
+    }
   } catch (error) {
     console.error('Error sending messages to Telegram:', error);
   }
