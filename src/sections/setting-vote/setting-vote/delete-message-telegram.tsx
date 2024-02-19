@@ -42,7 +42,7 @@ export default function DeleteMessageTelegram() {
       console.error('Error deleting messages:', error);
     } finally {
       try {
-        const messagesRef = ref(database, 'history_send_message_bot');
+        const messagesRef = ref(database, FIREBASE_COLLECTION.HISTORY_SEND_MESSAGE_BOT);
         await remove(messagesRef);
         enqueueSnackbar('Xóa Thành Công !', { variant: 'success' });
       } catch (error) {
