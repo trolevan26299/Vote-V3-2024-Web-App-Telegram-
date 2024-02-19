@@ -14,6 +14,7 @@ interface chart {
   series: {
     label: string;
     value: number;
+
   }[];
   options?: ApexOptions;
 }
@@ -75,12 +76,12 @@ export default function DHContentRight({
     0;
 
   // ------------------ END LOGIC tính đã gửi câu hỏi select đến bao nhiêu người và không được trùng lặp số
-
+  const colors1 = ['#4CAF50', '#F44336', '#2196F3'];
   const chart: chart = {
-    // colors: [],
+
     series:
       (pollDataByKey &&
-        pollDataByKey?.dap_an?.map((item) => ({
+        pollDataByKey?.dap_an?.map((item,index) => ({
           label:
             ((!user
               ? `${item.vi}(${item.en})`
@@ -92,8 +93,11 @@ export default function DHContentRight({
               listResultByQuestion.filter((item2) => item2?.answer_select_id === String(item?.id))
                 .length) ||
             0,
+
+
         }))) ||
       [],
+      colors:colors1
   };
 
   // Tính tổng value trong mảng
@@ -105,6 +109,7 @@ export default function DHContentRight({
       ? 'No Vote'
       : 'Chưa bình chọn',
     value: totalUserReceivedQuestion - totalValue,
+
   });
 
   const { series, colors, options } = chart;
@@ -118,6 +123,7 @@ export default function DHContentRight({
         blur: 1,
       },
     },
+
     colors,
     tooltip: {
       marker: { show: false },
@@ -126,14 +132,23 @@ export default function DHContentRight({
         title: {
           formatter: () => '',
         },
+
       },
+
     },
     plotOptions: {
+
       bar: {
+
         horizontal: false,
         barHeight: '28%',
         borderRadius: 2,
+        distributed: true,
+
       },
+    },
+    legend:{
+      show: false,
     },
     xaxis: {
       categories: series.map((i) => i.label),
@@ -142,9 +157,13 @@ export default function DHContentRight({
           colors: theme.palette.text.primary,
           fontSize: '13px',
           fontWeight: '500',
+
         },
+        show:true
       },
+
     },
+
     ...options,
   });
 
@@ -172,7 +191,6 @@ export default function DHContentRight({
       <Stack spacing={3} sx={{ pt: 1 }}>
         <Stack key="success">
           <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 1 }}>
-            {/* <Box sx={{ typography: 'overline' }}>pending</Box> */}
             <Box sx={{ typography: 'subtitle1' }}>{percentUserVoted.toFixed(2) || 0} %</Box>
           </Stack>
 
