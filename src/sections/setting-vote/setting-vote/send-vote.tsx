@@ -92,7 +92,7 @@ export default function SendVoteView() {
         )
         .map((holder) => holder.ten_cd);
     });
-  console.log('listCDSendPollSuccess:', listCDSendPollSuccess);
+
   // Code lấy ra list cổ đông đã gửi poll theo câu hỏi ==================================
   const filteredArray =
     historySendPoll &&
@@ -106,7 +106,6 @@ export default function SendVoteView() {
       }
     });
   });
-  console.log('uniqueGuiDenObjects:', uniqueGuiDenObjects);
 
   // list ma_cd send poll fail
   const missingPollList = uniqueGuiDenObjects.filter(
