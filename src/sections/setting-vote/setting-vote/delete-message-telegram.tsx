@@ -3,9 +3,9 @@
 import { Box, Button, Typography } from '@mui/material';
 import { alpha, useTheme } from '@mui/material/styles';
 import axios from 'axios';
-import { DatabaseReference, get, ref } from 'firebase/database';
-import { remove } from 'lodash';
-import React, { useEffect, useState } from 'react';
+import { get, ref, set, remove } from 'firebase/database';
+import { useSnackbar } from 'notistack';
+import { useEffect, useState } from 'react';
 import { ConfirmDialog } from 'src/components/custom-dialog';
 import { FIREBASE_COLLECTION } from 'src/constant/firebase_collection.constant';
 import { database } from 'src/firebase/firebase.config';
@@ -18,11 +18,11 @@ interface IHistorySendMessage {
 export default function DeleteMessageTelegram() {
   const theme = useTheme();
   const confirm = useBoolean();
+  const { enqueueSnackbar } = useSnackbar();
   const [historySendMessageList, setHistorySendMessageList] = useState<IHistorySendMessage[]>([]);
   const botToken = process.env.NEXT_PUBLIC_BOT_TOKEN;
 
   const handleDeleteMessageAll = async () => {
-    console.log('Delete all messages');
     try {
       // Lặp qua mỗi tin nhắn trong historySendMessageList và gửi yêu cầu xóa đến Telegram API
       const deleteMessagePromises = historySendMessageList.map(async (message) => {
@@ -37,19 +37,23 @@ export default function DeleteMessageTelegram() {
       // Chờ cho tất cả các promise hoàn thành
       await Promise.all(deleteMessagePromises);
 
-      // Xóa tất cả các tin nhắn từ Firebase
-      const messagesRef: DatabaseReference = ref(
-        database,
-        FIREBASE_COLLECTION.HISTORY_SEND_MESSAGE_BOT
-      ); // Định rõ kiểu DatabaseReference
-      remove([messagesRef]);
-
-      confirm.onFalse();
+      // Xóa tất cả các tin nhắn từ Firebase trong khối finally
     } catch (error) {
       console.error('Error deleting messages:', error);
+    } finally {
+      try {
+        const messagesRef = ref(database, 'history_send_message_bot');
+        await remove(messagesRef);
+        enqueueSnackbar('Xóa Thành Công !', { variant: 'success' });
+      } catch (error) {
+        enqueueSnackbar('Xóa lỗi !', { variant: 'error' });
+        console.error('Error saving data:', error);
+      } finally {
+        confirm.onFalse();
+      }
     }
   };
-  console.log('historySendMessageList:', historySendMessageList);
+
   useEffect(() => {
     const userRef = ref(database, FIREBASE_COLLECTION.HISTORY_SEND_MESSAGE_BOT);
     const fetchData = async () => {
