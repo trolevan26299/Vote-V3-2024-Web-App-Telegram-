@@ -36,5 +36,5 @@ export interface IHistorySendPoll {
 export interface ISendPollStatusSuccess {
   key: string;
   keyQuestion: string;
-  listUserSentSuccess: number[] || [];
+  listUserSentSuccess: number[] | [];
 }
