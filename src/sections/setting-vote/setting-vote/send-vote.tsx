@@ -1,3 +1,4 @@
+/* eslint-disable no-nested-ternary */
 import {
   Autocomplete,
   Box,
@@ -544,7 +545,9 @@ export default function SendVoteView() {
           <Box sx={{ paddingTop: '20px' }}>
             <Typography>
               <b>Thành Công :</b>{' '}
-              {listCDSendPollSuccess.length === uniqueGuiDenObjects.length
+              {uniqueGuiDenObjects.length === 0
+                ? ''
+                : listCDSendPollSuccess.length === uniqueGuiDenObjects.length
                 ? 'Tất Cả'
                 : listCDSendPollSuccess.join(' | ')}
             </Typography>

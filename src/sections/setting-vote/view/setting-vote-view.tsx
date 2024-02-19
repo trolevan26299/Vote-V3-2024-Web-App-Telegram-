@@ -5,6 +5,7 @@ import React from 'react';
 import SettingView from '../setting-vote/setting';
 import SendVoteView from '../setting-vote/send-vote';
 import ResultView from '../setting-vote/result';
+import DeleteMessageTelegram from '../setting-vote/delete-message-telegram';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -54,9 +55,10 @@ export default function SettingVoteView() {
           aria-label="basic tabs example"
           sx={{ width: '100%' }}
         >
-          <Tab sx={{ width: '33%', maxWidth: '31%' }} label="Cấu Hình" {...a11yProps(0)} />
-          <Tab sx={{ width: '33%', maxWidth: '31%' }} label="Gửi Bỏ Phiếu" {...a11yProps(1)} />
-          <Tab sx={{ width: '33%', maxWidth: '31%' }} label="Kết Quả" {...a11yProps(2)} />
+          <Tab sx={{ width: '23%', maxWidth: '31%' }} label="Cấu Hình" {...a11yProps(0)} />
+          <Tab sx={{ width: '23%', maxWidth: '31%' }} label="Gửi Bỏ Phiếu" {...a11yProps(1)} />
+          <Tab sx={{ width: '23%', maxWidth: '31%' }} label="Kết Quả" {...a11yProps(2)} />
+          <Tab sx={{ width: '23%', maxWidth: '31%' }} label="Tin nhắn Telegram" {...a11yProps(3)} />
         </Tabs>
       </Box>
       <CustomTabPanel value={value} index={0}>
@@ -67,6 +69,9 @@ export default function SettingVoteView() {
       </CustomTabPanel>
       <CustomTabPanel value={value} index={2}>
         <ResultView />
+      </CustomTabPanel>
+      <CustomTabPanel value={value} index={3}>
+        <DeleteMessageTelegram />
       </CustomTabPanel>
     </Box>
   );
