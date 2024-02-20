@@ -34,7 +34,7 @@ export default function SharesHolderInfoView() {
         cp_tham_du: shareholder?.cp_tham_du?.toString(),
         ty_le_cp_tham_du: `${(
           ((shareholder?.ty_le_cp_tham_du && shareholder?.ty_le_cp_tham_du) || 0) * 100
-        ).toFixed(4)}%`,
+        ).toFixed(2)}%`,
         trang_thai: shareholder?.trang_thai,
         telegram_id: shareholder?.telegram_id?.toString(),
         nguoi_nuoc_ngoai: shareholder?.nguoi_nuoc_ngoai,
