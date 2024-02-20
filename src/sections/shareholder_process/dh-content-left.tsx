@@ -34,6 +34,7 @@ interface Props {
   pollDataByKey?: IQuestion;
   // listResultByQuestion?: ISelectedAnswer[];
   // totalSharesHolder?: any[];
+  percentProcess: number;
   calculateTotalCP: (itemPoll: number) => number;
 }
 
@@ -41,6 +42,7 @@ export default function DHContentLeft({
   pollDataByKey,
   // listResultByQuestion,
   // totalSharesHolder,
+  percentProcess,
   calculateTotalCP,
 }: Props) {
   const theme = useTheme();
@@ -131,12 +133,12 @@ export default function DHContentLeft({
         <Stack key="success">
           <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 1 }}>
             {/* <Box sx={{ typography: 'overline' }}>pending</Box> */}
-            <Box sx={{ typography: 'subtitle1' }}>80%</Box>
+            <Box sx={{ typography: 'subtitle1' }}>{`${percentProcess.toFixed(2)}%`}</Box>
           </Stack>
 
           <LinearProgress
             variant="determinate"
-            value={80}
+            value={percentProcess}
             sx={{
               height: 8,
               color: (theme3) => alpha(theme3.palette.primary.light, 0.2),

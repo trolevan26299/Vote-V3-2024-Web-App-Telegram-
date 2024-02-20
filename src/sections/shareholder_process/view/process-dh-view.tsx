@@ -84,9 +84,9 @@ export default function ProcessDHView() {
       }
     });
   });
-  console.log('uniqueGuiDenObjects:', uniqueGuiDenObjects);
+
   const percentProcess = (listSendPollSuccessByKey.length / uniqueGuiDenObjects.length) * 100 || 0;
-  console.log('percentProcess:', percentProcess);
+
   const pollDataByKey = danhSachPollData.find((poll) => poll.key === questionSelect);
 
   // List result by question
@@ -397,7 +397,11 @@ export default function ProcessDHView() {
           sx={{ textAlign: 'center', paddingLeft: { xs: '0px', md: '0px' } }}
         >
           <Grid item xs={12} md={6} lg={6}>
-            <DHContentLeft calculateTotalCP={calculateTotalCP} pollDataByKey={pollDataByKey} />
+            <DHContentLeft
+              calculateTotalCP={calculateTotalCP}
+              pollDataByKey={pollDataByKey}
+              percentProcess={percentProcess}
+            />
           </Grid>
 
           <Grid item xs={12} md={6} lg={6}>
