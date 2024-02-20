@@ -19,6 +19,7 @@ interface Props extends StackProps {
   code_holder?: string;
   number_shares?: number;
   join_rate?: number;
+  foreign?: boolean;
 }
 
 export default function AppWelcome({
@@ -29,6 +30,7 @@ export default function AppWelcome({
   code_holder,
   number_shares,
   join_rate,
+  foreign,
   ...other
 }: Props) {
   const theme = useTheme();
@@ -67,13 +69,13 @@ export default function AppWelcome({
           <Typography variant="h5">Thông tin cổ phần của bạn :</Typography>
           <Grid container spacing={2} sx={styles.grid_box}>
             <Grid item xs={8} md={6} lg={4}>
-              <Typography>Mã cổ đông :</Typography>
+              <Typography>{foreign ? 'Shareholder code :' : 'Mã cổ đông :'}</Typography>
             </Grid>
             <Grid item xs={4} md={6} lg={8}>
               <Typography sx={{ fontWeight: 'bold' }}>{code_holder}</Typography>
             </Grid>
             <Grid item xs={8} md={6} lg={4}>
-              <Typography>Cổ phần tham dự :</Typography>
+              <Typography>{foreign ? 'Participation shares :' : 'Cổ phần tham dự :'}</Typography>
             </Grid>
             <Grid item xs={4} md={6} lg={8}>
               <Typography sx={{ fontWeight: 'bold' }}>
@@ -81,7 +83,7 @@ export default function AppWelcome({
               </Typography>
             </Grid>
             <Grid item xs={8} md={6} lg={4}>
-              <Typography>Tỷ lệ tham dự :</Typography>
+              <Typography>{foreign ? 'Participation share ratio :' : 'Tỷ lệ tham dự :'}</Typography>
             </Grid>
             <Grid item xs={4} md={6} lg={8}>
               <Typography sx={{ fontWeight: 'bold' }}>
@@ -89,7 +91,6 @@ export default function AppWelcome({
                   .toFixed(4)
                   .replace(/(\.[0-9]*[1-9])0+$/, '$1')
                   .replace(/\.$/, '')}%`}{' '}
-                %
               </Typography>
             </Grid>
           </Grid>
@@ -102,7 +103,7 @@ export default function AppWelcome({
               }}
               onClick={() => router.push(paths.dashboard.voteDH)}
             >
-              Bỏ phiếu đại hội
+              {foreign ? 'Congress poll' : 'Bỏ phiếu đại hội'}
             </Button>
           </Grid>
         </Box>

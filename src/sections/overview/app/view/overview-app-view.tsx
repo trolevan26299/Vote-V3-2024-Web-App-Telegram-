@@ -25,11 +25,16 @@ export default function OverviewAppView() {
       <Grid container spacing={3}>
         <Grid xs={12} md={12}>
           <AppWelcome
-            title={`👋 Chào mừng ${user?.ten_cd}  đến với Đại Hội Cổ Đông`}
+            title={`👋 ${
+              user?.nguoi_nuoc_ngoai ? 'Wellcome ' : 'Chào mừng '
+            } ${userAccess?.first_name} ${
+              user?.nguoi_nuoc_ngoai ? ' to shareholders meeting' : ' đến với Đại Hội Cổ Đông'
+            }`}
             img={<SeoIllustration />}
             code_holder={user?.ma_cd}
             number_shares={user?.cp_tham_du}
             join_rate={user?.ty_le_cp_tham_du}
+            foreign={user?.nguoi_nuoc_ngoai}
           />
         </Grid>
       </Grid>
