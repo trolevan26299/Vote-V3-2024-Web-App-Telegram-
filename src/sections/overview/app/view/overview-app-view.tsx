@@ -3,6 +3,7 @@
 import Container from '@mui/material/Container';
 import Grid from '@mui/material/Unstable_Grid2';
 
+import { useEffect, useState } from 'react';
 import { SeoIllustration } from 'src/assets/illustrations';
 import { useUser } from 'src/firebase/user_accesss_provider';
 import { useTelegram } from 'src/telegram/telegram.provider';
@@ -12,9 +13,13 @@ import AppWelcome from '../app-welcome';
 
 export default function OverviewAppView() {
   const { user } = useUser();
-  const telegram = useTelegram();
-  console.log('userId Access:', user);
-  console.log('telegram:', telegram);
+  const [userAccess, setUserAccess] = useState<number | undefined>(0);
+  console.log('userAccess', userAccess);
+  const telegramContext = useTelegram();
+  useEffect(() => {
+    setUserAccess(telegramContext?.user?.id);
+  }, [telegramContext]);
+
   return (
     <Container sx={{ maxWidth: '100% !important' }}>
       <Grid container spacing={3}>
