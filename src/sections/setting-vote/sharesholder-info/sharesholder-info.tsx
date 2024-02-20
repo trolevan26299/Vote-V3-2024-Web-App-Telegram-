@@ -19,6 +19,7 @@ type RowProps = {
   ty_le_cp_tham_du?: string;
   trang_thai?: string;
   telegram_id?: string;
+  nguoi_nuoc_ngoai?: boolean;
   ghi_chu?: string;
 };
 
@@ -70,6 +71,7 @@ function SharesHolderInfoRow({ row, index }: SharesHolderInfoRowProps) {
       <TableCell>{row.ty_le_cp_tham_du}</TableCell>
       <TableCell>{row.trang_thai}</TableCell>
       <TableCell>{row.telegram_id}</TableCell>
+      <TableCell>{row.nguoi_nuoc_ngoai ? 'Yes' : 'No'}</TableCell>
       <TableCell>{row.ghi_chu}</TableCell>
     </TableRow>
   );

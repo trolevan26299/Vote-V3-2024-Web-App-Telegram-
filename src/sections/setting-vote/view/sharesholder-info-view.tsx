@@ -32,13 +32,16 @@ export default function SharesHolderInfoView() {
         cp_so_huu: shareholder?.cp_so_huu?.toString(),
         ty_le_cp_so_huu: `${shareholder?.ty_le_cp_so_huu?.toFixed(2)}%`,
         cp_tham_du: shareholder?.cp_tham_du?.toString(),
-        ty_le_cp_tham_du: `${shareholder?.ty_le_cp_tham_du?.toFixed(2)}%`,
+        ty_le_cp_tham_du: `${(
+          ((shareholder?.ty_le_cp_tham_du && shareholder?.ty_le_cp_tham_du) || 0) * 100
+        ).toFixed(4)}%`,
         trang_thai: shareholder?.trang_thai,
         telegram_id: shareholder?.telegram_id?.toString(),
+        nguoi_nuoc_ngoai: shareholder?.nguoi_nuoc_ngoai,
         ghi_chu: shareholder?.ghi_chu?.toString(), // You can add the appropriate property here
       }))
     : [];
-
+  console.log('transformedData:', transformedData);
   const totalCpSoHuu = transformedData
     .reduce((sum, shareholder) => {
       const cpSoHuu = parseInt(shareholder.cp_so_huu as string, 10) || 0;
@@ -96,6 +99,7 @@ export default function SharesHolderInfoView() {
           { id: 'ty_le_cp_tham_du', label: 'Tỷ lệ tham dự %' },
           { id: 'trang_thai', label: 'Trạng thái' },
           { id: 'telegram_id', label: 'Telegram ID' },
+          { id: 'nguoi_nuoc_ngoai', label: 'Người nước ngoài' },
           { id: 'ghi_chu', label: 'Ghi chú' },
         ]}
         sx={{

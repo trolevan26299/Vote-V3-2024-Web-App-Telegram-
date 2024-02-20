@@ -1,24 +1,22 @@
 import { m } from 'framer-motion';
 // @mui
-import { alpha } from '@mui/material/styles';
-import Box from '@mui/material/Box';
-import Stack from '@mui/material/Stack';
 import Avatar from '@mui/material/Avatar';
+import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
-import MenuItem from '@mui/material/MenuItem';
 import IconButton from '@mui/material/IconButton';
+import MenuItem from '@mui/material/MenuItem';
+import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
+import { alpha } from '@mui/material/styles';
 // routes
-import { paths } from 'src/routes/paths';
 import { useRouter } from 'src/routes/hooks';
 // hooks
-import { useMockedUser } from 'src/hooks/use-mocked-user';
 // auth
 import { useAuthContext } from 'src/auth/hooks';
 // components
 import { varHover } from 'src/components/animate';
-import { useSnackbar } from 'src/components/snackbar';
 import CustomPopover, { usePopover } from 'src/components/custom-popover';
+import { useSnackbar } from 'src/components/snackbar';
 import { useUser } from 'src/firebase/user_accesss_provider';
 
 // ----------------------------------------------------------------------
@@ -33,15 +31,15 @@ export default function AccountPopover() {
   const OPTIONS = [
     {
       label: user?.nguoi_nuoc_ngoai === true ? 'Total Shares :' : 'CP Tham Dự :',
-      value: user?.cp_tham_du,
+      value: String(user?.cp_tham_du),
     },
     {
       label: 'Telegram ID :',
-      value: user?.telegram_id,
+      value: String(user?.telegram_id),
     },
     {
       label: user?.nguoi_nuoc_ngoai === true ? 'Rate Shares :' : 'Tỷ lệ CP tham dự :',
-      value: user?.ty_le_cp_tham_du?.toFixed(6),
+      value: ((user?.ty_le_cp_tham_du || 0) * 100).toFixed(6),
     },
   ];
 
