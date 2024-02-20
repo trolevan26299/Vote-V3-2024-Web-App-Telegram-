@@ -18,6 +18,8 @@ import { varHover } from 'src/components/animate';
 import CustomPopover, { usePopover } from 'src/components/custom-popover';
 import { useSnackbar } from 'src/components/snackbar';
 import { useUser } from 'src/firebase/user_accesss_provider';
+import { useTelegram } from 'src/telegram/telegram.provider';
+import { useEffect, useState } from 'react';
 
 // ----------------------------------------------------------------------
 
@@ -25,8 +27,10 @@ import { useUser } from 'src/firebase/user_accesss_provider';
 
 export default function AccountPopover() {
   const router = useRouter();
+  const telegramContext = useTelegram();
 
   const { user } = useUser();
+  const [userAccess, setUserAccess] = useState<any>();
 
   const OPTIONS = [
     {
@@ -46,28 +50,11 @@ export default function AccountPopover() {
     },
   ];
 
-  const { logout } = useAuthContext();
-
-  const { enqueueSnackbar } = useSnackbar();
-
   const popover = usePopover();
 
-  // const handleLogout = async () => {
-  //   try {
-  //     await logout();
-  //     popover.onClose();
-  //     router.replace('/');
-  //   } catch (error) {
-  //     console.error(error);
-  //     enqueueSnackbar('Unable to logout!', { variant: 'error' });
-  //   }
-  // };
-
-  // const handleClickItem = (path: string) => {
-  //   popover.onClose();
-  //   router.push(path);
-  // };
-
+  useEffect(() => {
+    setUserAccess(telegramContext?.user);
+  }, [telegramContext]);
   return (
     <>
       <IconButton
@@ -102,7 +89,7 @@ export default function AccountPopover() {
       <CustomPopover open={popover.open} onClose={popover.onClose} sx={{ width: 200, p: 0 }}>
         <Box sx={{ p: 2, pb: 1.5 }}>
           <Typography variant="subtitle2" noWrap>
-            <b> {user?.ten_cd}</b>
+            <b> {userAccess?.first_name}</b>
           </Typography>
 
           <Typography variant="body2" sx={{ color: 'text.secondary' }} noWrap>

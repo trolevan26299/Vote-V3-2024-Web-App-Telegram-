@@ -18,6 +18,7 @@ export default function OverviewAppView() {
   const telegramContext = useTelegram();
   useEffect(() => {
     setUserAccess(telegramContext?.user);
+    console.log('telegramContext', telegramContext);
   }, [telegramContext]);
 
   return (
