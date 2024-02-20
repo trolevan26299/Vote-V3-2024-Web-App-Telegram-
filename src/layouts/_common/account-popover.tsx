@@ -39,7 +39,7 @@ export default function AccountPopover() {
     },
     {
       label: user?.nguoi_nuoc_ngoai === true ? 'Rate Shares :' : 'Tỷ lệ CP tham dự :',
-      value: ((user?.ty_le_cp_tham_du || 0) * 100).toFixed(6),
+      value: `${((user?.ty_le_cp_tham_du || 0) * 100).toFixed(6)} %`,
     },
   ];
 
