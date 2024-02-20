@@ -162,7 +162,6 @@ export default function ResultView() {
   //  tạo một Set để lưu trữ các ma_cd đã xuất hiện
   const seenMaCd: string[] = [];
 
-  console.log('uniqueGuiDenObjects', uniqueGuiDenObjects);
   //  Tổng số user nhận được câu hỏi
   const totalUserReceivedQuestion =
     (filteredArray &&

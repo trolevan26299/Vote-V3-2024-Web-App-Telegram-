@@ -76,7 +76,9 @@ export default function AppWelcome({
               <Typography>Cổ phần tham dự :</Typography>
             </Grid>
             <Grid item xs={4} md={6} lg={8}>
-              <Typography sx={{ fontWeight: 'bold' }}>{number_shares}</Typography>
+              <Typography sx={{ fontWeight: 'bold' }}>
+                {number_shares?.toLocaleString('vi-VN')}
+              </Typography>
             </Grid>
             <Grid item xs={8} md={6} lg={4}>
               <Typography>Tỷ lệ tham dự :</Typography>
