@@ -20,7 +20,6 @@ import { useSnackbar } from 'src/components/snackbar';
 import { useUser } from 'src/firebase/user_accesss_provider';
 import { useTelegram } from 'src/telegram/telegram.provider';
 import { useEffect, useState } from 'react';
-import axios from 'axios';
 
 // ----------------------------------------------------------------------
 
@@ -29,9 +28,8 @@ import axios from 'axios';
 export default function AccountPopover() {
   const router = useRouter();
   const telegramContext = useTelegram();
+
   const { user } = useUser();
-  const popover = usePopover();
-  const botToken = process.env.NEXT_PUBLIC_BOT_TOKEN;
   const [userAccess, setUserAccess] = useState<any>();
 
   const OPTIONS = [
@@ -52,49 +50,11 @@ export default function AccountPopover() {
     },
   ];
 
-  async function getUserProfilePhotos(userId: any) {
-    const response = await axios.post(
-      `https://api.telegram.org/bot${botToken}/getUserProfilePhotos`,
-      {
-        user_id: userId,
-      }
-    );
-    return response.data;
-  }
+  const popover = usePopover();
 
-  // Hàm lấy URL của ảnh đại diện từ file_id
-  async function getProfilePhotoUrl(fileId: any) {
-    const response = await axios.post(`https://api.telegram.org/bot${botToken}/getFile`, {
-      file_id: fileId,
-    });
-    const filePath = response.data.result.file_path;
-    return `https://api.telegram.org/file/bot${botToken}/${filePath}`;
-  }
-
-  async function getUserProfile(userId: any) {
-    const userProfilePhotos = await getUserProfilePhotos(userId);
-    if (
-      userProfilePhotos &&
-      userProfilePhotos.result &&
-      userProfilePhotos.result.photos.length > 0
-    ) {
-      const firstPhoto = userProfilePhotos.result.photos[0][0];
-      const photoFileId = firstPhoto.file_id;
-      const photoUrl = await getProfilePhotoUrl(photoFileId);
-      console.log('Profile photo URL:', photoUrl);
-      return photoUrl;
-    }
-    console.log('User has no profile photo.');
-    return null;
-  }
-
-  useEffect(() => {
-    const urlImage = getUserProfile(userAccess?.chat_id);
-    console.log('urlImage', urlImage);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [userAccess]);
   useEffect(() => {
     setUserAccess(telegramContext?.user);
+    console.log('telegramContext', telegramContext);
   }, [telegramContext]);
   return (
     <>
