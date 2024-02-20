@@ -5,13 +5,16 @@ import Grid from '@mui/material/Unstable_Grid2';
 
 import { SeoIllustration } from 'src/assets/illustrations';
 import { useUser } from 'src/firebase/user_accesss_provider';
+import { useTelegram } from 'src/telegram/telegram.provider';
 import AppWelcome from '../app-welcome';
 
 // ----------------------------------------------------------------------
 
 export default function OverviewAppView() {
   const { user } = useUser();
+  const telegram = useTelegram();
   console.log('userId Access:', user);
+  console.log('telegram:', telegram);
   return (
     <Container sx={{ maxWidth: '100% !important' }}>
       <Grid container spacing={3}>
