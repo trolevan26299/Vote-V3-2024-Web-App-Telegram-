@@ -75,14 +75,14 @@ export const sendTelegramMessage = async (
   const messageContent = `
     *BẦU CỬ HỘI ĐỒNG V3 COMPANY 2024*
 
-    Đã đến thời gian bỏ phiếu : *${question}*
-    *Thời hạn :* ${expireTime}
+  Đã đến thời gian bỏ phiếu : *${question}*
+  *Thời hạn :* ${expireTime}
   `;
   const messageContentEng = `
     *Shareholder election V3 COMPANY 2024*
 
-    It's time to vote: : *${questionEng}*
-    *Due time :* ${expireTime}
+  It's time to vote: : *${questionEng}*
+  *Due time :* ${expireTime}
   `;
 
   try {

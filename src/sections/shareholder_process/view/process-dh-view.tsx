@@ -63,7 +63,6 @@ export default function ProcessDHView() {
   const listSendPollSuccessByKey = listSendPollStatusSuccess
     .filter((item) => item.keyQuestion === questionSelect)
     .flatMap((item) => item.listUserSentSuccess);
-  console.log('listSendPollSuccessByKey', listSendPollSuccessByKey);
 
   const handleChangeSelectQuestion = (event: SelectChangeEvent) => {
     SetQuestionSelect(event.target.value);
@@ -410,6 +409,7 @@ export default function ProcessDHView() {
               listResultByQuestion={listResultByQuestion}
               historySendPollData={historySendPollData}
               questionSelect={questionSelect}
+              listSendPollSuccessByKey={listSendPollSuccessByKey.length}
             />
           </Grid>
           <Grid item xs={12}>

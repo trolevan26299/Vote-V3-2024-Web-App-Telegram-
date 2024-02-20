@@ -23,6 +23,7 @@ interface Props {
   pollDataByKey?: IQuestion;
   listResultByQuestion?: ISelectedAnswer[];
   questionSelect?: string;
+  listSendPollSuccessByKey: number;
 }
 
 export default function DHContentRight({
@@ -30,6 +31,7 @@ export default function DHContentRight({
   pollDataByKey,
   listResultByQuestion,
   questionSelect,
+  listSendPollSuccessByKey,
 }: Props) {
   const { user } = useUser();
   const theme = useTheme();
@@ -106,13 +108,14 @@ export default function DHContentRight({
 
   // Tính tổng value trong mảng
   const totalValue = chart.series.reduce((sum, item) => sum + item.value, 0);
+  console.log('totalValue:', totalValue);
   chart.series.push({
     label: !user
       ? 'Chưa bình chọn (No Vote)'
       : user.nguoi_nuoc_ngoai === true
       ? 'No Vote'
       : 'Chưa bình chọn',
-    value: totalUserReceivedQuestion - totalValue,
+    value: listSendPollSuccessByKey - totalValue,
   });
 
   const { series, colors, options } = chart;
