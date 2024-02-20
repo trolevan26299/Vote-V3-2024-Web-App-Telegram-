@@ -37,6 +37,7 @@ import SnackbarProvider from 'src/components/snackbar/snackbar-provider';
 import { UserProvider } from 'src/firebase/user_accesss_provider';
 import { StringStateProvider } from 'src/stores/questionSelectUser.provider';
 import { TelegramProvider } from 'src/telegram/telegram.provider';
+import { Analytics } from '@vercel/analytics/react';
 
 // ----------------------------------------------------------------------
 
@@ -109,6 +110,7 @@ export default function RootLayout({ children }: Props) {
                              {children}
                         </AuthConsumer> */}
                         {children}
+                        <Analytics />
                       </SnackbarProvider>
                     </MotionLazy>
                   </StringStateProvider>
