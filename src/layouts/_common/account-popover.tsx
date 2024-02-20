@@ -85,15 +85,19 @@ export default function AccountPopover() {
       const photoFileId = firstPhoto.file_id;
       const photoUrl = await getProfilePhotoUrl(photoFileId);
       console.log('Profile photo URL:', photoUrl);
-      return photoUrl;
+      return photoUrl as string;
     }
     console.log('User has no profile photo.');
     return '';
   }
   useEffect(() => {
     setUserAccess(telegramContext?.user);
-    const urlImage = getUserProfile(telegramContext?.user?.id);
-    setUrlImageProfile(urlImage as string);
+
+    async function fetchData() {
+      const urlImage = await getUserProfile(telegramContext?.user?.id);
+      setUrlImageProfile(urlImage);
+    }
+    fetchData();
   }, [telegramContext]);
   return (
     <>
