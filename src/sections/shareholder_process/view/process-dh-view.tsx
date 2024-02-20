@@ -75,6 +75,23 @@ export default function ProcessDHView() {
     listResultByQuestion.push(...filteredArray);
   }
 
+  // CODE FOR SELECT QUESTION FROM FIREBASE
+  const existingKeys = new Set<string>();
+
+  // Lọc và merge dữ liệu từ ds_poll_id
+  const questionSelectData: any = historySendPollData.reduce((result, historyItem) => {
+    // Duyệt qua mỗi phần tử trong ds_poll_id của historyItem
+    historyItem?.ds_poll_id?.forEach((poll) => {
+      // Kiểm tra xem đã có key này trong Set chưa
+      if (!existingKeys.has(poll.key as string)) {
+        // Nếu chưa có, thêm vào mảng kết quả và đánh dấu là đã xuất hiện
+        existingKeys.add(poll.key as string);
+        result.push(poll);
+      }
+    });
+    return result;
+  }, [] as IHistorySendPoll[]);
+
   const calculateTotalCP = (itemPoll: number) => {
     const listInfoForAnswer = listResultByQuestion?.filter(
       (item: any) => item.answer_select_id === String(itemPoll)
@@ -282,12 +299,12 @@ export default function ProcessDHView() {
             sx={{ minWidth: '100% !important' }}
             fullWidth
           >
-            {danhSachPollData.map((item: IQuestion) => (
+            {questionSelectData.map((item: IQuestion) => (
               <MenuItem value={item.key} sx={{ minWidth: '100% important' }}>
                 {!user
-                  ? `${item.ten_poll} (${item.ten_poll_en})`
+                  ? `${item.ten_poll} (${pollDataByKey?.ten_poll_en})`
                   : user.nguoi_nuoc_ngoai === true
-                  ? item.ten_poll_en
+                  ? pollDataByKey?.ten_poll_en
                   : item.ten_poll}
               </MenuItem>
             ))}

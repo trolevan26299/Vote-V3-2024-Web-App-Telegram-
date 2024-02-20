@@ -72,7 +72,7 @@ function ProcessVoteTableRow({ row }: ProcessVoteRowProps) {
       </TableCell>
       <TableCell>{row.answer}</TableCell>
       <TableCell>{row.turn}</TableCell>
-      <TableCell>{row.numberCP}</TableCell>
+      <TableCell>{row.numberCP ? row.numberCP.toLocaleString('vi-VN') : 0}</TableCell>
       <TableCell>{row.percent}%</TableCell>
     </TableRow>
   );
