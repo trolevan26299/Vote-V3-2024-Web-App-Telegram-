@@ -304,7 +304,7 @@ export default function ProcessDHView() {
                 {!user
                   ? `${item.ten_poll} (${pollDataByKey?.ten_poll_en})`
                   : user.nguoi_nuoc_ngoai === true
-                  ? pollDataByKey?.ten_poll_en
+                  ? item.ten_poll_en
                   : item.ten_poll}
               </MenuItem>
             ))}
