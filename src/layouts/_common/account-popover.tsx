@@ -38,7 +38,7 @@ export default function AccountPopover() {
       value: String(user?.telegram_id),
     },
     {
-      label: user?.nguoi_nuoc_ngoai === true ? 'Rate Shares :' : '% CP tham dự :',
+      label: user?.nguoi_nuoc_ngoai === true ? 'Rate Shares :' : 'Tỷ lệ CP tham dự :',
       value: `${((user?.ty_le_cp_tham_du || 0) * 100).toFixed(4)} %`,
     },
   ];
