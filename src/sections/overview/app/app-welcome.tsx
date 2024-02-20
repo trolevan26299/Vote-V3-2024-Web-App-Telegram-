@@ -90,7 +90,7 @@ export default function AppWelcome({
             <Grid item xs={4} md={6} lg={8}>
               <Typography sx={{ fontWeight: 'bold' }}>
                 {` ${((join_rate || 0) * 100)
-                  .toFixed(4)
+                  .toFixed(2)
                   .replace(/(\.[0-9]*[1-9])0+$/, '$1')
                   .replace(/\.$/, '')}%`}{' '}
               </Typography>

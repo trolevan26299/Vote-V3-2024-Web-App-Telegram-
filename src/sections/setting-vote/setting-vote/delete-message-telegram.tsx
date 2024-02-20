@@ -92,7 +92,7 @@ export default function DeleteMessageTelegram() {
           Xóa Tin nhắn
         </Typography>
         <Typography variant="caption" color="error" textAlign="center">
-          * Chức năng này sẽ xóa toàn bộ tin nhắn đã gửi từ bot đến người dùng
+          * Chức năng này sẽ xóa toàn bộ tin nhắn giữa bot và người dùng
         </Typography>
 
         <Button

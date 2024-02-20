@@ -75,7 +75,15 @@ export default function DHContentRight({
     0;
 
   // ------------------ END LOGIC tính đã gửi câu hỏi select đến bao nhiêu người và không được trùng lặp số
-  const colors1 = ['rgb(0, 167, 111)', 'rgb(255, 171, 0)', '#2196F3'];
+  const colors1 = [
+    'rgb(0, 167, 111)',
+    'rgb(255, 171, 0)',
+    '#2196F3',
+    '#00FFFF',
+    '#FFCC99',
+    '#FFCCFF',
+    '#FF9999',
+  ];
   const chart: chart = {
     series:
       (pollDataByKey &&

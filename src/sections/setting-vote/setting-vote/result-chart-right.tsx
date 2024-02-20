@@ -1,5 +1,6 @@
 import { Box, Typography } from '@mui/material';
 import { ApexOptions } from 'apexcharts';
+import { alpha, useTheme } from '@mui/material/styles';
 import Chart, { useChart } from 'src/components/chart';
 import { IHistorySendPoll, IQuestion } from 'src/types/setting';
 import { ISelectedAnswer } from 'src/types/votedh.types';
@@ -24,6 +25,16 @@ export default function ResultChartRight({
   listResultByQuestion,
   totalUserReceivedQuestion,
 }: Props) {
+  const theme = useTheme();
+  const colors1 = [
+    'rgb(0, 167, 111)',
+    'rgb(255, 171, 0)',
+    '#2196F3',
+    '#00FFFF',
+    '#FFCC99',
+    '#FFCCFF',
+    '#FF9999',
+  ];
   const chartRight: right_chart = {
     series:
       (pollDataByKey &&
@@ -36,6 +47,7 @@ export default function ResultChartRight({
             0,
         }))) ||
       [],
+    colors: colors1,
   };
 
   // Tính tổng value trong mảng
@@ -46,7 +58,15 @@ export default function ResultChartRight({
   });
   const { series, colors, options } = chartRight;
   const chartSeriesRight = series.map((i) => i.value);
-  const chartOptionsRight = useChart({
+  const chartOptions = useChart({
+    dataLabels: {
+      enabled: true,
+      dropShadow: {
+        enabled: false,
+        blur: 1,
+      },
+    },
+
     colors,
     tooltip: {
       marker: { show: false },
@@ -62,11 +82,24 @@ export default function ResultChartRight({
         horizontal: false,
         barHeight: '28%',
         borderRadius: 2,
+        distributed: true,
       },
+    },
+    legend: {
+      show: false,
     },
     xaxis: {
       categories: series.map((i) => i.label),
+      labels: {
+        style: {
+          colors: theme.palette.text.primary,
+          fontSize: '13px',
+          fontWeight: '500',
+        },
+        show: true,
+      },
     },
+
     ...options,
   });
 
@@ -79,7 +112,7 @@ export default function ResultChartRight({
         type="bar"
         dir="ltr"
         series={[{ data: chartSeriesRight }]}
-        options={chartOptionsRight}
+        options={chartOptions}
         height={364}
       />
     </Box>
