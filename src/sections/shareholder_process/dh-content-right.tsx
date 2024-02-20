@@ -14,7 +14,6 @@ interface chart {
   series: {
     label: string;
     value: number;
-
   }[];
   options?: ApexOptions;
 }
@@ -76,12 +75,11 @@ export default function DHContentRight({
     0;
 
   // ------------------ END LOGIC tính đã gửi câu hỏi select đến bao nhiêu người và không được trùng lặp số
-  const colors1 = ['#4CAF50', '#F44336', '#2196F3'];
+  const colors1 = ['rgb(0, 167, 111)', 'rgb(255, 171, 0)', '#2196F3'];
   const chart: chart = {
-
     series:
       (pollDataByKey &&
-        pollDataByKey?.dap_an?.map((item,index) => ({
+        pollDataByKey?.dap_an?.map((item, index) => ({
           label:
             ((!user
               ? `${item.vi}(${item.en})`
@@ -93,11 +91,9 @@ export default function DHContentRight({
               listResultByQuestion.filter((item2) => item2?.answer_select_id === String(item?.id))
                 .length) ||
             0,
-
-
         }))) ||
       [],
-      colors:colors1
+    colors: colors1,
   };
 
   // Tính tổng value trong mảng
@@ -109,7 +105,6 @@ export default function DHContentRight({
       ? 'No Vote'
       : 'Chưa bình chọn',
     value: totalUserReceivedQuestion - totalValue,
-
   });
 
   const { series, colors, options } = chart;
@@ -132,22 +127,17 @@ export default function DHContentRight({
         title: {
           formatter: () => '',
         },
-
       },
-
     },
     plotOptions: {
-
       bar: {
-
         horizontal: false,
         barHeight: '28%',
         borderRadius: 2,
         distributed: true,
-
       },
     },
-    legend:{
+    legend: {
       show: false,
     },
     xaxis: {
@@ -157,11 +147,9 @@ export default function DHContentRight({
           colors: theme.palette.text.primary,
           fontSize: '13px',
           fontWeight: '500',
-
         },
-        show:true
+        show: true,
       },
-
     },
 
     ...options,
