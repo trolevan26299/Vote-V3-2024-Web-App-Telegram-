@@ -33,6 +33,7 @@ export default function AccountPopover() {
 
   const { user } = useUser();
   const [userAccess, setUserAccess] = useState<any>();
+  const [urlImageProfile, setUrlImageProfile] = useState<string>('');
 
   const OPTIONS = [
     {
@@ -70,6 +71,7 @@ export default function AccountPopover() {
       file_id: fileId,
     });
     const filePath = response.data.result.file_path;
+    console.log('File path:', filePath);
     return `https://api.telegram.org/file/bot${botToken}/${filePath}`;
   }
   async function getUserProfile(userId: any) {
@@ -86,11 +88,12 @@ export default function AccountPopover() {
       return photoUrl;
     }
     console.log('User has no profile photo.');
-    return null;
+    return '';
   }
   useEffect(() => {
     setUserAccess(telegramContext?.user);
-    getUserProfile(telegramContext?.user?.id);
+    const urlImage = getUserProfile(telegramContext?.user?.id);
+    setUrlImageProfile(urlImage as string);
   }, [telegramContext]);
   return (
     <>
@@ -111,7 +114,7 @@ export default function AccountPopover() {
         }}
       >
         <Avatar
-          src=""
+          src={`${urlImageProfile}`}
           alt={user?.ten_cd}
           sx={{
             width: 36,
