@@ -31,15 +31,15 @@ export default function AccountPopover() {
   const OPTIONS = [
     {
       label: user?.nguoi_nuoc_ngoai === true ? 'Total Shares :' : 'CP Tham Dự :',
-      value: String(user?.cp_tham_du),
+      value: user?.cp_tham_du?.toLocaleString('vi-VN'),
     },
     {
       label: 'Telegram ID :',
       value: String(user?.telegram_id),
     },
     {
-      label: user?.nguoi_nuoc_ngoai === true ? 'Rate Shares :' : 'Tỷ lệ CP tham dự :',
-      value: `${((user?.ty_le_cp_tham_du || 0) * 100).toFixed(6)} %`,
+      label: user?.nguoi_nuoc_ngoai === true ? 'Rate Shares :' : '% CP tham dự :',
+      value: `${((user?.ty_le_cp_tham_du || 0) * 100).toFixed(4)} %`,
     },
   ];
 
