@@ -84,7 +84,13 @@ export default function AppWelcome({
               <Typography>Tỷ lệ tham dự :</Typography>
             </Grid>
             <Grid item xs={4} md={6} lg={8}>
-              <Typography sx={{ fontWeight: 'bold' }}>{join_rate?.toFixed(5)} %</Typography>
+              <Typography sx={{ fontWeight: 'bold' }}>
+                {` ${((join_rate || 0) * 100)
+                  .toFixed(4)
+                  .replace(/(\.[0-9]*[1-9])0+$/, '$1')
+                  .replace(/\.$/, '')}%`}{' '}
+                %
+              </Typography>
             </Grid>
           </Grid>
           <Grid item xs={12} md={6} lg={6}>
