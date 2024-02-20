@@ -245,7 +245,11 @@ export default function SendVoteView() {
     const historySendVoteRef = ref(database, 'poll_process/ls_gui_poll');
     const newRef = push(historySendVoteRef);
     await set(newRef, {
-      ds_poll_id: answerSelect.map((item) => ({ key: item.key, ten_poll: item.ten_poll })),
+      ds_poll_id: answerSelect.map((item) => ({
+        key: item.key,
+        ten_poll: item.ten_poll,
+        ten_poll_en: item.ten_poll_en,
+      })),
       gui_den: shareHolderSelect.map((item) => ({
         ma_cd: item.ma_cd,
         ten_cd: item.ten_cd,
