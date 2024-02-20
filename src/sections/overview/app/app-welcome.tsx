@@ -66,7 +66,9 @@ export default function AppWelcome({
         </Typography>
 
         <Box className="box_content" sx={{ marginTop: '10px' }}>
-          <Typography variant="h5">Thông tin cổ phần của bạn :</Typography>
+          <Typography variant="h5">
+            {foreign ? 'Your stake information:' : 'Thông tin cổ phần của bạn :'}
+          </Typography>
           <Grid container spacing={2} sx={styles.grid_box}>
             <Grid item xs={8} md={6} lg={4}>
               <Typography>{foreign ? 'Shareholder code :' : 'Mã cổ đông :'}</Typography>
