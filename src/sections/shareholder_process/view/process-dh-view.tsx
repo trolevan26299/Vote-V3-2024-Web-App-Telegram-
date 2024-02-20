@@ -32,7 +32,7 @@ import { useUser } from 'src/firebase/user_accesss_provider';
 import { useRouter } from 'src/routes/hooks';
 import { paths } from 'src/routes/paths';
 import { useStringState } from 'src/stores/questionSelectUser.provider';
-import { IHistorySendPoll, IQuestion } from 'src/types/setting';
+import { IHistorySendPoll, IQuestion, ISendPollStatusSuccess } from 'src/types/setting';
 import { IHistoryVoted } from 'src/types/votedh.types';
 import { convertToMilliseconds } from 'src/utils/convertTimeStringToMiliSeconds';
 import { currentTimeUTC7 } from 'src/utils/currentTimeUTC+7';
@@ -53,15 +53,40 @@ export default function ProcessDHView() {
   const [listHistoryVoted, setListHistoryVoted] = useState<IHistoryVoted[]>([]);
   const [totalSharesHolder, setTotalSharesHolder] = useState<any>([]);
   const [isNewQuestion, setIsNewQuestion] = useState(false);
+  const [listSendPollStatusSuccess, setListSendPollStatusSuccess] = useState<
+    ISendPollStatusSuccess[]
+  >([]);
 
   // CODE FOR SELECT QUESTION
   // Handle select question
   const [questionSelect, SetQuestionSelect] = useState<string>(danhSachPollData[0]?.key || '');
+  const listSendPollSuccessByKey = listSendPollStatusSuccess
+    .filter((item) => item.keyQuestion === questionSelect)
+    .flatMap((item) => item.listUserSentSuccess);
+  console.log('listSendPollSuccessByKey', listSendPollSuccessByKey);
 
   const handleChangeSelectQuestion = (event: SelectChangeEvent) => {
     SetQuestionSelect(event.target.value);
   };
 
+  const filterArray =
+    historySendPollData &&
+    historySendPollData.filter(
+      (obj) => obj.ds_poll_id?.some((item) => item.key === questionSelect)
+    );
+  const uniqueGuiDenObjects: any = [];
+
+  filterArray?.forEach((item: any) => {
+    item.gui_den.forEach((obj: any) => {
+      const exists = uniqueGuiDenObjects.some((uniqueObj: any) => uniqueObj.ma_cd === obj.ma_cd);
+      if (!exists) {
+        uniqueGuiDenObjects.push(obj);
+      }
+    });
+  });
+  console.log('uniqueGuiDenObjects:', uniqueGuiDenObjects);
+  const percentProcess = (listSendPollSuccessByKey.length / uniqueGuiDenObjects.length) * 100 || 0;
+  console.log('percentProcess:', percentProcess);
   const pollDataByKey = danhSachPollData.find((poll) => poll.key === questionSelect);
 
   // List result by question
@@ -253,6 +278,30 @@ export default function ProcessDHView() {
 
     fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  useEffect(() => {
+    const userRef = ref(database, FIREBASE_COLLECTION.LOGS_STATUS_SEND_POLL);
+    const onDataChange = (snapshot: DataSnapshot) => {
+      const dataSnapShot = snapshot.exists();
+      if (dataSnapShot) {
+        const logs_status_send_poll = snapshot.val();
+        const logStatusSendPollWithKeys = Object.keys(logs_status_send_poll).map((key) => ({
+          key,
+          ...logs_status_send_poll[key],
+        }));
+
+        setListSendPollStatusSuccess(logStatusSendPollWithKeys);
+      } else {
+        console.log('No data available');
+      }
+    };
+    const unsubscribe = onValue(userRef, onDataChange);
+
+    // Clean up the listener when the component unmounts
+    return () => {
+      // Detach the listener
+      unsubscribe();
+    };
   }, []);
 
   return (

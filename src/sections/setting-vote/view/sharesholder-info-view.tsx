@@ -30,7 +30,9 @@ export default function SharesHolderInfoView() {
         name_shareholder: shareholder?.ten_cd,
         ten_cd: shareholder?.ten_cd,
         cp_so_huu: shareholder?.cp_so_huu?.toString(),
-        ty_le_cp_so_huu: `${shareholder?.ty_le_cp_so_huu?.toFixed(2)}%`,
+        ty_le_cp_so_huu: `${
+          shareholder && shareholder?.ty_le_cp_so_huu && shareholder?.ty_le_cp_so_huu?.toFixed(2)
+        }%`,
         cp_tham_du: shareholder?.cp_tham_du?.toString(),
         ty_le_cp_tham_du: `${(
           ((shareholder?.ty_le_cp_tham_du && shareholder?.ty_le_cp_tham_du) || 0) * 100

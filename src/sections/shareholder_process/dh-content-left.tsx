@@ -131,12 +131,12 @@ export default function DHContentLeft({
         <Stack key="success">
           <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 1 }}>
             {/* <Box sx={{ typography: 'overline' }}>pending</Box> */}
-            <Box sx={{ typography: 'subtitle1' }}>100%</Box>
+            <Box sx={{ typography: 'subtitle1' }}>80%</Box>
           </Stack>
 
           <LinearProgress
             variant="determinate"
-            value={100}
+            value={80}
             sx={{
               height: 8,
               color: (theme3) => alpha(theme3.palette.primary.light, 0.2),
