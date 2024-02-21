@@ -274,6 +274,7 @@ export default function VoteDHView() {
     try {
       await runTransaction(upvotesRef, async (current_value) => {
         const newUpvotes = (current_value || 0) + 1;
+        console.log('current value:', current_value);
         if (!current_value) {
           await set(historyVotedRef, {
             ma_cd: user?.ma_cd,
@@ -281,7 +282,7 @@ export default function VoteDHView() {
           });
         } else if (dataExist) {
           await set(historyVotedRef, {
-            ...current_value,
+            ma_cd: user?.ma_cd,
             detail: [...dataExist.detail, ...selectedAnswers],
           });
         }

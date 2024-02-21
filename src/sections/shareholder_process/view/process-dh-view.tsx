@@ -96,6 +96,7 @@ export default function ProcessDHView() {
     let filteredArray = obj.detail.filter((item) => item.key_question === questionSelect);
     filteredArray = filteredArray.map((item) => ({ ...item, ma_cd: obj.ma_cd }));
     //  push các object trong filteredArray vào result
+
     listResultByQuestion.push(...filteredArray);
   }
 
