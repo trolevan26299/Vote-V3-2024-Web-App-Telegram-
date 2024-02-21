@@ -262,32 +262,31 @@ export default function VoteDHView() {
   //     console.log('Error saving data:', error);
   //   }
   // };
-
   const handleSubmitVote = async () => {
-    const dataExist =
-      listHistoryVoted.length > 0
-        ? listHistoryVoted.find((item) => item?.ma_cd === user?.ma_cd)
-        : undefined; // Tìm xem đã gửi voted lần nào chưa
-    const historyVotedRef = ref(
-      database,
-      `poll_process/ls_poll/${dataExist ? dataExist?.key : ''}`
-    ); // nếu có rồi đổi ref để chỉnh sửa , nếu chưa ref để thêm mới
-
+    const dataExist = listHistoryVoted.find((item) => item?.ma_cd === user?.ma_cd);
+    const historyVotedRef = ref(database, `poll_process/ls_poll/${dataExist ? dataExist.key : ''}`);
     const upvotesRef = ref(
       database,
       'server/saving-data/fireblog/posts/-JRHTHaIs-jNPLXOQivY/upvotes'
     );
+
     try {
-      updateHistorySendPoll();
       await runTransaction(
         upvotesRef,
         async (current_value) => {
           const newUpvotes = (current_value || 0) + 1;
-          const newRef = push(historyVotedRef);
-          await update(dataExist ? historyVotedRef : newRef, {
-            ma_cd: user?.ma_cd,
-            detail: dataExist ? [...dataExist.detail, ...selectedAnswers] : selectedAnswers,
-          });
+          if (!dataExist) {
+            const newRef = push(historyVotedRef);
+            await set(newRef, {
+              ma_cd: user?.ma_cd,
+              detail: selectedAnswers,
+            });
+          } else {
+            await update(historyVotedRef, {
+              ma_cd: user?.ma_cd,
+              detail: [...dataExist.detail, ...selectedAnswers],
+            });
+          }
           return newUpvotes;
         },
         { applyLocally: false }
