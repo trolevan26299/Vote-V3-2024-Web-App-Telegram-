@@ -215,9 +215,7 @@ export default function VoteDHView() {
           : undefined; // Tìm xem đã gửi voted lần nào chưa
 
       const historyVotedRef = ref(database, `poll_process/ls_poll`);
-      const transactionRef = dataExist
-        ? child(historyVotedRef, dataExist.key)
-        : push(historyVotedRef);
+      const transactionRef = dataExist ? child(historyVotedRef, dataExist.key) : historyVotedRef; // Sử dụng tham chiếu gốc nếu không có dữ liệu tồn tại
 
       await runTransaction(transactionRef, async (currentData) => {
         if (!currentData) {
