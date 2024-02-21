@@ -279,10 +279,10 @@ export default function VoteDHView() {
             ma_cd: user?.ma_cd,
             detail: selectedAnswersData,
           });
-        } else {
+        } else if (dataExist) {
           await set(historyVotedRef, {
             ...current_value,
-            detail: [...current_value.detail, ...selectedAnswers],
+            detail: [...dataExist.detail, ...selectedAnswers],
           });
         }
         return newUpvotes;
