@@ -302,6 +302,49 @@ export default function VoteDHView() {
   //   }
   // };
 
+  // const handleSubmitVote = async () => {
+  //   const dataExist = listHistoryVoted.find((item) => item?.ma_cd === user?.ma_cd);
+  //   // let historyVotedRef
+
+  //   // if (dataExist) {
+  //   //   historyVotedRef = ref(database, `poll_process/ls_poll/${dataExist.key}`);
+  //   // } else {
+  //   //   historyVotedRef = push(child(ref(database), 'poll_process/ls_poll'));
+  //   // }
+  //   const historyVotedRef = ref(database, `poll_process/ls_poll`);
+  //   console.log('historyVotedRef', historyVotedRef);
+
+  //   try {
+  //     console.log('có vào trye');
+  //     await runTransaction(historyVotedRef, async (currentData) => {
+  //       console.log('current data :', currentData);
+  //       if (currentData === null) {
+  //         console.log('có vào if');
+  //         // If there's no existing data, add new data
+  //         return {
+  //           ma_cd: user?.ma_cd,
+  //           detail: selectedAnswers,
+  //         };
+  //       }
+  //       // If there's existing data, update it
+  //       return {
+  //         ma_cd: user?.ma_cd,
+  //         detail: [...currentData.detail, ...selectedAnswers],
+  //       };
+  //     });
+
+  //     updateHistorySendPoll();
+  //     updateStringValue(selectedAnswers[0].key_question);
+  //     enqueueSnackbar(
+  //       user && user.nguoi_nuoc_ngoai === true ? 'Send Success !' : 'Gửi ý kiến thành công  !',
+  //       { variant: 'success' }
+  //     );
+  //   } catch (error) {
+  //     enqueueSnackbar('Gửi ý kiến lỗi !', { variant: 'error' });
+  //     console.log('Error saving data:', error);
+  //   }
+  // };
+
   const handleSubmitVote = async () => {
     const dataExist = listHistoryVoted.find((item) => item?.ma_cd === user?.ma_cd);
     // let historyVotedRef
@@ -311,8 +354,7 @@ export default function VoteDHView() {
     // } else {
     //   historyVotedRef = push(child(ref(database), 'poll_process/ls_poll'));
     // }
-    const historyVotedRef = ref(database, `poll_process/ls_poll`);
-    console.log('historyVotedRef', historyVotedRef);
+    const historyVotedRef = ref(database, 'ls_poll');
 
     try {
       console.log('có vào trye');
