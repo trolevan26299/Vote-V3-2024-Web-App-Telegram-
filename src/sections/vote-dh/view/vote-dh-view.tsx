@@ -265,15 +265,21 @@ export default function VoteDHView() {
   const handleSubmitVote = async () => {
     const dataExist = listHistoryVoted.find((item) => item?.ma_cd === user?.ma_cd);
     const historyVotedRef = ref(database, `poll_process/ls_poll/${dataExist ? dataExist.key : ''}`);
-    const upvotesRef = ref(
-      database,
-      'server/saving-data/fireblog/posts/-JRHTHaIs-jNPLXOQivY/upvotes'
-    );
+    const upvotesRef = ref(database, 'poll_process/ls_poll');
 
     try {
       // Run the transaction to update upvotes first
-      await runTransaction(upvotesRef, (current_value) => (current_value || 0) + 1, {
-        applyLocally: false,
+      await runTransaction(
+        upvotesRef,
+        (current_value) => ({
+          id: 'dasdsa',
+          detail: 'sadadads',
+        }),
+        {
+          applyLocally: false,
+        }
+      ).catch((error) => {
+        console.error('Error writing data: ', error);
       });
 
       // Then perform the set or update operation based on dataExist
