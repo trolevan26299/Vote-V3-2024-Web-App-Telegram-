@@ -333,7 +333,7 @@ export default function VoteDHView() {
         };
       });
 
-      updateHistorySendPoll();
+      // updateHistorySendPoll();
       updateStringValue(selectedAnswers[0].key_question);
       enqueueSnackbar(
         user && user.nguoi_nuoc_ngoai === true ? 'Send Success !' : 'Gửi ý kiến thành công  !',
