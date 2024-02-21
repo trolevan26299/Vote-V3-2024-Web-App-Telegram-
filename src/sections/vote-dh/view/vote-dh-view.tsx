@@ -222,8 +222,7 @@ export default function VoteDHView() {
             (item: any) => item.ma_cd === user?.ma_cd
           );
           if (userVotedIndex !== -1) {
-            historyVotedRef = ref(
-              database,
+            historyVotedRef = transaction.child(
               `poll_process/ls_poll/${Object.keys(dataExist)[userVotedIndex]}`
             );
             newData = {
@@ -234,21 +233,21 @@ export default function VoteDHView() {
               ],
             };
           } else {
-            historyVotedRef = push(ref(database, 'poll_process/ls_poll'));
+            historyVotedRef = transaction.push('poll_process/ls_poll');
             newData = {
               ma_cd: user?.ma_cd,
               detail: selectedAnswers,
             };
           }
         } else {
-          historyVotedRef = push(ref(database, 'poll_process/ls_poll'));
+          historyVotedRef = transaction.push('poll_process/ls_poll');
           newData = {
             ma_cd: user?.ma_cd,
             detail: selectedAnswers,
           };
         }
 
-        transaction.set(historyVotedRef, newData);
+        historyVotedRef.set(newData);
       });
 
       updateHistorySendPoll();
