@@ -222,6 +222,7 @@ export default function VoteDHView() {
       console.log('có chạy vào try');
       const newRef = push(historyVotedRef);
       await runTransaction(dataExist ? historyVotedRef : newRef, async (currentData) => {
+        console.log('currentData', currentData);
         if (!currentData) {
           console.log('dữ liệu chưa tồn tại');
           // Nếu dữ liệu chưa tồn tại, tạo mới
