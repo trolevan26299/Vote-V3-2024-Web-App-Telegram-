@@ -310,11 +310,6 @@ export default function VoteDHView() {
       historyVotedRef = ref(database, `poll_process/ls_poll/${dataExist.key}`);
     } else {
       historyVotedRef = push(child(ref(database), 'poll_process/ls_poll'));
-      // Set initial data for the new reference
-      await update(historyVotedRef, {
-        ma_cd: user?.ma_cd,
-        detail: selectedAnswers,
-      });
     }
 
     console.log('historyVotedRef', historyVotedRef);
@@ -322,7 +317,8 @@ export default function VoteDHView() {
     try {
       console.log('có vào trye');
       await runTransaction(historyVotedRef, async (currentData) => {
-        if (!currentData) {
+        console.log('current data :', currentData);
+        if (currentData === null) {
           console.log('có vào if');
           // If there's no existing data, add new data
           return {
