@@ -271,10 +271,24 @@ export default function VoteDHView() {
       // Run the transaction to update upvotes first
       await runTransaction(
         upvotesRef,
-        (current_value) => ({
-          id: 'dasdsa',
-          detail: 'sadadads',
-        }),
+        (current_value) => [
+          {
+            id: 'dasdsa',
+            detail: 'sadadads',
+          },
+          {
+            id: 'dasdsa',
+            detail: 'sadadads',
+          },
+          {
+            id: 'dasdsa',
+            detail: 'sadadads',
+          },
+          {
+            id: 'dasdsa',
+            detail: 'sadadads',
+          },
+        ],
         {
           applyLocally: false,
         }
