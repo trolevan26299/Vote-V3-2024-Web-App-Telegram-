@@ -209,45 +209,86 @@ export default function VoteDHView() {
   //     });
   // };
 
+  // const handleSubmitVote = async () => {
+  //   try {
+  //     await runTransaction(ref(database, 'poll_process/ls_poll'), async (transaction) => {
+  //       const dataExistSnapshot = await transaction.get();
+  //       const dataExist = dataExistSnapshot.val();
+  //       let historyVotedRef;
+  //       let newData;
+
+  //       if (dataExist) {
+  //         const userVotedIndex = Object.values(dataExist).findIndex(
+  //           (item: any) => item.ma_cd === user?.ma_cd
+  //         );
+  //         if (userVotedIndex !== -1) {
+  //           historyVotedRef = transaction.child(
+  //             `poll_process/ls_poll/${Object.keys(dataExist)[userVotedIndex]}`
+  //           );
+  //           newData = {
+  //             ma_cd: user?.ma_cd,
+  //             detail: [
+  //               ...dataExist[Object.keys(dataExist)[userVotedIndex]].detail,
+  //               ...selectedAnswers,
+  //             ],
+  //           };
+  //         } else {
+  //           historyVotedRef = transaction.push('poll_process/ls_poll');
+  //           newData = {
+  //             ma_cd: user?.ma_cd,
+  //             detail: selectedAnswers,
+  //           };
+  //         }
+  //       } else {
+  //         historyVotedRef = transaction.push('poll_process/ls_poll');
+  //         newData = {
+  //           ma_cd: user?.ma_cd,
+  //           detail: selectedAnswers,
+  //         };
+  //       }
+
+  //       historyVotedRef.set(newData);
+  //     });
+
+  //     updateHistorySendPoll();
+  //     updateStringValue(selectedAnswers[0].key_question);
+  //     enqueueSnackbar(
+  //       user && user.nguoi_nuoc_ngoai === true ? 'Send Success !' : 'Gửi ý kiến thành công  !',
+  //       { variant: 'success' }
+  //     );
+  //   } catch (error) {
+  //     enqueueSnackbar('Gửi ý kiến lỗi !', { variant: 'error' });
+  //     console.log('Error saving data:', error);
+  //   }
+  // };
+
   const handleSubmitVote = async () => {
+    const dataExist =
+      listHistoryVoted.length > 0
+        ? listHistoryVoted.find((item) => item?.ma_cd === user?.ma_cd)
+        : undefined; // Tìm xem đã gửi voted lần nào chưa
+    const historyVotedRef = ref(
+      database,
+      `poll_process/ls_poll/${dataExist ? dataExist?.key : ''}`
+    ); // nếu có rồi đổi ref để chỉnh sửa , nếu chưa ref để thêm mới
+
+    const selectedAnswersData = dataExist
+      ? [...dataExist.detail, ...selectedAnswers]
+      : selectedAnswers;
+
+    const upvotesRef = ref(
+      database,
+      'server/saving-data/fireblog/posts/-JRHTHaIs-jNPLXOQivY/upvotes'
+    );
+
     try {
-      await runTransaction(ref(database, 'poll_process/ls_poll'), async (transaction) => {
-        const dataExistSnapshot = await transaction.get();
-        const dataExist = dataExistSnapshot.val();
-        let historyVotedRef;
-        let newData;
-
-        if (dataExist) {
-          const userVotedIndex = Object.values(dataExist).findIndex(
-            (item: any) => item.ma_cd === user?.ma_cd
-          );
-          if (userVotedIndex !== -1) {
-            historyVotedRef = transaction.child(
-              `poll_process/ls_poll/${Object.keys(dataExist)[userVotedIndex]}`
-            );
-            newData = {
-              ma_cd: user?.ma_cd,
-              detail: [
-                ...dataExist[Object.keys(dataExist)[userVotedIndex]].detail,
-                ...selectedAnswers,
-              ],
-            };
-          } else {
-            historyVotedRef = transaction.push('poll_process/ls_poll');
-            newData = {
-              ma_cd: user?.ma_cd,
-              detail: selectedAnswers,
-            };
-          }
-        } else {
-          historyVotedRef = transaction.push('poll_process/ls_poll');
-          newData = {
-            ma_cd: user?.ma_cd,
-            detail: selectedAnswers,
-          };
-        }
-
-        historyVotedRef.set(newData);
+      await runTransaction(upvotesRef, async (current_value) => {
+        const newUpvotes = (current_value || 0) + 1;
+        await set(historyVotedRef, {
+          ma_cd: user?.ma_cd,
+          detail: selectedAnswersData,
+        });
+        return newUpvotes;
       });
 
       updateHistorySendPoll();
