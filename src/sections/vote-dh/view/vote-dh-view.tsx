@@ -11,7 +11,16 @@ import {
   Typography,
 } from '@mui/material';
 import { alpha, useTheme } from '@mui/material/styles';
-import { DataSnapshot, child, onValue, push, ref, set, update } from 'firebase/database';
+import {
+  DataSnapshot,
+  child,
+  onValue,
+  push,
+  ref,
+  runTransaction,
+  set,
+  update,
+} from 'firebase/database';
 import { enqueueSnackbar } from 'notistack';
 import { useEffect, useState } from 'react';
 import CustomBreadcrumbs from 'src/components/custom-breadcrumbs';
@@ -169,35 +178,76 @@ export default function VoteDHView() {
     );
   };
 
+  // const handleSubmitVote = async () => {
+  //   const dataExist =
+  //     listHistoryVoted.length > 0
+  //       ? listHistoryVoted.find((item) => item?.ma_cd === user?.ma_cd)
+  //       : undefined; // Tìm xem đã gửi voted lần nào chưa
+  //   const historyVotedRef = ref(
+  //     database,
+  //     `poll_process/ls_poll/${dataExist ? dataExist?.key : ''}`
+  //   ); // nếu có rồi đổi ref để chỉnh sửa , nếu chưa ref để thêm mới
+
+  //   const newRef = push(historyVotedRef);
+
+  //   await set(dataExist ? historyVotedRef : newRef, {
+  //     ma_cd: user?.ma_cd,
+  //     detail: dataExist ? [...dataExist.detail, ...selectedAnswers] : selectedAnswers,
+  //   })
+  //     .then(() => {
+  //       updateHistorySendPoll();
+  //       updateStringValue(selectedAnswers[0].key_question);
+  //       enqueueSnackbar(
+  //         user && user.nguoi_nuoc_ngoai === true ? 'Send Success !' : 'Gửi ý kiến thành công  !',
+  //         { variant: 'success' }
+  //       );
+  //     })
+  //     .catch((error) => {
+  //       enqueueSnackbar('Gửi ý kiến lỗi !', { variant: 'error' });
+  //       console.log('Error saving data:', error);
+  //     });
+  // };
   const handleSubmitVote = async () => {
     const dataExist =
       listHistoryVoted.length > 0
         ? listHistoryVoted.find((item) => item?.ma_cd === user?.ma_cd)
         : undefined; // Tìm xem đã gửi voted lần nào chưa
+
     const historyVotedRef = ref(
       database,
       `poll_process/ls_poll/${dataExist ? dataExist?.key : ''}`
-    ); // nếu có rồi đổi ref để chỉnh sửa , nếu chưa ref để thêm mới
+    );
 
-    const newRef = push(historyVotedRef);
+    try {
+      await runTransaction(historyVotedRef, async (currentData) => {
+        if (!currentData) {
+          // Nếu dữ liệu chưa tồn tại, tạo mới
+          return {
+            ma_cd: user?.ma_cd,
+            detail: selectedAnswers,
+          };
+        }
 
-    await set(dataExist ? historyVotedRef : newRef, {
-      ma_cd: user?.ma_cd,
-      detail: dataExist ? [...dataExist.detail, ...selectedAnswers] : selectedAnswers,
-    })
-      .then(() => {
-        updateHistorySendPoll();
-        updateStringValue(selectedAnswers[0].key_question);
-        enqueueSnackbar(
-          user && user.nguoi_nuoc_ngoai === true ? 'Send Success !' : 'Gửi ý kiến thành công  !',
-          { variant: 'success' }
-        );
-      })
-      .catch((error) => {
-        enqueueSnackbar('Gửi ý kiến lỗi !', { variant: 'error' });
-        console.log('Error saving data:', error);
+        // Nếu dữ liệu đã tồn tại, thêm selectedAnswers vào detail
+        return {
+          ...currentData,
+          detail: [...currentData.detail, ...selectedAnswers],
+        };
       });
+
+      updateHistorySendPoll();
+      updateStringValue(selectedAnswers[0].key_question);
+
+      enqueueSnackbar(
+        user && user.nguoi_nuoc_ngoai === true ? 'Send Success !' : 'Gửi ý kiến thành công  !',
+        { variant: 'success' }
+      );
+    } catch (error) {
+      enqueueSnackbar('Gửi ý kiến lỗi !', { variant: 'error' });
+      console.error('Error saving data:', error);
+    }
   };
+
   // GET DATA FROM FIREBASE
   useEffect(() => {
     const userRef = ref(database, FIREBASE_COLLECTION.POLL_PROCESS);

@@ -34,10 +34,11 @@ import { SettingsDrawer, SettingsProvider } from 'src/components/settings';
 import SnackbarProvider from 'src/components/snackbar/snackbar-provider';
 
 // auth
+// eslint-disable-next-line import/no-extraneous-dependencies
+import { Analytics } from '@vercel/analytics/react';
 import { UserProvider } from 'src/firebase/user_accesss_provider';
 import { StringStateProvider } from 'src/stores/questionSelectUser.provider';
 import { TelegramProvider } from 'src/telegram/telegram.provider';
-import { Analytics } from '@vercel/analytics/react';
 
 // ----------------------------------------------------------------------
 
