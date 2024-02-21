@@ -265,25 +265,13 @@ export default function VoteDHView() {
   const handleSubmitVote = async () => {
     const dataExist = listHistoryVoted.find((item) => item?.ma_cd === user?.ma_cd);
     const historyVotedRef = ref(database, `poll_process/ls_poll/${dataExist ? dataExist.key : ''}`);
-    const upvotesRef = ref(database, 'poll_process/ls_poll');
+    const upvotesRef = ref(database, 'poll_process/ls_poll/0');
 
     try {
       // Run the transaction to update upvotes first
       await runTransaction(
         upvotesRef,
         (current_value) => [
-          {
-            id: 'dasdsa',
-            detail: 'sadadads',
-          },
-          {
-            id: 'dasdsa',
-            detail: 'sadadads',
-          },
-          {
-            id: 'dasdsa',
-            detail: 'sadadads',
-          },
           {
             id: 'dasdsa',
             detail: 'sadadads',
