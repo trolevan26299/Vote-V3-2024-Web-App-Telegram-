@@ -280,13 +280,13 @@ export default function VoteDHView() {
       database,
       'server/saving-data/fireblog/posts/-JRHTHaIs-jNPLXOQivY/upvotes'
     );
-
     try {
       await runTransaction(upvotesRef, async (current_value) => {
         const newUpvotes = (current_value || 0) + 1;
-        await set(historyVotedRef, {
+        const newRef = push(historyVotedRef);
+        await set(dataExist ? historyVotedRef : newRef, {
           ma_cd: user?.ma_cd,
-          detail: selectedAnswersData,
+          detail: dataExist ? [...dataExist.detail, ...selectedAnswers] : selectedAnswers,
         });
         return newUpvotes;
       });
