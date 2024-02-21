@@ -88,6 +88,7 @@ export default function VoteDHView() {
       updatedSelectedAnswers[existingAnswerIndex].answer_select_id = selectedAnswerId;
       updatedSelectedAnswers[existingAnswerIndex].time_voted = currentTimeUTC7();
       updatedSelectedAnswers[existingAnswerIndex].key_history_send_poll = key_history_send_poll;
+      updatedSelectedAnswers[existingAnswerIndex].ma_cd = user?.ma_cd;
       setSelectedAnswers(updatedSelectedAnswers);
     } else {
       // Nếu chưa chọn, thêm vào danh sách
@@ -294,13 +295,12 @@ export default function VoteDHView() {
           const newUpvotes = (current_value || 0) + 1;
           const newRef = push(historyVotedRef);
           const updateData = {
-            ma_cd: user?.ma_cd,
             detail: dataExist ? [...dataExist.detail, ...selectedAnswers] : selectedAnswers,
           };
           if (dataExist) {
             updateData.detail = selectedAnswersData;
           }
-          await update(historyVotedRef, updateData);
+          await update(dataExist ? historyVotedRef : newRef, updateData);
           return newUpvotes;
         },
         { applyLocally: false }
