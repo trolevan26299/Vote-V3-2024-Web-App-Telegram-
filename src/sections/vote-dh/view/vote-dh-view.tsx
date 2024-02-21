@@ -257,32 +257,27 @@ export default function VoteDHView() {
       listHistoryVoted.length > 0
         ? listHistoryVoted.find((item) => item?.ma_cd === user?.ma_cd)
         : undefined; // Tìm xem đã gửi voted lần nào chưa
-    const historyVotedRef = ref(
-      database,
-      `poll_process/ls_poll/${dataExist ? dataExist?.key : ''}`
-    ); // nếu có rồi đổi ref để chỉnh sửa , nếu chưa ref để thêm mới
+
+    const historyVotedRef = ref(database, `poll_process/ls_poll`);
 
     const selectedAnswersData = dataExist
       ? [...dataExist.detail, ...selectedAnswers]
       : selectedAnswers;
-
-    const upvotesRef = ref(
-      database,
-      'server/saving-data/fireblog/posts/-JRHTHaIs-jNPLXOQivY/upvotes'
-    );
-
+    const newRef = push(historyVotedRef);
     try {
-      await runTransaction(upvotesRef, async (current_value) => {
-        const newUpvotes = (current_value || 0) + 1;
-        console.log('current value:', current_value);
-        const newRef = push(historyVotedRef);
-        if (!current_value) {
-          await set(dataExist ? historyVotedRef : newRef, {
+      await runTransaction(dataExist ? historyVotedRef : newRef, async (currentData) => {
+        if (!currentData) {
+          // Nếu dữ liệu chưa tồn tại, tạo mới một mảng với key mới
+          return {
             ma_cd: user?.ma_cd,
-            detail: dataExist ? [...dataExist.detail, ...selectedAnswers] : selectedAnswers,
-          });
+            detail: selectedAnswersData,
+          };
         }
-        return newUpvotes;
+        // Nếu dữ liệu đã tồn tại, thêm selectedAnswers vào detail của key tìm được
+        return {
+          ...currentData,
+          detail: [...currentData.detail, ...selectedAnswers],
+        };
       });
 
       updateHistorySendPoll();
