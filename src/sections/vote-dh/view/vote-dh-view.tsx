@@ -213,15 +213,12 @@ export default function VoteDHView() {
         ? listHistoryVoted.find((item) => item?.ma_cd === user?.ma_cd)
         : undefined; // Tìm xem đã gửi voted lần nào chưa
     console.log('dataExist', dataExist);
-    const historyVotedRef = ref(
-      database,
-      `poll_process/ls_poll/${dataExist ? dataExist?.key : ''}`
-    );
+    const historyVotedRef = ref(database, `poll_process/ls_poll`);
     console.log('historyVotedRef', historyVotedRef);
     try {
       console.log('có chạy vào try');
       const newRef = push(historyVotedRef);
-      await runTransaction(dataExist ? historyVotedRef : newRef, async (currentData) => {
+      await runTransaction(historyVotedRef, async (currentData) => {
         console.log('currentData', currentData);
         if (!currentData) {
           console.log('dữ liệu chưa tồn tại');
@@ -251,6 +248,50 @@ export default function VoteDHView() {
       console.error('Error saving data:', error);
     }
   };
+  // const handleSubmitVote = async () => {
+  //   const dataExist =
+  //     listHistoryVoted.length > 0
+  //       ? listHistoryVoted.find((item) => item?.ma_cd === user?.ma_cd)
+  //       : undefined; // Tìm xem đã gửi voted lần nào chưa
+  //   console.log('dataExist', dataExist);
+  //   const historyVotedRef = ref(
+  //     database,
+  //     `poll_process/ls_poll/${dataExist ? dataExist?.key : ''}`
+  //   );
+  //   console.log('historyVotedRef', historyVotedRef);
+  //   try {
+  //     console.log('có chạy vào try');
+  //     const newRef = push(historyVotedRef);
+  //     await runTransaction(dataExist ? historyVotedRef : newRef, async (currentData) => {
+  //       console.log('currentData', currentData);
+  //       if (!currentData) {
+  //         console.log('dữ liệu chưa tồn tại');
+  //         // Nếu dữ liệu chưa tồn tại, tạo mới
+  //         return {
+  //           ma_cd: user?.ma_cd,
+  //           detail: selectedAnswers,
+  //         };
+  //       }
+
+  //       // Nếu dữ liệu đã tồn tại, thêm selectedAnswers vào detail
+  //       return {
+  //         ...currentData,
+  //         detail: [...currentData.detail, ...selectedAnswers],
+  //       };
+  //     });
+
+  //     updateHistorySendPoll();
+  //     updateStringValue(selectedAnswers[0].key_question);
+
+  //     enqueueSnackbar(
+  //       user && user.nguoi_nuoc_ngoai === true ? 'Send Success !' : 'Gửi ý kiến thành công  !',
+  //       { variant: 'success' }
+  //     );
+  //   } catch (error) {
+  //     enqueueSnackbar('Gửi ý kiến lỗi !', { variant: 'error' });
+  //     console.error('Error saving data:', error);
+  //   }
+  // };
   // const handleSubmitVote = async () => {
   //   const dataExist =
   //     listHistoryVoted.length > 0
