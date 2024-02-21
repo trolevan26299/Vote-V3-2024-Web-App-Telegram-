@@ -14,6 +14,7 @@ import { alpha, useTheme } from '@mui/material/styles';
 import {
   DataSnapshot,
   child,
+  get,
   onValue,
   push,
   ref,
@@ -210,31 +211,55 @@ export default function VoteDHView() {
 
   const handleSubmitVote = async () => {
     try {
-      const dataExist =
-        listHistoryVoted.length > 0
-          ? listHistoryVoted.find((item) => item?.ma_cd === user?.ma_cd)
-          : undefined; // Tìm xem đã gửi voted lần nào chưa
+      await runTransaction(ref(database, 'poll_process/ls_poll'), async (transaction) => {
+        const dataExistSnapshot = await transaction.get();
+        const dataExist = dataExistSnapshot.val();
+        let historyVotedRef;
+        let newData;
 
-      const historyVotedRef = ref(database, `poll_process/ls_poll`);
-      const transactionRef = dataExist
-        ? child(historyVotedRef, dataExist.key)
-        : push(historyVotedRef); // Sử dụng push để tạo một nút mới nếu không có dữ liệu tồn tại
+        if (dataExist) {
+          const userVotedIndex = Object.values(dataExist).findIndex(
+            (item: any) => item.ma_cd === user?.ma_cd
+          );
+          if (userVotedIndex !== -1) {
+            historyVotedRef = ref(
+              database,
+              `poll_process/ls_poll/${Object.keys(dataExist)[userVotedIndex]}`
+            );
+            newData = {
+              ma_cd: user?.ma_cd,
+              detail: [
+                ...dataExist[Object.keys(dataExist)[userVotedIndex]].detail,
+                ...selectedAnswers,
+              ],
+            };
+          } else {
+            historyVotedRef = push(ref(database, 'poll_process/ls_poll'));
+            newData = {
+              ma_cd: user?.ma_cd,
+              detail: selectedAnswers,
+            };
+          }
+        } else {
+          historyVotedRef = push(ref(database, 'poll_process/ls_poll'));
+          newData = {
+            ma_cd: user?.ma_cd,
+            detail: selectedAnswers,
+          };
+        }
 
-      await set(transactionRef, {
-        ma_cd: user?.ma_cd,
-        detail: dataExist ? [...dataExist.detail, ...selectedAnswers] : selectedAnswers,
+        transaction.set(historyVotedRef, newData);
       });
 
       updateHistorySendPoll();
       updateStringValue(selectedAnswers[0].key_question);
-
       enqueueSnackbar(
         user && user.nguoi_nuoc_ngoai === true ? 'Send Success !' : 'Gửi ý kiến thành công  !',
         { variant: 'success' }
       );
     } catch (error) {
       enqueueSnackbar('Gửi ý kiến lỗi !', { variant: 'error' });
-      console.error('Error saving data:', error);
+      console.log('Error saving data:', error);
     }
   };
 
