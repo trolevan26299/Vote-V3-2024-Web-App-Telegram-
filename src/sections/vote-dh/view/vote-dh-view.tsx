@@ -304,13 +304,21 @@ export default function VoteDHView() {
 
   const handleSubmitVote = async () => {
     const dataExist = listHistoryVoted.find((item) => item?.ma_cd === user?.ma_cd);
-    let historyVotedRef = ref(database, `poll_process/ls_poll/${dataExist ? dataExist.key : ''}`);
+    let historyVotedRef;
+
     if (dataExist) {
       historyVotedRef = ref(database, `poll_process/ls_poll/${dataExist.key}`);
     } else {
       historyVotedRef = push(child(ref(database), 'poll_process/ls_poll'));
+      // Set initial data for the new reference
+      await set(historyVotedRef, {
+        ma_cd: user?.ma_cd,
+        detail: selectedAnswers,
+      });
     }
+
     console.log('historyVotedRef', historyVotedRef);
+
     try {
       console.log('có vào trye');
       await runTransaction(historyVotedRef, async (currentData) => {
