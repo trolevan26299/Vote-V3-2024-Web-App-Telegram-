@@ -268,10 +268,17 @@ export default function VoteDHView() {
     try {
       await runTransaction(upvotesRef, async (current_value) => {
         const newUpvotes = (current_value || 0) + 1;
-        await set(historyVotedRef, {
-          ma_cd: user?.ma_cd,
-          detail: selectedAnswersData,
-        });
+        if (!current_value) {
+          await set(historyVotedRef, {
+            ma_cd: user?.ma_cd,
+            detail: selectedAnswersData,
+          });
+        } else {
+          await set(historyVotedRef, {
+            ...current_value,
+            detail: [...current_value.detail, ...selectedAnswers],
+          });
+        }
         return newUpvotes;
       });
 
