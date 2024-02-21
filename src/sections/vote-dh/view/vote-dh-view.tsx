@@ -208,17 +208,19 @@ export default function VoteDHView() {
   //     });
   // };
   const handleSubmitVote = async () => {
-    const dataExist =
-      listHistoryVoted.length > 0
-        ? listHistoryVoted.find((item) => item?.ma_cd === user?.ma_cd)
-        : undefined; // Tìm xem đã gửi voted lần nào chưa
-    const historyVotedRef = ref(database, `poll_process/ls_poll`);
     try {
-      const newRef = push(historyVotedRef);
-      await runTransaction(newRef, async (currentData) => {
-        console.log('currentData', currentData);
+      const dataExist =
+        listHistoryVoted.length > 0
+          ? listHistoryVoted.find((item) => item?.ma_cd === user?.ma_cd)
+          : undefined; // Tìm xem đã gửi voted lần nào chưa
+
+      const historyVotedRef = ref(database, `poll_process/ls_poll`);
+      const transactionRef = dataExist
+        ? child(historyVotedRef, dataExist.key)
+        : push(historyVotedRef);
+
+      await runTransaction(transactionRef, async (currentData) => {
         if (!currentData) {
-          console.log('dữ liệu chưa tồn tại');
           // Nếu dữ liệu chưa tồn tại, tạo mới
           return {
             ma_cd: user?.ma_cd,
@@ -245,6 +247,7 @@ export default function VoteDHView() {
       console.error('Error saving data:', error);
     }
   };
+
   // const handleSubmitVote = async () => {
   //   const dataExist =
   //     listHistoryVoted.length > 0
