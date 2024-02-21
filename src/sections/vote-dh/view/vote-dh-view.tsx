@@ -213,10 +213,7 @@ export default function VoteDHView() {
         ? listHistoryVoted.find((item) => item?.ma_cd === user?.ma_cd)
         : undefined; // Tìm xem đã gửi voted lần nào chưa
     console.log('dataExist', dataExist);
-    const historyVotedRef = ref(
-      database,
-      `poll_process/ls_poll/${dataExist ? dataExist?.key : ''}`
-    );
+    const historyVotedRef = ref(database, `poll_process/ls_poll`);
     console.log('historyVotedRef', historyVotedRef);
     try {
       console.log('có chạy vào try');
