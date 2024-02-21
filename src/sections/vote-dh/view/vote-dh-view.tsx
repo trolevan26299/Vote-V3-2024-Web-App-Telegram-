@@ -281,26 +281,30 @@ export default function VoteDHView() {
       'server/saving-data/fireblog/posts/-JRHTHaIs-jNPLXOQivY/upvotes'
     );
     try {
-      await runTransaction(upvotesRef, async (current_value) => {
-        // const newUpvotes = (current_value || 0) + 1;
-        // const newRef = push(historyVotedRef);
-        // await set(dataExist ? historyVotedRef : newRef, {
-        //   ma_cd: user?.ma_cd,
-        //   detail: dataExist ? [...dataExist.detail, ...selectedAnswers] : selectedAnswers,
-        // });
-        // return newUpvotes;
-        const newUpvotes = (current_value || 0) + 1;
-        const newRef = push(historyVotedRef);
-        const updateData = {
-          ma_cd: user?.ma_cd,
-          detail: dataExist ? [...dataExist.detail, ...selectedAnswers] : selectedAnswers,
-        };
-        if (dataExist) {
-          updateData.detail = selectedAnswersData;
-        }
-        await update(historyVotedRef, updateData);
-        return newUpvotes;
-      });
+      await runTransaction(
+        upvotesRef,
+        async (current_value) => {
+          // const newUpvotes = (current_value || 0) + 1;
+          // const newRef = push(historyVotedRef);
+          // await set(dataExist ? historyVotedRef : newRef, {
+          //   ma_cd: user?.ma_cd,
+          //   detail: dataExist ? [...dataExist.detail, ...selectedAnswers] : selectedAnswers,
+          // });
+          // return newUpvotes;
+          const newUpvotes = (current_value || 0) + 1;
+          const newRef = push(historyVotedRef);
+          const updateData = {
+            ma_cd: user?.ma_cd,
+            detail: dataExist ? [...dataExist.detail, ...selectedAnswers] : selectedAnswers,
+          };
+          if (dataExist) {
+            updateData.detail = selectedAnswersData;
+          }
+          await update(historyVotedRef, updateData);
+          return newUpvotes;
+        },
+        { applyLocally: false }
+      );
 
       updateHistorySendPoll();
       updateStringValue(selectedAnswers[0].key_question);
