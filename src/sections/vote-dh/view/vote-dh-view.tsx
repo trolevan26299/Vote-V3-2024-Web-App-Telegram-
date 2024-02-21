@@ -271,26 +271,25 @@ export default function VoteDHView() {
     );
 
     try {
-      await runTransaction(
-        upvotesRef,
-        async (current_value) => {
-          const newUpvotes = (current_value || 0) + 1;
-          if (!dataExist) {
-            const newRef = push(historyVotedRef);
-            await set(newRef, {
-              ma_cd: user?.ma_cd,
-              detail: selectedAnswers,
-            });
-          } else {
-            await update(historyVotedRef, {
-              ma_cd: user?.ma_cd,
-              detail: [...dataExist.detail, ...selectedAnswers],
-            });
-          }
-          return newUpvotes;
-        },
-        { applyLocally: false }
-      );
+      // Run the transaction to update upvotes first
+      await runTransaction(upvotesRef, (current_value) => (current_value || 0) + 1, {
+        applyLocally: false,
+      });
+
+      // Then perform the set or update operation based on dataExist
+      if (!dataExist) {
+        const newRef = push(historyVotedRef);
+        await set(newRef, {
+          ma_cd: user?.ma_cd,
+          detail: selectedAnswers,
+        });
+      } else {
+        await update(historyVotedRef, {
+          ma_cd: user?.ma_cd,
+          detail: [...dataExist.detail, ...selectedAnswers],
+        });
+      }
+
       updateHistorySendPoll();
       updateStringValue(selectedAnswers[0].key_question);
       enqueueSnackbar(
@@ -302,7 +301,6 @@ export default function VoteDHView() {
       console.log('Error saving data:', error);
     }
   };
-
   // GET DATA FROM FIREBASE
   useEffect(() => {
     const userRef = ref(database, FIREBASE_COLLECTION.POLL_PROCESS);
