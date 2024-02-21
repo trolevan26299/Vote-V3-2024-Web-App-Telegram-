@@ -311,7 +311,7 @@ export default function VoteDHView() {
     } else {
       historyVotedRef = push(child(ref(database), 'poll_process/ls_poll'));
       // Set initial data for the new reference
-      await set(historyVotedRef, {
+      await update(historyVotedRef, {
         ma_cd: user?.ma_cd,
         detail: selectedAnswers,
       });
