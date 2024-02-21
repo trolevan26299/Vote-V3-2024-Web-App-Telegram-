@@ -262,120 +262,35 @@ export default function VoteDHView() {
   //     console.log('Error saving data:', error);
   //   }
   // };
-  // const handleSubmitVote = async () => {
-  //   const dataExist = listHistoryVoted.find((item) => item?.ma_cd === user?.ma_cd);
-  //   const historyVotedRef = ref(database, `poll_process/ls_poll/${dataExist ? dataExist.key : ''}`);
-  //   const upvotesRef = ref(
-  //     database,
-  //     'server/saving-data/fireblog/posts/-JRHTHaIs-jNPLXOQivY/upvotes'
-  //   );
-
-  //   try {
-  //     // Run the transaction to update upvotes first
-  //     await runTransaction(upvotesRef, (current_value) => (current_value || 0) + 1, {
-  //       applyLocally: false,
-  //     });
-
-  //     // Then perform the set or update operation based on dataExist
-  //     if (!dataExist) {
-  //       const newRef = push(historyVotedRef);
-  //       await set(newRef, {
-  //         ma_cd: user?.ma_cd,
-  //         detail: selectedAnswers,
-  //       });
-  //     } else {
-  //       await update(historyVotedRef, {
-  //         ma_cd: user?.ma_cd,
-  //         detail: [...dataExist.detail, ...selectedAnswers],
-  //       });
-  //     }
-
-  //     updateHistorySendPoll();
-  //     updateStringValue(selectedAnswers[0].key_question);
-  //     enqueueSnackbar(
-  //       user && user.nguoi_nuoc_ngoai === true ? 'Send Success !' : 'Gửi ý kiến thành công  !',
-  //       { variant: 'success' }
-  //     );
-  //   } catch (error) {
-  //     enqueueSnackbar('Gửi ý kiến lỗi !', { variant: 'error' });
-  //     console.log('Error saving data:', error);
-  //   }
-  // };
-
-  // const handleSubmitVote = async () => {
-  //   const dataExist = listHistoryVoted.find((item) => item?.ma_cd === user?.ma_cd);
-  //   // let historyVotedRef
-
-  //   // if (dataExist) {
-  //   //   historyVotedRef = ref(database, `poll_process/ls_poll/${dataExist.key}`);
-  //   // } else {
-  //   //   historyVotedRef = push(child(ref(database), 'poll_process/ls_poll'));
-  //   // }
-  //   const historyVotedRef = ref(database, `poll_process/ls_poll`);
-  //   console.log('historyVotedRef', historyVotedRef);
-
-  //   try {
-  //     console.log('có vào trye');
-  //     await runTransaction(historyVotedRef, async (currentData) => {
-  //       console.log('current data :', currentData);
-  //       if (currentData === null) {
-  //         console.log('có vào if');
-  //         // If there's no existing data, add new data
-  //         return {
-  //           ma_cd: user?.ma_cd,
-  //           detail: selectedAnswers,
-  //         };
-  //       }
-  //       // If there's existing data, update it
-  //       return {
-  //         ma_cd: user?.ma_cd,
-  //         detail: [...currentData.detail, ...selectedAnswers],
-  //       };
-  //     });
-
-  //     updateHistorySendPoll();
-  //     updateStringValue(selectedAnswers[0].key_question);
-  //     enqueueSnackbar(
-  //       user && user.nguoi_nuoc_ngoai === true ? 'Send Success !' : 'Gửi ý kiến thành công  !',
-  //       { variant: 'success' }
-  //     );
-  //   } catch (error) {
-  //     enqueueSnackbar('Gửi ý kiến lỗi !', { variant: 'error' });
-  //     console.log('Error saving data:', error);
-  //   }
-  // };
-
   const handleSubmitVote = async () => {
     const dataExist = listHistoryVoted.find((item) => item?.ma_cd === user?.ma_cd);
-    // let historyVotedRef
-
-    // if (dataExist) {
-    //   historyVotedRef = ref(database, `poll_process/ls_poll/${dataExist.key}`);
-    // } else {
-    //   historyVotedRef = push(child(ref(database), 'poll_process/ls_poll'));
-    // }
-    const historyVotedRef = ref(database, 'ls_poll');
+    const historyVotedRef = ref(database, `poll_process/ls_poll/${dataExist ? dataExist.key : ''}`);
+    const upvotesRef = ref(
+      database,
+      'server/saving-data/fireblog/posts/-JRHTHaIs-jNPLXOQivY/upvotes'
+    );
 
     try {
-      console.log('có vào trye');
-      await runTransaction(historyVotedRef, async (currentData) => {
-        console.log('current data :', currentData);
-        if (currentData === null) {
-          console.log('có vào if');
-          // If there's no existing data, add new data
-          return {
-            ma_cd: user?.ma_cd,
-            detail: selectedAnswers,
-          };
-        }
-        // If there's existing data, update it
-        return {
-          ma_cd: user?.ma_cd,
-          detail: [...currentData.detail, ...selectedAnswers],
-        };
+      // Run the transaction to update upvotes first
+      await runTransaction(upvotesRef, (current_value) => (current_value || 0) + 1, {
+        applyLocally: false,
       });
 
-      // updateHistorySendPoll();
+      // Then perform the set or update operation based on dataExist
+      // if (!dataExist) {
+      //   const newRef = push(historyVotedRef);
+      //   await set(newRef, {
+      //     ma_cd: user?.ma_cd,
+      //     detail: selectedAnswers,
+      //   });
+      // } else {
+      //   await update(historyVotedRef, {
+      //     ma_cd: user?.ma_cd,
+      //     detail: [...dataExist.detail, ...selectedAnswers],
+      //   });
+      // }
+
+      updateHistorySendPoll();
       updateStringValue(selectedAnswers[0].key_question);
       enqueueSnackbar(
         user && user.nguoi_nuoc_ngoai === true ? 'Send Success !' : 'Gửi ý kiến thành công  !',
@@ -386,6 +301,7 @@ export default function VoteDHView() {
       console.log('Error saving data:', error);
     }
   };
+
   // GET DATA FROM FIREBASE
   useEffect(() => {
     const userRef = ref(database, FIREBASE_COLLECTION.POLL_PROCESS);
