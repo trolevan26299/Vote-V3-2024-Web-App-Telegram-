@@ -212,15 +212,17 @@ export default function VoteDHView() {
       listHistoryVoted.length > 0
         ? listHistoryVoted.find((item) => item?.ma_cd === user?.ma_cd)
         : undefined; // Tìm xem đã gửi voted lần nào chưa
-
+    console.log('dataExist', dataExist);
     const historyVotedRef = ref(
       database,
       `poll_process/ls_poll/${dataExist ? dataExist?.key : ''}`
     );
-
+    console.log('historyVotedRef', historyVotedRef);
     try {
+      console.log('có chạy vào try');
       await runTransaction(historyVotedRef, async (currentData) => {
         if (!currentData) {
+          console.log('dữ liệu chưa tồn tại');
           // Nếu dữ liệu chưa tồn tại, tạo mới
           return {
             ma_cd: user?.ma_cd,
