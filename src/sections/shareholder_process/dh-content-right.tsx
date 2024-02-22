@@ -12,8 +12,8 @@ import { bgGradient } from '../../theme/css';
 interface chart {
   colors?: string[];
   series: {
-    label: string;
-    value: number;
+    name: string;
+    data: number[];
   }[];
   options?: ApexOptions;
 }
@@ -87,41 +87,69 @@ export default function DHContentRight({
     '#FF9999',
   ];
   const chart: chart = {
-    series:
-      (pollDataByKey &&
-        pollDataByKey?.dap_an?.map((item, index) => ({
-          label:
-            ((!user
-              ? `${item.vi}(${item.en})`
-              : user.nguoi_nuoc_ngoai === true
-              ? item.en
-              : item.vi) as string) || '',
-          value:
-            (listResultByQuestion &&
-              listResultByQuestion.filter((item2) => item2?.answer_select_id === String(item?.id))
-                .length) ||
-            0,
-        }))) ||
-      [],
+    // series:
+    //   (pollDataByKey &&
+    //     pollDataByKey?.dap_an?.map((item, index) => ({
+    //       label:
+    //         ((!user
+    //           ? `${item.vi}(${item.en})`
+    //           : user.nguoi_nuoc_ngoai === true
+    //           ? item.en
+    //           : item.vi) as string) || '',
+    //       value:
+    //         (listResultByQuestion &&
+    //           listResultByQuestion.filter((item2) => item2?.answer_select_id === String(item?.id))
+    //             .length) ||
+    //         0,
+    //     }))) ||
+    //   [],
+    series: [
+      {
+        name: 'Marine Sprite',
+        data: [44, 55, 41, 37, 22, 43, 21],
+      },
+      {
+        name: 'Striking Calf',
+        data: [53, 32, 33, 52, 13, 43, 32],
+      },
+      {
+        name: 'Tank Picture',
+        data: [12, 17, 11, 9, 15, 11, 20],
+      },
+      {
+        name: 'Bucket Slope',
+        data: [9, 7, 5, 8, 6, 9, 4],
+      },
+      {
+        name: 'Reborn Kid',
+        data: [25, 12, 19, 32, 25, 24, 10],
+      },
+    ],
     colors: colors1,
   };
 
   // Tính tổng value trong mảng
-  const totalValue = chart.series.reduce((sum, item) => sum + item.value, 0);
-  console.log('totalValue:', totalValue);
-  chart.series.push({
-    label: !user
-      ? 'Chưa bình chọn (No Vote)'
-      : user.nguoi_nuoc_ngoai === true
-      ? 'No Vote'
-      : 'Chưa bình chọn',
-    value: listSendPollSuccessByKey - totalValue,
-  });
+  // const totalValue = chart.series.reduce((sum, item) => sum + item.value, 0);
+  // console.log('totalValue:', totalValue);
+  // chart.series.push({
+  //   label: !user
+  //     ? 'Chưa bình chọn (No Vote)'
+  //     : user.nguoi_nuoc_ngoai === true
+  //     ? 'No Vote'
+  //     : 'Chưa bình chọn',
+  //   value: listSendPollSuccessByKey - totalValue,
+  // });
 
   const { series, colors, options } = chart;
-  const chartSeries = series.map((i) => i.value);
+  // const chartSeries = series.map((i) => i.value);
 
   const chartOptions = useChart({
+    chart: {
+      type: 'bar',
+      height: 350,
+      stacked: true,
+      stackType: '100%',
+    },
     dataLabels: {
       enabled: true,
       dropShadow: {
@@ -129,7 +157,13 @@ export default function DHContentRight({
         blur: 1,
       },
     },
-
+    stroke: {
+      width: 1,
+      colors: ['#fff'],
+    },
+    title: {
+      text: '100% Stacked Bar',
+    },
     colors,
     tooltip: {
       marker: { show: false },
@@ -142,7 +176,7 @@ export default function DHContentRight({
     },
     plotOptions: {
       bar: {
-        horizontal: false,
+        horizontal: true,
         barHeight: '28%',
         borderRadius: 2,
         distributed: true,
@@ -152,15 +186,7 @@ export default function DHContentRight({
       show: false,
     },
     xaxis: {
-      categories: series.map((i) => i.label),
-      labels: {
-        style: {
-          colors: theme.palette.text.primary,
-          fontSize: '13px',
-          fontWeight: '500',
-        },
-        show: true,
-      },
+      categories: [2008, 2009, 2010, 2011, 2012, 2013, 2014],
     },
 
     ...options,
@@ -215,13 +241,7 @@ export default function DHContentRight({
               'Biểu đồ cổ đông bình chọn'
             )}
           </Typography>
-          <Chart
-            type="bar"
-            dir="ltr"
-            series={[{ data: chartSeries }]}
-            options={chartOptions}
-            height={364}
-          />
+          <Chart type="bar" dir="ltr" series={chart.series} options={chartOptions} height={364} />
         </Stack>
       </Stack>
     </Box>
