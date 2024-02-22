@@ -113,17 +113,17 @@ export default function DHContentRight({
         data: [53, 32, 33, 52, 13, 43, 32],
       },
       {
-        name: 'Tank Picture',
+        name: 'Chưa bình chọn',
         data: [12, 17, 11, 9, 15, 11, 20],
       },
-      {
-        name: 'Bucket Slope',
-        data: [9, 7, 5, 8, 6, 9, 4],
-      },
-      {
-        name: 'Reborn Kid',
-        data: [25, 12, 19, 32, 25, 24, 10],
-      },
+      // {
+      //   name: 'Bucket Slope',
+      //   data: [9, 7, 5, 8, 6, 9, 4],
+      // },
+      // {
+      //   name: 'Reborn Kid',
+      //   data: [25, 12, 19, 32, 25, 24, 10],
+      // },
     ],
     // colors: colors1,
   };
@@ -175,7 +175,7 @@ export default function DHContentRight({
     plotOptions: {
       bar: {
         horizontal: true,
-        barHeight: '50%',
+        barHeight: '90%',
         borderRadius: 2,
         distributed: true,
       },
