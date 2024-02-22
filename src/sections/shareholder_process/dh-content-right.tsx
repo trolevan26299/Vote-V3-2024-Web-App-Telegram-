@@ -105,11 +105,11 @@ export default function DHContentRight({
     //   [],
     series: [
       {
-        name: 'Marine Sprite',
+        name: 'Tán Thành',
         data: [44, 55, 41, 37, 22, 43, 21],
       },
       {
-        name: 'Striking Calf',
+        name: 'Không Tán Thành',
         data: [53, 32, 33, 52, 13, 43, 32],
       },
       {
