@@ -144,47 +144,35 @@ export default function DHContentRight({
   // const chartSeries = series.map((i) => i.value);
 
   const chartOptions = useChart({
-    chart: {
-      type: 'bar',
-      height: 350,
-      stacked: true,
-      stackType: '100%',
-    },
-    dataLabels: {
-      enabled: true,
-      dropShadow: {
-        enabled: false,
-        blur: 1,
+    plotOptions: {
+      bar: {
+        horizontal: true,
       },
     },
     stroke: {
       width: 1,
       colors: ['#fff'],
     },
-
-    colors,
-    tooltip: {
-      marker: { show: false },
-      y: {
-        formatter: (value: number) => fNumber(value),
-        title: {
-          formatter: () => '',
-        },
-      },
-    },
-    plotOptions: {
-      bar: {
-        horizontal: true,
-        barHeight: '90%',
-        borderRadius: 2,
-        distributed: true,
-      },
-    },
-    legend: {
-      show: false,
+    title: {
+      text: '100% Stacked Bar',
     },
     xaxis: {
       categories: ['Câu 1', 'Câu 2', 'Câu 3', 'Câu 4'],
+    },
+    tooltip: {
+      y: {
+        formatter(val) {
+          return `${val}K`;
+        },
+      },
+    },
+    fill: {
+      opacity: 1,
+    },
+    legend: {
+      position: 'top',
+      horizontalAlign: 'left',
+      offsetX: 40,
     },
 
     ...options,
