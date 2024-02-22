@@ -125,7 +125,7 @@ export default function DHContentRight({
         data: [25, 12, 19, 32, 25, 24, 10],
       },
     ],
-    colors: colors1,
+    // colors: colors1,
   };
 
   // Tính tổng value trong mảng
