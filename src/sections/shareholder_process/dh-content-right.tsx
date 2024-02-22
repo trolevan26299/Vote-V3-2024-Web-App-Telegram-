@@ -144,6 +144,12 @@ export default function DHContentRight({
   // const chartSeries = series.map((i) => i.value);
 
   const chartOptions = useChart({
+    chart: {
+      type: 'bar',
+      height: 350,
+      stacked: true,
+      stackType: '100%',
+    },
     plotOptions: {
       bar: {
         horizontal: true,
