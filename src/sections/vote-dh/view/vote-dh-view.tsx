@@ -228,18 +228,20 @@ export default function VoteDHView() {
       ).catch((error) => {
         console.error('Error writing data: ', error);
       });
-      if (response) {
-        console.log('response');
-        updateHistorySendPoll();
-        updateStringValue(selectedAnswers[0].key_question);
-        enqueueSnackbar(
-          user && user.nguoi_nuoc_ngoai === true ? 'Send Success !' : 'Gửi ý kiến thành công  !',
-          { variant: 'success' }
-        );
-      }
+
+      console.log('response');
+      // updateHistorySendPoll();
+      updateStringValue(selectedAnswers[0].key_question);
+      enqueueSnackbar(
+        user && user.nguoi_nuoc_ngoai === true ? 'Send Success !' : 'Gửi ý kiến thành công  !',
+        { variant: 'success' }
+      );
     } catch (error) {
       enqueueSnackbar('Gửi ý kiến lỗi !', { variant: 'error' });
       console.log('Error saving data:', error);
+    } finally {
+      // Always run updateHistorySendPoll(), regardless of whether the transaction was successful or not
+      updateHistorySendPoll();
     }
   };
 
