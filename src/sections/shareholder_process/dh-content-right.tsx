@@ -161,9 +161,7 @@ export default function DHContentRight({
       width: 1,
       colors: ['#fff'],
     },
-    title: {
-      text: '100% Stacked Bar',
-    },
+
     colors,
     tooltip: {
       marker: { show: false },
@@ -177,7 +175,7 @@ export default function DHContentRight({
     plotOptions: {
       bar: {
         horizontal: true,
-        barHeight: '28%',
+        barHeight: '50%',
         borderRadius: 2,
         distributed: true,
       },
