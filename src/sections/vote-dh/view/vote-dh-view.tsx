@@ -11,17 +11,7 @@ import {
   Typography,
 } from '@mui/material';
 import { alpha, useTheme } from '@mui/material/styles';
-import {
-  DataSnapshot,
-  child,
-  get,
-  onValue,
-  push,
-  ref,
-  runTransaction,
-  set,
-  update,
-} from 'firebase/database';
+import { DataSnapshot, child, onValue, ref, runTransaction, update } from 'firebase/database';
 import { enqueueSnackbar } from 'notistack';
 import { useEffect, useState } from 'react';
 import CustomBreadcrumbs from 'src/components/custom-breadcrumbs';
@@ -36,6 +26,7 @@ import { IHistorySendPoll, IQuestion } from 'src/types/setting';
 import { IHistoryVoted, ISelectedAnswer } from 'src/types/votedh.types';
 import { convertToMilliseconds } from 'src/utils/convertTimeStringToMiliSeconds';
 import { currentTimeUTC7 } from 'src/utils/currentTimeUTC+7';
+import { GenerateUniqueID } from 'src/utils/getUuid';
 import { bgGradient } from '../../../theme/css';
 import VoteDHTable from '../vote-dh-table';
 
@@ -264,19 +255,23 @@ export default function VoteDHView() {
   // };
   const handleSubmitVote = async () => {
     const dataExist = listHistoryVoted.find((item) => item?.ma_cd === user?.ma_cd);
-    const historyVotedRef = ref(database, `poll_process/ls_poll/${dataExist ? dataExist.key : ''}`);
-    const upvotesRef = ref(database, 'poll_process/ls_poll/0');
+    const historyVotedRef1 = ref(
+      database,
+      `poll_process/ls_poll/${dataExist ? dataExist.key : ''}`
+    );
+    const historyVotedRef = ref(
+      database,
+      `poll_process/ls_poll/${dataExist ? dataExist.key : GenerateUniqueID()}`
+    );
 
     try {
       // Run the transaction to update upvotes first
       await runTransaction(
-        upvotesRef,
-        (current_value) => [
-          {
-            id: 'dasdsa',
-            detail: 'sadadads',
-          },
-        ],
+        historyVotedRef,
+        (current_value) => ({
+          ma_cd: user?.ma_cd,
+          detail: dataExist ? [...dataExist.detail, ...selectedAnswers] : selectedAnswers,
+        }),
         {
           applyLocally: false,
         }
