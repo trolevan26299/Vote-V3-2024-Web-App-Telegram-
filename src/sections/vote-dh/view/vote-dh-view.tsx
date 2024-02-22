@@ -158,13 +158,18 @@ export default function VoteDHView() {
     // Sử dụng Promise.all để chờ tất cả các phần tử trong mảng được cập nhật
     await Promise.all(
       updatedFilteredData.map(async (item) => {
-        // Kiểm tra xem item có thuộc tính key hay không
         if (item.key) {
-          // Tạo đường dẫn đến item cần cập nhật
           const itemRef = child(historySendVoteRef, item.key);
 
-          // Cập nhật dữ liệu trong Firebase Realtime Database
-          await update(itemRef, item);
+          // Use runTransaction() instead of update()
+          await runTransaction(itemRef, (currentData) => {
+            // If currentData exists, merge it with the new data
+            if (currentData) {
+              return { ...currentData, ...item };
+            }
+            // If currentData does not exist, just return the new data
+            return item;
+          });
           router.push(paths.dashboard.process.dh);
         }
       })
