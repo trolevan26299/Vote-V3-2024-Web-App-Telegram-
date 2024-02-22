@@ -106,15 +106,15 @@ export default function DHContentRight({
     series: [
       {
         name: 'Tán Thành',
-        data: [44, 55, 41, 37, 22, 43, 21],
+        data: [44, 55, 41, 37],
       },
       {
         name: 'Không Tán Thành',
-        data: [53, 32, 33, 52, 13, 43, 32],
+        data: [53, 32, 33, 52],
       },
       {
         name: 'Chưa bình chọn',
-        data: [12, 17, 11, 9, 15, 11, 20],
+        data: [12, 17, 11, 9],
       },
       // {
       //   name: 'Bucket Slope',
