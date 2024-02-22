@@ -14,8 +14,8 @@ import {
   Typography,
 } from '@mui/material';
 import { alpha, useTheme } from '@mui/material/styles';
-import { DataSnapshot, child, onValue, ref, runTransaction, update } from 'firebase/database';
-import { enqueueSnackbar } from 'notistack';
+import axios from 'axios';
+import { DataSnapshot, child, onValue, push, ref, runTransaction, set } from 'firebase/database';
 import { useEffect, useState } from 'react';
 import CustomBreadcrumbs from 'src/components/custom-breadcrumbs';
 import { useSettingsContext } from 'src/components/settings';
@@ -32,6 +32,7 @@ import { currentTimeUTC7 } from 'src/utils/currentTimeUTC+7';
 import { GenerateUniqueID } from 'src/utils/getUuid';
 import { bgGradient } from '../../../theme/css';
 import VoteDHTable from '../vote-dh-table';
+import { enqueueSnackbar } from 'notistack';
 
 export default function VoteDHView() {
   const settings = useSettingsContext();
@@ -158,7 +159,6 @@ export default function VoteDHView() {
 
     const historySendVoteRef = ref(database, 'poll_process/ls_gui_poll');
 
-    // Sử dụng Promise.all để chờ tất cả các phần tử trong mảng được cập nhật
     for (const item of updatedFilteredData) {
       if (item.key) {
         const itemRef = child(historySendVoteRef, item.key);
@@ -177,73 +177,87 @@ export default function VoteDHView() {
     }
   };
 
-  // const handleSubmitVote = async () => {
-  //   const dataExist =
-  //     listHistoryVoted.length > 0
-  //       ? listHistoryVoted.find((item) => item?.ma_cd === user?.ma_cd)
-  //       : undefined; // Tìm xem đã gửi voted lần nào chưa
-  //   const historyVotedRef = ref(
-  //     database,
-  //     `poll_process/ls_poll/${dataExist ? dataExist?.key : ''}`
-  //   ); // nếu có rồi đổi ref để chỉnh sửa , nếu chưa ref để thêm mới
-
-  //   const newRef = push(historyVotedRef);
-
-  //   await set(dataExist ? historyVotedRef : newRef, {
-  //     ma_cd: user?.ma_cd,
-  //     detail: dataExist ? [...dataExist.detail, ...selectedAnswers] : selectedAnswers,
-  //   })
-  //     .then(() => {
-  //       updateHistorySendPoll();
-  //       updateStringValue(selectedAnswers[0].key_question);
-  //       enqueueSnackbar(
-  //         user && user.nguoi_nuoc_ngoai === true ? 'Send Success !' : 'Gửi ý kiến thành công  !',
-  //         { variant: 'success' }
-  //       );
-  //     })
-  //     .catch((error) => {
-  //       enqueueSnackbar('Gửi ý kiến lỗi !', { variant: 'error' });
-  //       console.log('Error saving data:', error);
-  //     });
-  // };
-
   const handleSubmitVote = async () => {
-    const dataExist = listHistoryVoted.find((item) => item?.ma_cd === user?.ma_cd);
+    const dataExist =
+      listHistoryVoted.length > 0
+        ? listHistoryVoted.find((item) => item?.ma_cd === user?.ma_cd)
+        : undefined; // Tìm xem đã gửi voted lần nào chưa
     const historyVotedRef = ref(
       database,
-      `poll_process/ls_poll/${dataExist ? dataExist.key : GenerateUniqueID()}`
-    );
+      `poll_process/ls_poll/${dataExist ? dataExist?.key : ''}`
+    ); // nếu có rồi đổi ref để chỉnh sửa , nếu chưa ref để thêm mới
 
-    try {
-      // Run the transaction to update vote first
-      const response = await runTransaction(
-        historyVotedRef,
-        (current_value) => ({
-          ma_cd: user?.ma_cd,
-          detail: dataExist ? [...dataExist.detail, ...selectedAnswers] : selectedAnswers,
-        }),
-        {
-          applyLocally: false,
-        }
-      ).catch((error) => {
-        console.error('Error writing data: ', error);
+    const newRef = push(historyVotedRef);
+
+    await set(dataExist ? historyVotedRef : newRef, {
+      ma_cd: user?.ma_cd,
+      detail: dataExist ? [...dataExist.detail, ...selectedAnswers] : selectedAnswers,
+    })
+      .then(() => {
+        updateHistorySendPoll();
+        updateStringValue(selectedAnswers[0].key_question);
+        enqueueSnackbar(
+          user && user.nguoi_nuoc_ngoai === true ? 'Send Success !' : 'Gửi ý kiến thành công  !',
+          { variant: 'success' }
+        );
+      })
+      .catch((error) => {
+        enqueueSnackbar('Gửi ý kiến lỗi !', { variant: 'error' });
+        console.log('Error saving data:', error);
       });
-
-      console.log('response');
-      // updateHistorySendPoll();
-      updateStringValue(selectedAnswers[0].key_question);
-      enqueueSnackbar(
-        user && user.nguoi_nuoc_ngoai === true ? 'Send Success !' : 'Gửi ý kiến thành công  !',
-        { variant: 'success' }
-      );
-    } catch (error) {
-      enqueueSnackbar('Gửi ý kiến lỗi !', { variant: 'error' });
-      console.log('Error saving data:', error);
-    } finally {
-      // Always run updateHistorySendPoll(), regardless of whether the transaction was successful or not
-      updateHistorySendPoll();
-    }
   };
+
+  // const handleSubmitVote = async () => {
+  //   const dataExist = listHistoryVoted.find((item) => item?.ma_cd === user?.ma_cd);
+  //   const historyVotedRef = ref(
+  //     database,
+  //     `poll_process/ls_poll/${dataExist ? dataExist.key : GenerateUniqueID()}`
+  //   );
+
+  //   try {
+  //     // Run the transaction to update vote first
+  //     await runTransaction(
+  //       historyVotedRef,
+  //       (current_value) => ({
+  //         ma_cd: user?.ma_cd,
+  //         detail: dataExist ? [...dataExist.detail, ...selectedAnswers] : selectedAnswers,
+  //       }),
+  //       {
+  //         applyLocally: false,
+  //       }
+  //     ).catch((error) => {
+  //       console.error('Error writing data: ', error);
+  //     });
+
+  //     console.log('response');
+  //     // updateHistorySendPoll();
+  //     updateStringValue(selectedAnswers[0].key_question);
+  //     enqueueSnackbar(
+  //       user && user.nguoi_nuoc_ngoai === true ? 'Send Success !' : 'Gửi ý kiến thành công  !',
+  //       { variant: 'success' }
+  //     );
+  //   } catch (error) {
+  //     enqueueSnackbar('Gửi ý kiến lỗi !', { variant: 'error' });
+  //     console.log('Error saving data:', error);
+  //   } finally {
+  //     // Always run updateHistorySendPoll(), regardless of whether the transaction was successful or not
+  //     updateHistorySendPoll();
+  //   }
+  // };
+  // const handleSubmitVote = async () => {
+  //   const dataExist = listHistoryVoted.find((item) => item?.ma_cd === user?.ma_cd);
+  //   const VOTE_API_URL = `${process.env.NEXT_PUBLIC_API_VOTE}/vote`;
+  //   try {
+  //     const response = await axios.post(VOTE_API_URL, {
+  //       key: dataExist ? dataExist.key : GenerateUniqueID(),
+  //       ma_cd: user?.ma_cd,
+  //       detail: dataExist ? [...dataExist.detail, ...selectedAnswers] : selectedAnswers,
+  //     });
+  //     console.log('response', response);
+  //   } catch (error) {
+  //     console.log('error:', error);
+  //   }
+  // };
 
   // GET DATA FROM FIREBASE
   useEffect(() => {
