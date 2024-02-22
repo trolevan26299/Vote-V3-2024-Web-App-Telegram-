@@ -184,7 +184,7 @@ export default function DHContentRight({
       show: false,
     },
     xaxis: {
-      categories: [2008, 2009, 2010, 2011, 2012, 2013, 2014],
+      categories: ['Câu 1', 'Câu 2', 'Câu 3', 'Câu 4'],
     },
 
     ...options,
