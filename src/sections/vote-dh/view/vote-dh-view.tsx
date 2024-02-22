@@ -1,3 +1,5 @@
+/* eslint-disable no-await-in-loop */
+/* eslint-disable no-restricted-syntax */
 'use client';
 
 import {
@@ -156,24 +158,22 @@ export default function VoteDHView() {
     const historySendVoteRef = ref(database, 'poll_process/ls_gui_poll');
 
     // Sử dụng Promise.all để chờ tất cả các phần tử trong mảng được cập nhật
-    await Promise.all(
-      updatedFilteredData.map(async (item) => {
-        if (item.key) {
-          const itemRef = child(historySendVoteRef, item.key);
+    for (const item of updatedFilteredData) {
+      if (item.key) {
+        const itemRef = child(historySendVoteRef, item.key);
 
-          // Use runTransaction() instead of update()
-          await runTransaction(itemRef, (currentData) => {
-            // If currentData exists, merge it with the new data
-            if (currentData) {
-              return { ...currentData, ...item };
-            }
-            // If currentData does not exist, just return the new data
-            return item;
-          });
-          router.push(paths.dashboard.process.dh);
-        }
-      })
-    );
+        // Use runTransaction() instead of update()
+        await runTransaction(itemRef, (currentData) => {
+          // If currentData exists, merge it with the new data
+          if (currentData) {
+            return { ...currentData, ...item };
+          }
+          // If currentData does not exist, just return the new data
+          return item;
+        });
+        router.push(paths.dashboard.process.dh);
+      }
+    }
   };
 
   // const handleSubmitVote = async () => {
@@ -215,7 +215,7 @@ export default function VoteDHView() {
 
     try {
       // Run the transaction to update vote first
-      await runTransaction(
+      const response = await runTransaction(
         historyVotedRef,
         (current_value) => ({
           ma_cd: user?.ma_cd,
@@ -227,12 +227,15 @@ export default function VoteDHView() {
       ).catch((error) => {
         console.error('Error writing data: ', error);
       });
-      updateHistorySendPoll();
-      updateStringValue(selectedAnswers[0].key_question);
-      enqueueSnackbar(
-        user && user.nguoi_nuoc_ngoai === true ? 'Send Success !' : 'Gửi ý kiến thành công  !',
-        { variant: 'success' }
-      );
+      if (response) {
+        console.log('response');
+        updateHistorySendPoll();
+        updateStringValue(selectedAnswers[0].key_question);
+        enqueueSnackbar(
+          user && user.nguoi_nuoc_ngoai === true ? 'Send Success !' : 'Gửi ý kiến thành công  !',
+          { variant: 'success' }
+        );
+      }
     } catch (error) {
       enqueueSnackbar('Gửi ý kiến lỗi !', { variant: 'error' });
       console.log('Error saving data:', error);
