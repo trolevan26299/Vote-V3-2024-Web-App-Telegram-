@@ -396,15 +396,15 @@ export default function ProcessDHView() {
           spacing={2}
           sx={{ textAlign: 'center', paddingLeft: { xs: '0px', md: '0px' } }}
         >
-          <Grid item xs={12} md={6} lg={6}>
+          {/* <Grid item xs={12} md={6} lg={6}>
             <DHContentLeft
               calculateTotalCP={calculateTotalCP}
               pollDataByKey={pollDataByKey}
               percentProcess={percentProcess}
             />
-          </Grid>
+          </Grid> */}
 
-          <Grid item xs={12} md={6} lg={6}>
+          <Grid item xs={12} md={12} lg={12}>
             <DHContentRight
               pollDataByKey={pollDataByKey}
               listResultByQuestion={listResultByQuestion}
