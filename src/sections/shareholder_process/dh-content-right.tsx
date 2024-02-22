@@ -106,15 +106,15 @@ export default function DHContentRight({
     series: [
       {
         name: 'Tán Thành',
-        data: [44, 55, 41, 37],
+        data: [40, 55, 41, 37],
       },
       {
         name: 'Không Tán Thành',
-        data: [53, 32, 33, 52],
+        data: [30, 32, 33, 52],
       },
       {
         name: 'Chưa bình chọn',
-        data: [12, 17, 11, 9],
+        data: [30, 17, 11, 9],
       },
       // {
       //   name: 'Bucket Slope',
@@ -144,6 +144,13 @@ export default function DHContentRight({
   // const chartSeries = series.map((i) => i.value);
 
   const chartOptions = useChart({
+    dataLabels: {
+      enabled: true,
+      dropShadow: {
+        enabled: false,
+        blur: 1,
+      },
+    },
     chart: {
       type: 'bar',
       height: 350,
@@ -159,16 +166,32 @@ export default function DHContentRight({
       width: 1,
       colors: ['#fff'],
     },
-    title: {
-      text: '100% Stacked Bar',
-    },
+
     xaxis: {
       categories: ['Câu 1', 'Câu 2', 'Câu 3', 'Câu 4'],
+      labels: {
+        style: {
+          colors: theme.palette.text.primary,
+          fontSize: '13px',
+          fontWeight: '500',
+        },
+        show: true,
+      },
+    },
+    yaxis: {
+      labels: {
+        style: {
+          colors: theme.palette.text.primary,
+          fontSize: '15px',
+          fontWeight: '600',
+        },
+        show: true,
+      },
     },
     tooltip: {
       y: {
         formatter(val) {
-          return `${val}K`;
+          return `${val}% - 2000CP - 10 Người bình chọn`;
         },
       },
     },
@@ -176,8 +199,8 @@ export default function DHContentRight({
       opacity: 1,
     },
     legend: {
-      position: 'top',
-      horizontalAlign: 'left',
+      position: 'bottom',
+      horizontalAlign: 'center',
       offsetX: 40,
     },
 
@@ -233,6 +256,11 @@ export default function DHContentRight({
               'Biểu đồ cổ đông bình chọn'
             )}
           </Typography>
+          {/* <Box sx={{display:'flex',flexDirection:'row' ,justifyContent:'space-between',alignItems:'end' ,paddingLeft:'1%',marginTop:'2%'}}>
+            <Typography> <b>Câu 1 :</b> Bầu cử anh A làm phó giám đốc</Typography>
+            <Typography> <b>Câu 2 :</b> Bầu cử anh A làm phó giám đốc</Typography>
+            <Typography> <b>Câu 3 :</b> Bầu cử anh A làm phó giám đốc</Typography>
+          </Box> */}
           <Chart type="bar" dir="ltr" series={chart.series} options={chartOptions} height={364} />
         </Stack>
       </Stack>
