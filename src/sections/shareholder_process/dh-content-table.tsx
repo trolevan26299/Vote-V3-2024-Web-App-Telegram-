@@ -12,11 +12,9 @@ import Scrollbar from 'src/components/scrollbar';
 import { TableHeadCustom } from 'src/components/table';
 
 type RowProps = {
-  answer: string;
-  turn?: number;
-  numberCP?: number;
-  percent: string | number;
-  top?: string;
+  question?: string;
+  approve?: string;
+  disApprove?: string;
 };
 
 interface Props extends CardProps {
@@ -26,12 +24,9 @@ interface Props extends CardProps {
 }
 export default function DHContentTable({ subheader, tableData, tableLabels, ...other }: Props) {
   // Sắp xếp mảng tableData theo giá trị row.percent giảm dần
-  const sortedTableData = [...tableData].sort(
-    (a, b) => (b.percent as number) - (a.percent as number)
-  );
 
   // Gán giá trị "Top" cho mỗi phần tử trong mảng tableData
-  const updatedTableData = sortedTableData.map((row, index) => ({
+  const updatedTableData = tableData.map((row, index) => ({
     ...row,
     top: `Top ${index + 1}`,
   }));
@@ -62,18 +57,9 @@ type ProcessVoteRowProps = {
 function ProcessVoteTableRow({ row }: ProcessVoteRowProps) {
   return (
     <TableRow>
-      <TableCell>
-        <Label
-          variant="soft"
-          color={(row.top === 'Top 1' && 'primary') || (row.top === 'Top 2' && 'info') || 'error'}
-        >
-          {row.top}
-        </Label>
-      </TableCell>
-      <TableCell>{row.answer}</TableCell>
-      <TableCell>{row.turn}</TableCell>
-      <TableCell>{row.numberCP ? row.numberCP.toLocaleString('vi-VN') : 0}</TableCell>
-      <TableCell>{row.percent}%</TableCell>
+      <TableCell>{row.question}</TableCell>
+      <TableCell>{row.approve}</TableCell>
+      <TableCell>{row.disApprove}</TableCell>
     </TableRow>
   );
 }

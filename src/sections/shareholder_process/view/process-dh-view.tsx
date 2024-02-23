@@ -1,3 +1,5 @@
+/* eslint-disable consistent-return */
+/* eslint-disable array-callback-return */
 /* eslint-disable no-nested-ternary */
 
 'use client';
@@ -22,7 +24,7 @@ import {
   Typography,
 } from '@mui/material';
 import { alpha, useTheme } from '@mui/material/styles';
-import { DataSnapshot, get, onValue, ref } from 'firebase/database';
+import { DataSnapshot, onValue, ref } from 'firebase/database';
 import { useEffect, useState } from 'react';
 import CustomBreadcrumbs from 'src/components/custom-breadcrumbs';
 import { useSettingsContext } from 'src/components/settings';
@@ -32,13 +34,18 @@ import { useUser } from 'src/firebase/user_accesss_provider';
 import { useRouter } from 'src/routes/hooks';
 import { paths } from 'src/routes/paths';
 import { useStringState } from 'src/stores/questionSelectUser.provider';
-import { IHistorySendPoll, IQuestion, ISendPollStatusSuccess } from 'src/types/setting';
+import { IHistorySendPoll, IQuestion } from 'src/types/setting';
 import { IHistoryVoted } from 'src/types/votedh.types';
 import { convertToMilliseconds } from 'src/utils/convertTimeStringToMiliSeconds';
 import { currentTimeUTC7 } from 'src/utils/currentTimeUTC+7';
 import { bgGradient } from '../../../theme/css';
 import DHContentRight from '../dh-content-right';
 import DHContentTable from '../dh-content-table';
+
+interface ApprovePercentage {
+  key: string;
+  approve_percentage: number;
+}
 
 export default function ProcessDHView() {
   const settings = useSettingsContext();
@@ -50,19 +57,11 @@ export default function ProcessDHView() {
   const [historySendPollData, setHistorySendPollData] = useState<IHistorySendPoll[]>([]);
   const [danhSachPollData, setDanhSachPollData] = useState<IQuestion[]>([]);
   const [listHistoryVoted, setListHistoryVoted] = useState<IHistoryVoted[]>([]);
-  const [totalSharesHolder, setTotalSharesHolder] = useState<any>([]);
   const [isNewQuestion, setIsNewQuestion] = useState(false);
-  const [listSendPollStatusSuccess, setListSendPollStatusSuccess] = useState<
-    ISendPollStatusSuccess[]
-  >([]);
 
   // CODE FOR SELECT QUESTION
   // Handle select question
   const [questionSelect, SetQuestionSelect] = useState<string>(danhSachPollData[0]?.key || '');
-
-  const listSendPollSuccessByKey = listSendPollStatusSuccess
-    .filter((item) => item.keyQuestion === questionSelect)
-    .flatMap((item) => item.listUserSentSuccess);
 
   const handleChangeSelectQuestion = (event: SelectChangeEvent) => {
     SetQuestionSelect(event.target.value);
@@ -84,8 +83,6 @@ export default function ProcessDHView() {
     });
   });
 
-  const percentProcess = (listSendPollSuccessByKey.length / uniqueGuiDenObjects.length) * 100 || 0;
-
   const pollDataByKey = danhSachPollData.filter((item) => item.group === questionSelect);
 
   // List result by question
@@ -93,74 +90,164 @@ export default function ProcessDHView() {
   // eslint-disable-next-line no-restricted-syntax
   for (const obj of listHistoryVoted) {
     //  lọc các object trong thuộc tính detail theo điều kiện
-    let filteredArray = obj.detail.filter((item) => item.key_question === questionSelect);
-    filteredArray = filteredArray.map((item) => ({ ...item, ma_cd: obj.ma_cd }));
+    let filteredArray = obj.detail?.filter((item) => item.key_question === questionSelect);
+    filteredArray = filteredArray?.map((item) => ({ ...item, ma_cd: obj.ma_cd }));
     //  push các object trong filteredArray vào result
 
-    listResultByQuestion.push(...filteredArray);
+    if (listResultByQuestion !== undefined && filteredArray !== undefined) {
+      listResultByQuestion.push(...filteredArray);
+    }
   }
-
-  // CODE FOR SELECT QUESTION FROM FIREBASE
-  const existingKeys = new Set<string>();
 
   // xử lý lấy ra những nhóm câu hỏi đã gửi đi
   const unitGroupQuestionSendVote = historySendPollData
     .map((item) => item.groupQuestionSelect)
     .filter((value, index, self) => self.indexOf(value) === index);
 
-  const questionSelectData: any = historySendPollData.reduce((result, historyItem) => {
-    // Duyệt qua mỗi phần tử trong ds_poll_id của historyItem
-    historyItem?.ds_poll_id?.forEach((poll) => {
-      // Kiểm tra xem đã có key này trong Set chưa
-      if (!existingKeys.has(poll.key as string)) {
-        // Nếu chưa có, thêm vào mảng kết quả và đánh dấu là đã xuất hiện
-        existingKeys.add(poll.key as string);
-        result.push(poll);
-      }
-    });
-    return result;
-  }, [] as IHistorySendPoll[]);
-
-  const calculateTotalCP = (itemPoll: number) => {
-    const listInfoForAnswer = listResultByQuestion?.filter(
-      (item: any) => item.answer_select_id === String(itemPoll)
-    );
-    const totalNumberCP = listInfoForAnswer?.reduce(
-      (accumulator: any, current: any) =>
-        accumulator +
-        (totalSharesHolder?.find((item2: any) => item2.ma_cd === current.ma_cd)?.cp_tham_du || 0),
-      0
-    );
-    return totalNumberCP || 0;
-  };
-
-  const totalAllCP = listResultByQuestion.reduce(
-    (accumulator: any, current: any) =>
-      accumulator +
-      (totalSharesHolder?.find((item: any) => item.ma_cd === current.ma_cd)?.cp_tham_du || 0),
-    0
-  );
-  const dataTable =
-    (pollDataByKey &&
-      pollDataByKey?.dap_an?.map((item) => ({
-        answer:
-          ((!user
-            ? `${item.vi}(${item.en})`
-            : user.nguoi_nuoc_ngoai === true
-            ? item.en
-            : item.vi) as string) || '',
-        turn: listResultByQuestion.filter(
-          (item2: any) => item2.answer_select_id === String(item.id)
-        ).length,
-        numberCP: calculateTotalCP(item.id as number),
-        percent: ((calculateTotalCP(item.id as number) / totalAllCP || 0) * 100).toFixed(1),
-      }))) ||
-    [];
-
   const handleClosePopup = () => {
     setIsNewQuestion(false);
   };
 
+  // ====================== For content right ======================================================
+  // logic lấy ra đã gửi nhóm câu hỏi được select cho bao nhiêu người
+  const listUserSendPoll = historySendPollData
+    ?.filter((item) => item.groupQuestionSelect === questionSelect)
+    .map((item2) => item2.gui_den)
+    .flatMap((item3) => item3);
+
+  console.log('pollDataByKey', pollDataByKey);
+  console.log('listUserSendPoll', listUserSendPoll);
+  // list tổng cổ phần theo list câu hỏi trong group question
+  const totalShareholderByGroupSelect = listUserSendPoll?.reduce(
+    (total, userSendPoll) => total + (userSendPoll?.cp_tham_du || 0),
+    0
+  );
+  console.log('totalShareholderByGroupSelect', totalShareholderByGroupSelect);
+  // logic lấy ra câu trả lời của người dùng(đáp án , cp tham dự) theo từng câu hỏi có trong group question select
+  const listResultByQuestionSelect = pollDataByKey
+    ?.map((pollItem) => {
+      const historyItems = listHistoryVoted.filter(
+        (history) => history.detail?.some((detailItem) => detailItem.key_question === pollItem.key)
+      );
+
+      if (historyItems.length > 0) {
+        const resultItems = historyItems.map((historyItem) => {
+          const detailItem = historyItem.detail.find(
+            (detailItemVoted) => detailItemVoted.key_question === pollItem.key
+          );
+          return {
+            key: pollItem.key,
+            answer_select_id: detailItem?.answer_select_id,
+            cp_tham_du: historyItem.cp_tham_du,
+          };
+        });
+        return resultItems;
+      }
+      return null;
+    })
+    .flat()
+    .filter((item) => item !== null);
+  console.log('listResultByQuestionSelect', listResultByQuestionSelect);
+
+  // logic tính phần trăm "Tán thành" và không tán thành theo cổ phần tham dự theo từng câu hỏi được gửi trong group question select
+  const calculatePercentResultByQuestion = (answerId: string): ApprovePercentage[] =>
+    pollDataByKey
+      ?.map((pollItem) => {
+        const totalApproveShares = listResultByQuestionSelect
+          ?.filter(
+            (resultItem) =>
+              resultItem &&
+              resultItem.key === pollItem.key &&
+              resultItem.answer_select_id === answerId
+          )
+          .reduce((total, resultItem) => (resultItem ? total + resultItem.cp_tham_du : total), 0);
+        if (
+          totalApproveShares !== undefined &&
+          totalShareholderByGroupSelect !== undefined &&
+          totalShareholderByGroupSelect !== 0
+        ) {
+          const approvePercentage = (totalApproveShares / totalShareholderByGroupSelect) * 100;
+          return {
+            key: pollItem.key,
+            approve_percentage: approvePercentage,
+          };
+        }
+        // Trả về null cho trường hợp không xác định
+        return null;
+      })
+      .filter((item): item is ApprovePercentage => item !== null);
+
+  // logic tính số phần trăm chưa bình chọn
+  const percentNoVoteByQuestion = pollDataByKey?.map((pollItem) => {
+    const totalApprovePercentage =
+      calculatePercentResultByQuestion('0')?.find((item) => item?.key === pollItem.key)
+        ?.approve_percentage || 0;
+    const totalDisApprovePercentage =
+      calculatePercentResultByQuestion('2')?.find((item) => item?.key === pollItem.key)
+        ?.approve_percentage || 0;
+
+    const totalNoVotePercentage = 100 - totalApprovePercentage - totalDisApprovePercentage;
+
+    return {
+      key: pollItem.key,
+      no_vote_shares: totalNoVotePercentage,
+    };
+  });
+
+  // % số người đã bình chọn trên tổng số người được gửi câu hỏi select
+  const percentUserVoted =
+    ((listUserSendPoll?.filter((item) => item?.status === 'voted')?.length || 0) /
+      (listUserSendPoll?.length || 0)) *
+      100 || 0;
+
+  // ======================= End for content right==================================================
+
+  const dataTable = pollDataByKey.map((pollItem) => {
+    // Lọc danh sách các kết quả bỏ phiếu cho câu hỏi hiện tại từ listResultByQuestionSelect
+    const approveResults = listResultByQuestionSelect.filter(
+      (resultItem) => resultItem?.key === pollItem.key && resultItem?.answer_select_id === '0'
+    );
+    const disapproveResults = listResultByQuestionSelect.filter(
+      (resultItem) => resultItem?.key === pollItem.key && resultItem?.answer_select_id === '2'
+    );
+
+    // Tính tổng số cp_tham_du cho từng loại kết quả
+    const totalApproveShares = approveResults.reduce((total, resultItem) => {
+      if (resultItem) {
+        return total + resultItem.cp_tham_du;
+      }
+      return total;
+    }, 0);
+    const totalDisapproveShares = disapproveResults.reduce((total, resultItem) => {
+      if (resultItem) {
+        return total + resultItem.cp_tham_du;
+      }
+      return total;
+    }, 0);
+    const percentApprove = (totalApproveShares / totalShareholderByGroupSelect) * 100;
+    const percentDisApprove = (totalDisapproveShares / totalShareholderByGroupSelect) * 100;
+
+    // Xây dựng các chuỗi cho cột approve và disapprove
+    const approveString = `Lượt: ${approveResults.length} | ${totalApproveShares.toLocaleString(
+      'vi-VN'
+    )} CP (${percentApprove.toFixed(2)} %)`;
+    const disapproveString = `Lượt: ${
+      disapproveResults.length
+    } | ${totalDisapproveShares.toLocaleString('vi-VN')} CP (${percentDisApprove.toFixed(2)} %)`;
+
+    // Trả về dữ liệu cho mỗi hàng trong bảng
+    return {
+      question: `${
+        !user
+          ? `${pollItem.ten_poll} (${pollItem.ten_poll_en}) `
+          : user.nguoi_nuoc_ngoai
+          ? pollItem.ten_poll_en
+          : pollItem.ten_poll
+      }`,
+      approve: approveString,
+      disApprove: disapproveString,
+    };
+  });
   useEffect(() => {
     // hàm dùng để check nếu có câu hỏi mới và còn hạn thì sẽ hiện popup thông báo quay lại câu hỏi
     const filteredData = historySendPollData.filter((item) => {
@@ -262,52 +349,6 @@ export default function ProcessDHView() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [stringValue]);
 
-  useEffect(() => {
-    // Get Data danh sách cổ đông không realtime
-    const userRef = ref(database, FIREBASE_COLLECTION.THONG_TIN_CD);
-    const fetchData = async () => {
-      try {
-        const snapshot = await get(userRef);
-        if (snapshot.exists()) {
-          const dataObject = snapshot.val();
-          const dataArray = Object.values(dataObject);
-          setTotalSharesHolder(dataArray);
-        } else {
-          console.log('No Data');
-        }
-      } catch (error) {
-        console.error('Error when get data:', error);
-      }
-    };
-
-    fetchData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-  useEffect(() => {
-    const userRef = ref(database, FIREBASE_COLLECTION.LOGS_STATUS_SEND_POLL);
-    const onDataChange = (snapshot: DataSnapshot) => {
-      const dataSnapShot = snapshot.exists();
-      if (dataSnapShot) {
-        const logs_status_send_poll = snapshot.val();
-        const logStatusSendPollWithKeys = Object.keys(logs_status_send_poll).map((key) => ({
-          key,
-          ...logs_status_send_poll[key],
-        }));
-
-        setListSendPollStatusSuccess(logStatusSendPollWithKeys);
-      } else {
-        console.log('No data available');
-      }
-    };
-    const unsubscribe = onValue(userRef, onDataChange);
-
-    // Clean up the listener when the component unmounts
-    return () => {
-      // Detach the listener
-      unsubscribe();
-    };
-  }, []);
-
   return (
     <Container sx={{ maxWidth: '100% !important' }}>
       <CustomBreadcrumbs
@@ -352,15 +393,6 @@ export default function ProcessDHView() {
             sx={{ minWidth: '100% !important' }}
             fullWidth
           >
-            {/* {questionSelectData.map((item: IQuestion) => (
-              <MenuItem value={item.key} sx={{ minWidth: '100% important' }}>
-                {!user
-                  ? `${item.ten_poll} (${pollDataByKey?.ten_poll_en})`
-                  : user.nguoi_nuoc_ngoai === true
-                  ? item.ten_poll_en
-                  : item.ten_poll}
-              </MenuItem>
-            ))} */}
             {unitGroupQuestionSendVote.map(
               (item: string | undefined, index: number) =>
                 item && (
@@ -419,43 +451,39 @@ export default function ProcessDHView() {
           <Grid item xs={12} md={12} lg={12}>
             <DHContentRight
               pollDataByKey={pollDataByKey}
-              listResultByQuestion={listResultByQuestion}
-              historySendPollData={historySendPollData}
-              questionSelect={questionSelect}
-              listSendPollSuccessByKey={listSendPollSuccessByKey.length}
-              listHistoryVoted={listHistoryVoted}
+              calculatePercentResultByQuestion={calculatePercentResultByQuestion}
+              percentNoVoteByQuestion={percentNoVoteByQuestion}
+              percentUserVoted={percentUserVoted}
             />
           </Grid>
           <Grid item xs={12}>
             <DHContentTable
               tableData={dataTable}
               tableLabels={[
-                { id: 'top', label: 'Top' },
                 {
-                  id: 'answer',
+                  id: 'question',
                   label: !user
-                    ? 'Đáp án (Answers)'
-                    : user.nguoi_nuoc_ngoai === true
-                    ? 'Answers'
-                    : 'Đáp án',
+                    ? 'Câu hỏi (Question)'
+                    : user.nguoi_nuoc_ngoai
+                    ? 'Question'
+                    : 'Câu hỏi',
                 },
                 {
-                  id: 'turn',
+                  id: 'approve',
                   label: !user
-                    ? 'Lượt bầu (Votes)'
-                    : user.nguoi_nuoc_ngoai === true
-                    ? 'Votes'
-                    : 'Lượt bầu',
+                    ? 'Tán thành (Approve)'
+                    : user.nguoi_nuoc_ngoai
+                    ? 'Approve'
+                    : 'Tán thành',
                 },
                 {
-                  id: 'numberCP',
+                  id: '',
                   label: !user
-                    ? 'Số cổ phần (Number of shares)'
-                    : user.nguoi_nuoc_ngoai === true
-                    ? 'Number of shares'
-                    : 'Số cổ phần',
+                    ? 'Không tán thành (DisApprove)'
+                    : user.nguoi_nuoc_ngoai
+                    ? 'DisApprove'
+                    : 'Không tán thành',
                 },
-                { id: 'percent', label: '%' },
               ]}
             />
           </Grid>
