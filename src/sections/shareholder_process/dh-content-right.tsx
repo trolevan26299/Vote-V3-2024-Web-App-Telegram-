@@ -1,3 +1,5 @@
+/* eslint-disable consistent-return */
+/* eslint-disable array-callback-return */
 /* eslint-disable no-nested-ternary */
 import { Box, LinearProgress, Stack, Typography } from '@mui/material';
 import { alpha, useTheme } from '@mui/material/styles';
@@ -20,7 +22,7 @@ interface chart {
 
 interface Props {
   historySendPollData?: IHistorySendPoll[];
-  pollDataByKey?: IQuestion;
+  pollDataByKey?: IQuestion[];
   listResultByQuestion?: ISelectedAnswer[];
   questionSelect?: string;
   listSendPollSuccessByKey: number;
@@ -37,6 +39,7 @@ export default function DHContentRight({
 }: Props) {
   const { user } = useUser();
   const theme = useTheme();
+  console.log('pollDataByKey', pollDataByKey);
   console.log('questionSelect', questionSelect);
   console.log('historySendPollData', historySendPollData);
   console.log('listHistoryVoted', listHistoryVoted);
@@ -55,7 +58,76 @@ export default function DHContentRight({
     0
   );
   console.log('totalShareholderByGroupSelect', totalShareholderByGroupSelect);
-  const percentApproveByQuestionSelect = (10 / (listUserSendPoll?.length || 0)) * 100 || 0;
+
+  // logic lấy ra câu trả lời của người dùng(đáp án , cp tham dự) theo từng câu hỏi có trong group question select
+  const listResultByQuestionSelect = pollDataByKey
+    ?.map((pollItem) => {
+      const historyItems = listHistoryVoted.filter((history) =>
+        history.detail.some((detailItem) => detailItem.key_question === pollItem.key)
+      );
+
+      if (historyItems.length > 0) {
+        const resultItems = historyItems.map((historyItem) => {
+          const detailItem = historyItem.detail.find(
+            (detailItemVoted) => detailItemVoted.key_question === pollItem.key
+          );
+          return {
+            key: pollItem.key,
+            answer_select_id: detailItem?.answer_select_id,
+            cp_tham_du: historyItem.cp_tham_du,
+          };
+        });
+        return resultItems;
+      }
+      return null;
+    })
+    .flat()
+    .filter((item) => item !== null);
+
+  // logic tính phần trăm "Tán thành" theo cổ phần tham dự theo từng câu hỏi được gửi trong group question select
+  function calculatePercentResultByQuestion(answerId: string) {
+    return pollDataByKey?.map((pollItem) => {
+      const totalApproveShares = listResultByQuestionSelect
+        ?.filter(
+          (resultItem) =>
+            resultItem &&
+            resultItem.key === pollItem.key &&
+            resultItem.answer_select_id === answerId
+        )
+        .reduce((total, resultItem) => (resultItem ? total + resultItem.cp_tham_du : total), 0);
+
+      if (
+        totalApproveShares !== undefined &&
+        totalShareholderByGroupSelect !== undefined &&
+        totalShareholderByGroupSelect !== 0
+      ) {
+        const approvePercentage = (totalApproveShares / totalShareholderByGroupSelect) * 100;
+        return {
+          key: pollItem.key,
+          approve_percentage: approvePercentage,
+        };
+      }
+    });
+  }
+  // logic tính số phần trăm chưa bình chọn
+  const percentNoVoteByQuestion = pollDataByKey?.map((pollItem) => {
+    const totalApprovePercentage =
+      calculatePercentResultByQuestion('0')?.find((item) => item?.key === pollItem.key)
+        ?.approve_percentage || 0;
+    const totalDisApprovePercentage =
+      calculatePercentResultByQuestion('2')?.find((item) => item?.key === pollItem.key)
+        ?.approve_percentage || 0;
+
+    const totalNoVotePercentage = 100 - totalApprovePercentage - totalDisApprovePercentage;
+
+    return {
+      key: pollItem.key,
+      no_vote_shares: totalNoVotePercentage,
+    };
+  });
+
+  console.log(listResultByQuestionSelect);
+  console.log('listResultByQuestionSelect', listResultByQuestionSelect);
   // ------------------ LOGIC tính đã gửi câu hỏi select đến bao nhiêu người và không được trùng lặp số người
   const filteredArray =
     historySendPollData &&
@@ -88,7 +160,8 @@ export default function DHContentRight({
           : user.nguoi_nuoc_ngoai === true
           ? 'Approve'
           : 'Tán Thành',
-        data: [40, 55, 41, 37],
+        data:
+          calculatePercentResultByQuestion('0')?.map((item: any) => item.approve_percentage) || [],
       },
       {
         name: !user
@@ -96,7 +169,8 @@ export default function DHContentRight({
           : user.nguoi_nuoc_ngoai === true
           ? 'Disapprove'
           : 'Không Tán Thành',
-        data: [30, 32, 33, 52],
+        data:
+          calculatePercentResultByQuestion('2')?.map((item: any) => item.approve_percentage) || [],
       },
       {
         name: !user
@@ -104,7 +178,7 @@ export default function DHContentRight({
           : user.nguoi_nuoc_ngoai === true
           ? 'No Vote'
           : 'Chưa bình chọn',
-        data: [30, 17, 11, 9],
+        data: percentNoVoteByQuestion?.map((item: any) => item.no_vote_shares) || [],
       },
     ],
   };
@@ -114,6 +188,13 @@ export default function DHContentRight({
   const chartOptions = useChart({
     dataLabels: {
       enabled: true,
+      formatter(val: string | number | number[]) {
+        if (typeof val === 'number') {
+          return val.toFixed(2);
+        }
+        // Xử lý trường hợp val không phải là số nếu cần thiết
+        return val.toString(); // Chuyển đổi val thành chuỗi
+      },
       dropShadow: {
         enabled: false,
         blur: 1,
@@ -136,7 +217,7 @@ export default function DHContentRight({
     },
 
     xaxis: {
-      categories: ['Câu 1', 'Câu 2', 'Câu 3', 'Câu 4'],
+      categories: ['Câu 1', 'Câu 2', 'Câu 3'],
       labels: {
         style: {
           colors: theme.palette.text.primary,

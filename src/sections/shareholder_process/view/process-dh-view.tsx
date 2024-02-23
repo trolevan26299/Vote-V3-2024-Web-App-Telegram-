@@ -86,7 +86,7 @@ export default function ProcessDHView() {
 
   const percentProcess = (listSendPollSuccessByKey.length / uniqueGuiDenObjects.length) * 100 || 0;
 
-  const pollDataByKey = danhSachPollData.find((poll) => poll.key === questionSelect);
+  const pollDataByKey = danhSachPollData.filter((item) => item.group === questionSelect);
 
   // List result by question
   const listResultByQuestion: any = [];

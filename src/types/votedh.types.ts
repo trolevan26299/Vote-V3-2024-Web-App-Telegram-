@@ -11,6 +11,7 @@ export type IHistoryVoted = {
   key: string;
   ma_cd: string;
   detail: ISelectedAnswer[];
+  cp_tham_du: number;
 };
 
 export type IDataQuestionSelect = {
