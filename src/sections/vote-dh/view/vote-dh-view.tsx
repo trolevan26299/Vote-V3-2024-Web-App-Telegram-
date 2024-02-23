@@ -189,6 +189,7 @@ export default function VoteDHView() {
 
     await set(dataExist ? historyVotedRef : newRef, {
       ma_cd: user?.ma_cd,
+      cp_tham_du: user?.cp_tham_du,
       detail: dataExist ? [...dataExist.detail, ...selectedAnswers] : selectedAnswers,
     })
       .then(() => {
