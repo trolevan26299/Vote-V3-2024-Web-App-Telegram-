@@ -4,6 +4,11 @@ import {
   Button,
   Card,
   Container,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+  SelectChangeEvent,
   Table,
   TableBody,
   TableCell,
@@ -34,6 +39,7 @@ export default function SettingView() {
     { id: 'name_question', label: 'Tên câu hỏi' },
     { id: 'content', label: 'Nội dung' },
     { id: 'answer', label: 'Đáp án' },
+    { id: 'group', label: 'Nhóm' },
     { id: '', label: '' },
   ];
 
@@ -47,6 +53,7 @@ export default function SettingView() {
     ten_poll_en: '',
     noi_dung: '',
     noi_dung_en: '',
+    group: '',
     dap_an: [
       {
         id: 0,
@@ -55,19 +62,7 @@ export default function SettingView() {
       },
     ],
   };
-  const [formValuesQuestion, setFormValuesQuestion] = useState({
-    ten_poll: '',
-    ten_poll_en: '',
-    noi_dung: '',
-    noi_dung_en: '',
-    dap_an: [
-      {
-        id: 0,
-        en: '',
-        vi: '',
-      },
-    ],
-  });
+  const [formValuesQuestion, setFormValuesQuestion] = useState(initForm);
 
   const handleInputChangeQuestion = (
     field: string,
@@ -184,6 +179,7 @@ export default function SettingView() {
         noi_dung: dataEdit.noi_dung || '',
         noi_dung_en: dataEdit.noi_dung_en || '',
         dap_an: convertedDapAn || [],
+        group: dataEdit.group || '',
       });
     }
   };
@@ -252,6 +248,38 @@ export default function SettingView() {
             onChange={(e) => handleInputChangeQuestion('noi_dung_en', e.target.value)}
           />
         </Box>
+        <Box className="name-content" sx={{ ...styles.box_name_content, mt: '30px' }}>
+          <Typography sx={{ width: '15%' }}>Nhóm câu hỏi :</Typography>
+          <FormControl sx={{ width: '35%' }} size="small">
+            <InputLabel id="demo-select-small-label">Nhóm câu hỏi </InputLabel>
+            <Select
+              labelId="demo-select-small-label"
+              id="demo-select-small"
+              value={formValuesQuestion.group}
+              label="Nhóm"
+              onChange={(e) => handleInputChangeQuestion('group', e.target.value)}
+            >
+              <MenuItem value="0">
+                <em>Vui lòng chọn nhóm câu hỏi</em>
+              </MenuItem>
+              <MenuItem value="1">Nhóm 1</MenuItem>
+              <MenuItem value="2">Nhóm 2</MenuItem>
+              <MenuItem value="3">Nhóm 3</MenuItem>
+              <MenuItem value="4">Nhóm 4</MenuItem>
+              <MenuItem value="5">Nhóm 5</MenuItem>
+              <MenuItem value="6">Nhóm 6</MenuItem>
+              <MenuItem value="7">Nhóm 7</MenuItem>
+              <MenuItem value="8">Nhóm 8</MenuItem>
+              <MenuItem value="9">Nhóm 9</MenuItem>
+              <MenuItem value="10">Nhóm 10</MenuItem>
+              <MenuItem value="11">Nhóm 11</MenuItem>
+              <MenuItem value="12">Nhóm 12</MenuItem>
+              <MenuItem value="13">Nhóm 13</MenuItem>
+              <MenuItem value="14">Nhóm 14</MenuItem>
+              <MenuItem value="15">Nhóm 15</MenuItem>
+            </Select>
+          </FormControl>
+        </Box>
         <Typography sx={styles.title_answer}>Đáp án bỏ phiếu :</Typography>
         <Box sx={{ width: '100%' }}>
           {formValuesQuestion.dap_an.map((row, index) => (
@@ -302,7 +330,8 @@ export default function SettingView() {
             formValuesQuestion.ten_poll === '' ||
             formValuesQuestion.ten_poll_en === '' ||
             formValuesQuestion.dap_an[0].en === '' ||
-            formValuesQuestion.dap_an[0].vi === ''
+            formValuesQuestion.dap_an[0].vi === '' ||
+            formValuesQuestion.group === ''
           }
           onClick={() => handleSubmitForm()}
         >
@@ -329,6 +358,8 @@ export default function SettingView() {
                       <TableCell align="left">
                         {row?.dap_an?.map((item) => item.vi).join(' | ')}
                       </TableCell>
+
+                      <TableCell align="left">{`Nhóm ${row?.group}`}</TableCell>
                       <TableCell align="left">
                         <Button
                           variant="contained"

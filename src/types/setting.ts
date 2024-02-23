@@ -5,6 +5,7 @@ export interface IQuestion {
   ten_poll?: string;
   ten_poll_en?: string;
   dap_an?: IAnswer[];
+  group?: string;
 }
 
 export interface IAnswer {
@@ -31,6 +32,7 @@ export interface IHistorySendPoll {
   thoi_gian_gui?: string;
   thoi_gian_ket_thuc?: string;
   trang_thai?: string;
+  groupQuestionSelect?: string;
 }
 
 export interface ISendPollStatusSuccess {

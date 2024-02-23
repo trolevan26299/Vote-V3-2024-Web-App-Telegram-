@@ -37,7 +37,6 @@ import { IHistoryVoted } from 'src/types/votedh.types';
 import { convertToMilliseconds } from 'src/utils/convertTimeStringToMiliSeconds';
 import { currentTimeUTC7 } from 'src/utils/currentTimeUTC+7';
 import { bgGradient } from '../../../theme/css';
-import DHContentLeft from '../dh-content-left';
 import DHContentRight from '../dh-content-right';
 import DHContentTable from '../dh-content-table';
 
@@ -104,6 +103,7 @@ export default function ProcessDHView() {
   const existingKeys = new Set<string>();
 
   // Lọc và merge dữ liệu từ ds_poll_id
+  console.log('history send poll data:', historySendPollData);
   const questionSelectData: any = historySendPollData.reduce((result, historyItem) => {
     // Duyệt qua mỗi phần tử trong ds_poll_id của historyItem
     historyItem?.ds_poll_id?.forEach((poll) => {
@@ -116,6 +116,7 @@ export default function ProcessDHView() {
     });
     return result;
   }, [] as IHistorySendPoll[]);
+  console.log('question Select data :', questionSelectData);
 
   const calculateTotalCP = (itemPoll: number) => {
     const listInfoForAnswer = listResultByQuestion?.filter(

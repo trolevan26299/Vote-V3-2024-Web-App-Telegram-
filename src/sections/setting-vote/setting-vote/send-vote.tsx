@@ -41,6 +41,7 @@ export default function SendVoteView() {
   const theme = useTheme();
 
   const tableLabels = [
+    { id: 'grouQuestionSelect', label: 'Nhóm Câu hỏi' },
     { id: 'name_question', label: 'Tên nội dung' },
     { id: 'receiver', label: 'Gửi đến' },
     { id: 'send_time', label: 'Thời gian gửi' },
@@ -50,6 +51,7 @@ export default function SendVoteView() {
   // handle select answer
   const [inputValueTextAnswer, setInputValueTextAnswer] = useState('');
   const [answerSelect, setAnswerSelect] = React.useState<IQuestion[]>([]);
+  const [groupQuestionSelect, setGroupQuestionSelect] = React.useState<string>('');
 
   // handle select shareholder
   const allOption: IUserAccess = {
@@ -78,6 +80,11 @@ export default function SendVoteView() {
 
   // list Hitsory Poll
   const [listHistoryPoll, setListHistoryPoll] = useState<IHistoryVoted[]>([]);
+
+  // lấy ra các nhóm câu hỏi
+  const listGroupQuestion = listQuestion
+    .map((item) => item.group)
+    .filter((value, index, self) => self.indexOf(value) === index);
 
   // list ma_cd send poll success
   const listCDSendPollSuccess = listSendPollStatusSuccess
@@ -134,6 +141,11 @@ export default function SendVoteView() {
   // Onchange for answer select
   const handleActionSelectAnswer = (event: React.SyntheticEvent, values: any) => {
     setAnswerSelect(values);
+  };
+  // Onchange for group question select
+  const handleGroupQuestionSelect = (values: any) => {
+    setAnswerSelect([]);
+    setGroupQuestionSelect(values);
   };
 
   const setInitFormWhenSubmit = () => {
@@ -255,6 +267,7 @@ export default function SendVoteView() {
         ten_cd: item.ten_cd,
         status: 'sent',
       })),
+      groupQuestionSelect,
       is_active: true,
       thoi_gian_gui: currentTimeUTC7(),
       thoi_gian_ket_thuc: ExpireTimeFunc(currentTimeUTC7(), expireTime),
@@ -390,6 +403,26 @@ export default function SendVoteView() {
       >
         <Box sx={{ width: '70%' }}>
           <Box className="name-content" sx={{ ...styles.box_name_content }}>
+            <Typography sx={{ width: '15%' }}>Nhóm câu hỏi:</Typography>
+            <FormControl sx={{ width: '70%' }} size="small">
+              <InputLabel id="demo-select-small-label">Chọn nhóm câu hỏi </InputLabel>
+              <Select
+                labelId="demo-select-small-label"
+                id="demo-select-small"
+                value={String(groupQuestionSelect)}
+                label="Nhóm"
+                onChange={(event) => handleGroupQuestionSelect(event.target.value)}
+              >
+                <MenuItem value="">
+                  <em>Vui lòng chọn nhóm câu hỏi</em>
+                </MenuItem>
+                {listGroupQuestion.map((item) => (
+                  <MenuItem value={item}>{`Nhóm ${item}`}</MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Box>
+          <Box className="name-content" sx={{ ...styles.box_name_content }}>
             <Typography sx={{ width: '15%' }}>Chọn câu hỏi:</Typography>
             <Autocomplete
               multiple
@@ -401,7 +434,7 @@ export default function SendVoteView() {
                 setInputValueTextAnswer(newInputValue);
               }}
               id="controllable-states-demo"
-              options={listQuestion}
+              options={listQuestion.filter((item) => item.group === groupQuestionSelect)}
               getOptionLabel={(option) => option.ten_poll as string}
               renderInput={(params) => (
                 <TextField {...params} placeholder="Câu hỏi" label="Chọn câu hỏi" size="small" />
@@ -424,7 +457,7 @@ export default function SendVoteView() {
               >
                 {answerSelect.map((item) => (
                   <Typography sx={{ width: '100%' }}>
-                    - {item.ten_poll} : {item.noi_dung}
+                    {`${item.ten_poll}  (Nhóm : ${item.group}): ${item.noi_dung}`}
                   </Typography>
                 ))}
               </Box>
@@ -581,6 +614,7 @@ export default function SendVoteView() {
                 <TableBody>
                   {historySendPoll.map((row) => (
                     <TableRow key={row.key}>
+                      <TableCell>{`Nhóm  ${row?.groupQuestionSelect}`}</TableCell>
                       <TableCell>
                         {row?.ds_poll_id?.map((item) => item.ten_poll).join(' | ')}
                       </TableCell>
