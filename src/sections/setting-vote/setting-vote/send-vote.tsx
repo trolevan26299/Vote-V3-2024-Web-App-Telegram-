@@ -155,11 +155,12 @@ export default function SendVoteView() {
     setExpireTime('');
   };
 
+  console.log('answerSelect:')
   // hàm trình chiếu muốn show tiến trình bầu cử của câu hỏi
   const handleShowResultQuestionForAdmin = () => {
     const keyShowFirebaseRef = ref(database, FIREBASE_COLLECTION.QUESTION_SHOW_BY_ADMIN);
     const updateData = {
-      key: answerSelect[0].key,
+      key: answerSelect[0].group,
     };
     update(keyShowFirebaseRef, updateData)
       .then(() => {

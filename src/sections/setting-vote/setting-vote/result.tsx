@@ -121,12 +121,15 @@ export default function ResultView() {
   // eslint-disable-next-line no-restricted-syntax
   for (const obj of listHistoryVoted) {
     // lọc các object trong thuộc tính detail theo điều kiện
-    let filteredArray = obj.detail.filter((item) => item.key_question === questionSelect);
+    console.log('obj:',obj)
+    let filteredArray = obj.detail?.filter((item) => item.key_question === questionSelect);
+    console.log('filteredArray', filteredArray)
     filteredArray = filteredArray.map((item) => ({ ...item, ma_cd: obj.ma_cd }));
     //  push các object trong filteredArray vào result
     listResultByQuestion.push(...filteredArray);
   }
-
+console.log('list history voted:',listHistoryVoted)
+console.log('question select:', questionSelect)
   // FUNCTION TO CALCULATE TOTAL CP
   const calculateTotalCP = (itemPoll: number) => {
     const listInfoForAnswer = listResultByQuestion?.filter(
