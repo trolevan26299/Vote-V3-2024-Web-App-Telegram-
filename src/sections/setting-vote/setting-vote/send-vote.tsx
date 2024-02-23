@@ -266,6 +266,7 @@ export default function SendVoteView() {
       gui_den: shareHolderSelect.map((item) => ({
         ma_cd: item.ma_cd,
         ten_cd: item.ten_cd,
+        cp_tham_du: item.cp_tham_du,
         status: 'sent',
       })),
       groupQuestionSelect,

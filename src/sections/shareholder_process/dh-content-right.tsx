@@ -35,6 +35,23 @@ export default function DHContentRight({
 }: Props) {
   const { user } = useUser();
   const theme = useTheme();
+  console.log('questionSelect', questionSelect);
+  console.log('historySendPollData', historySendPollData);
+
+  // logic lấy ra đã gửi nhóm câu hỏi được select cho bao nhiêu người
+  const listUserSendPoll = historySendPollData
+    ?.filter((item) => item.groupQuestionSelect === questionSelect)
+    .map((item2) => item2.gui_den)
+    .flatMap((item3) => item3);
+  console.log('listUserSendPoll', listUserSendPoll);
+  // lấy ra list thông tin của câu hỏi theo nhóm câu hỏi được chọn
+  const listQuestionInfoByGroupSelect = historySendPollData?.map((item) => item.ds_poll_id);
+  // list tổng cổ phần theo list câu hỏi trong group question
+  const listTotalShareholderByGroupSelect = listQuestionInfoByGroupSelect?.map(
+    (item) => item?.map((item2) => item2.key)
+  );
+  console.log('a:', listUserSendPoll);
+  const percentApproveByQuestionSelect = (10 / (listUserSendPoll?.length || 0)) * 100 || 0;
   // ------------------ LOGIC tính đã gửi câu hỏi select đến bao nhiêu người và không được trùng lặp số người
   const filteredArray =
     historySendPollData &&
@@ -55,7 +72,10 @@ export default function DHContentRight({
   const numberUserVoted = uniqueGuiDenObjects.filter(
     (itemUserVoted: any) => itemUserVoted.status === 'voted'
   ).length;
-  const percentUserVoted = (numberUserVoted / uniqueGuiDenObjects.length) * 100 || 0;
+  const percentUserVoted =
+    ((listUserSendPoll?.filter((item) => item?.status === 'voted')?.length || 0) /
+      (listUserSendPoll?.length || 0)) *
+      100 || 0;
 
   //  tạo một Set để lưu trữ các ma_cd đã xuất hiện
   const seenMaCd: string[] = [];
@@ -77,33 +97,37 @@ export default function DHContentRight({
     0;
 
   // ------------------ END LOGIC tính đã gửi câu hỏi select đến bao nhiêu người và không được trùng lặp số
-  const colors1 = [
-    'rgb(0, 167, 111)',
-    'rgb(255, 171, 0)',
-    '#2196F3',
-    '#00FFFF',
-    '#FFCC99',
-    '#FFCCFF',
-    '#FF9999',
-  ];
+
   const chart: chart = {
     series: [
       {
-        name: 'Tán Thành',
+        name: !user
+          ? 'Tán Thành (Approve)'
+          : user.nguoi_nuoc_ngoai === true
+          ? 'Approve'
+          : 'Tán Thành',
         data: [40, 55, 41, 37],
       },
       {
-        name: 'Không Tán Thành',
+        name: !user
+          ? 'Không Tán Thành (Disapprove)'
+          : user.nguoi_nuoc_ngoai === true
+          ? 'Disapprove'
+          : 'Không Tán Thành',
         data: [30, 32, 33, 52],
       },
       {
-        name: 'Chưa bình chọn',
+        name: !user
+          ? 'Chưa bình chọn (No Vote)'
+          : user.nguoi_nuoc_ngoai === true
+          ? 'No Vote'
+          : 'Chưa bình chọn',
         data: [30, 17, 11, 9],
       },
     ],
   };
 
-  const { series, colors, options } = chart;
+  const { options } = chart;
 
   const chartOptions = useChart({
     dataLabels: {
