@@ -66,7 +66,8 @@ export default function VoteDHView() {
   const handleChange = (
     event: React.ChangeEvent<HTMLInputElement>,
     questionKey: string,
-    key_history_send_poll: string
+    key_history_send_poll: string,
+    groupQuestionSelect?: string
   ) => {
     const selectedAnswerId = (event.target as HTMLInputElement).value;
 
@@ -82,6 +83,7 @@ export default function VoteDHView() {
       updatedSelectedAnswers[existingAnswerIndex].time_voted = currentTimeUTC7();
       updatedSelectedAnswers[existingAnswerIndex].key_history_send_poll = key_history_send_poll;
       updatedSelectedAnswers[existingAnswerIndex].ma_cd = user?.ma_cd;
+      updatedSelectedAnswers[existingAnswerIndex].group_question = groupQuestionSelect || '';
       setSelectedAnswers(updatedSelectedAnswers);
     } else {
       // Nếu chưa chọn, thêm vào danh sách
@@ -369,7 +371,12 @@ export default function VoteDHView() {
                           )?.answer_select_id || ''
                         }
                         onChange={(event) =>
-                          handleChange(event, item2.key as string, item.key as string)
+                          handleChange(
+                            event,
+                            item2.key as string,
+                            item.key as string,
+                            item?.groupQuestionSelect
+                          )
                         }
                         sx={{ display: 'flex', flexDirection: 'row' }}
                       >

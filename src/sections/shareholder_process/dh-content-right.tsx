@@ -5,7 +5,7 @@ import { ApexOptions } from 'apexcharts';
 import Chart, { useChart } from 'src/components/chart';
 import { useUser } from 'src/firebase/user_accesss_provider';
 import { IHistorySendPoll, IQuestion } from 'src/types/setting';
-import { ISelectedAnswer } from 'src/types/votedh.types';
+import { IHistoryVoted, ISelectedAnswer } from 'src/types/votedh.types';
 import { fNumber } from 'src/utils/format-number';
 import { bgGradient } from '../../theme/css';
 
@@ -24,6 +24,7 @@ interface Props {
   listResultByQuestion?: ISelectedAnswer[];
   questionSelect?: string;
   listSendPollSuccessByKey: number;
+  listHistoryVoted: IHistoryVoted[];
 }
 
 export default function DHContentRight({
@@ -32,11 +33,13 @@ export default function DHContentRight({
   listResultByQuestion,
   questionSelect,
   listSendPollSuccessByKey,
+  listHistoryVoted,
 }: Props) {
   const { user } = useUser();
   const theme = useTheme();
   console.log('questionSelect', questionSelect);
   console.log('historySendPollData', historySendPollData);
+  console.log('listHistoryVoted', listHistoryVoted);
 
   // logic lấy ra đã gửi nhóm câu hỏi được select cho bao nhiêu người
   const listUserSendPoll = historySendPollData
@@ -47,10 +50,11 @@ export default function DHContentRight({
   // lấy ra list thông tin của câu hỏi theo nhóm câu hỏi được chọn
   const listQuestionInfoByGroupSelect = historySendPollData?.map((item) => item.ds_poll_id);
   // list tổng cổ phần theo list câu hỏi trong group question
-  const listTotalShareholderByGroupSelect = listQuestionInfoByGroupSelect?.map(
-    (item) => item?.map((item2) => item2.key)
+  const totalShareholderByGroupSelect = listUserSendPoll?.reduce(
+    (total, userSendPoll) => total + (userSendPoll?.cp_tham_du || 0),
+    0
   );
-  console.log('a:', listUserSendPoll);
+  console.log('totalShareholderByGroupSelect', totalShareholderByGroupSelect);
   const percentApproveByQuestionSelect = (10 / (listUserSendPoll?.length || 0)) * 100 || 0;
   // ------------------ LOGIC tính đã gửi câu hỏi select đến bao nhiêu người và không được trùng lặp số người
   const filteredArray =
@@ -69,32 +73,10 @@ export default function DHContentRight({
     });
   });
 
-  const numberUserVoted = uniqueGuiDenObjects.filter(
-    (itemUserVoted: any) => itemUserVoted.status === 'voted'
-  ).length;
   const percentUserVoted =
     ((listUserSendPoll?.filter((item) => item?.status === 'voted')?.length || 0) /
       (listUserSendPoll?.length || 0)) *
       100 || 0;
-
-  //  tạo một Set để lưu trữ các ma_cd đã xuất hiện
-  const seenMaCd: string[] = [];
-
-  //  sử dụng phương thức reduce() để tính toán kết quả
-  const totalUserReceivedQuestion =
-    (filteredArray &&
-      filteredArray
-        .flatMap((obj) => obj.gui_den) // Chuyển mảng 2D thành mảng 1D
-        .filter((item) => {
-          // Nếu ma_cd đã xuất hiện, bỏ qua phần tử này
-          if (seenMaCd.includes(item?.ma_cd as string)) {
-            return false;
-          }
-          // Nếu chưa xuất hiện, thêm ma_cd vào mảng và giữ lại phần tử này
-          seenMaCd.push(item?.ma_cd as string);
-          return true;
-        }).length) ||
-    0;
 
   // ------------------ END LOGIC tính đã gửi câu hỏi select đến bao nhiêu người và không được trùng lặp số
 

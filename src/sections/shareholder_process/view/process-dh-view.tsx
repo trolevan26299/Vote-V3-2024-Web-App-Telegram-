@@ -423,6 +423,7 @@ export default function ProcessDHView() {
               historySendPollData={historySendPollData}
               questionSelect={questionSelect}
               listSendPollSuccessByKey={listSendPollSuccessByKey.length}
+              listHistoryVoted={listHistoryVoted}
             />
           </Grid>
           <Grid item xs={12}>

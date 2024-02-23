@@ -4,6 +4,7 @@ export type ISelectedAnswer = {
   answer_select_id: string;
   time_voted: string;
   ma_cd?: string;
+  group_question?: string;
 };
 
 export type IHistoryVoted = {

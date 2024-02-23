@@ -22,6 +22,7 @@ export interface IListSender {
   ma_cd?: string;
   ten_cd?: string;
   status?: string;
+  cp_tham_du?: number;
 }
 
 export interface IHistorySendPoll {
