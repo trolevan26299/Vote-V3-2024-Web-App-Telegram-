@@ -83,7 +83,6 @@ export default function VoteDHView() {
       updatedSelectedAnswers[existingAnswerIndex].time_voted = currentTimeUTC7();
       updatedSelectedAnswers[existingAnswerIndex].key_history_send_poll = key_history_send_poll;
       updatedSelectedAnswers[existingAnswerIndex].ma_cd = user?.ma_cd;
-      updatedSelectedAnswers[existingAnswerIndex].group_question = groupQuestionSelect || '';
       setSelectedAnswers(updatedSelectedAnswers);
     } else {
       // Nếu chưa chọn, thêm vào danh sách
