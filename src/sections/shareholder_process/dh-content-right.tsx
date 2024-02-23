@@ -87,22 +87,6 @@ export default function DHContentRight({
     '#FF9999',
   ];
   const chart: chart = {
-    // series:
-    //   (pollDataByKey &&
-    //     pollDataByKey?.dap_an?.map((item, index) => ({
-    //       label:
-    //         ((!user
-    //           ? `${item.vi}(${item.en})`
-    //           : user.nguoi_nuoc_ngoai === true
-    //           ? item.en
-    //           : item.vi) as string) || '',
-    //       value:
-    //         (listResultByQuestion &&
-    //           listResultByQuestion.filter((item2) => item2?.answer_select_id === String(item?.id))
-    //             .length) ||
-    //         0,
-    //     }))) ||
-    //   [],
     series: [
       {
         name: 'Tán Thành',
@@ -116,32 +100,10 @@ export default function DHContentRight({
         name: 'Chưa bình chọn',
         data: [30, 17, 11, 9],
       },
-      // {
-      //   name: 'Bucket Slope',
-      //   data: [9, 7, 5, 8, 6, 9, 4],
-      // },
-      // {
-      //   name: 'Reborn Kid',
-      //   data: [25, 12, 19, 32, 25, 24, 10],
-      // },
     ],
-    // colors: colors1,
   };
 
-  // Tính tổng value trong mảng
-  // const totalValue = chart.series.reduce((sum, item) => sum + item.value, 0);
-  // console.log('totalValue:', totalValue);
-  // chart.series.push({
-  //   label: !user
-  //     ? 'Chưa bình chọn (No Vote)'
-  //     : user.nguoi_nuoc_ngoai === true
-  //     ? 'No Vote'
-  //     : 'Chưa bình chọn',
-  //   value: listSendPollSuccessByKey - totalValue,
-  // });
-
   const { series, colors, options } = chart;
-  // const chartSeries = series.map((i) => i.value);
 
   const chartOptions = useChart({
     dataLabels: {
@@ -256,11 +218,6 @@ export default function DHContentRight({
               'Biểu đồ cổ đông bình chọn'
             )}
           </Typography>
-          {/* <Box sx={{display:'flex',flexDirection:'row' ,justifyContent:'space-between',alignItems:'end' ,paddingLeft:'1%',marginTop:'2%'}}>
-            <Typography> <b>Câu 1 :</b> Bầu cử anh A làm phó giám đốc</Typography>
-            <Typography> <b>Câu 2 :</b> Bầu cử anh A làm phó giám đốc</Typography>
-            <Typography> <b>Câu 3 :</b> Bầu cử anh A làm phó giám đốc</Typography>
-          </Box> */}
           <Chart type="bar" dir="ltr" series={chart.series} options={chartOptions} height={364} />
         </Stack>
       </Stack>

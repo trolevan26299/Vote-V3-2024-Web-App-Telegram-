@@ -144,7 +144,8 @@ export default function SendVoteView() {
   };
   // Onchange for group question select
   const handleGroupQuestionSelect = (values: any) => {
-    setAnswerSelect([]);
+    // setAnswerSelect([]);
+    setAnswerSelect(listQuestion.filter((item) => item.group === values));
     setGroupQuestionSelect(values);
   };
 
@@ -422,7 +423,7 @@ export default function SendVoteView() {
               </Select>
             </FormControl>
           </Box>
-          <Box className="name-content" sx={{ ...styles.box_name_content }}>
+          {/* <Box className="name-content" sx={{ ...styles.box_name_content }}>
             <Typography sx={{ width: '15%' }}>Chọn câu hỏi:</Typography>
             <Autocomplete
               multiple
@@ -442,7 +443,7 @@ export default function SendVoteView() {
               sx={{ width: '70%' }}
               size="small"
             />
-          </Box>
+          </Box> */}
 
           <Box className="name-content" sx={{ ...styles.box_name_content }}>
             <Typography sx={{ width: '15%' }}>Nội dung câu hỏi:</Typography>

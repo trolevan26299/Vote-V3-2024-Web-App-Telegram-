@@ -59,6 +59,7 @@ export default function ProcessDHView() {
   // CODE FOR SELECT QUESTION
   // Handle select question
   const [questionSelect, SetQuestionSelect] = useState<string>(danhSachPollData[0]?.key || '');
+
   const listSendPollSuccessByKey = listSendPollStatusSuccess
     .filter((item) => item.keyQuestion === questionSelect)
     .flatMap((item) => item.listUserSentSuccess);
@@ -102,8 +103,11 @@ export default function ProcessDHView() {
   // CODE FOR SELECT QUESTION FROM FIREBASE
   const existingKeys = new Set<string>();
 
-  // Lọc và merge dữ liệu từ ds_poll_id
-  console.log('history send poll data:', historySendPollData);
+  // xử lý lấy ra những nhóm câu hỏi đã gửi đi
+  const unitGroupQuestionSendVote = historySendPollData
+    .map((item) => item.groupQuestionSelect)
+    .filter((value, index, self) => self.indexOf(value) === index);
+
   const questionSelectData: any = historySendPollData.reduce((result, historyItem) => {
     // Duyệt qua mỗi phần tử trong ds_poll_id của historyItem
     historyItem?.ds_poll_id?.forEach((poll) => {
@@ -116,7 +120,6 @@ export default function ProcessDHView() {
     });
     return result;
   }, [] as IHistorySendPoll[]);
-  console.log('question Select data :', questionSelectData);
 
   const calculateTotalCP = (itemPoll: number) => {
     const listInfoForAnswer = listResultByQuestion?.filter(
@@ -335,10 +338,10 @@ export default function ProcessDHView() {
         <FormControl sx={{ width: user ? '250px !important' : '700px' }} size="small" fullWidth>
           <InputLabel id="demo-simple-select-label" sx={{ width: '100% !important' }} size="small">
             {!user
-              ? 'Chọn câu hỏi (Select Question)'
+              ? 'Chọn nhóm câu hỏi (Select Group Question)'
               : user.nguoi_nuoc_ngoai === true
-              ? 'Select answer'
-              : 'Chọn câu hỏi'}
+              ? 'Select group question'
+              : 'Chọn nhóm câu hỏi'}
           </InputLabel>
           <Select
             labelId="demo-simple-select-label"
@@ -349,7 +352,7 @@ export default function ProcessDHView() {
             sx={{ minWidth: '100% !important' }}
             fullWidth
           >
-            {questionSelectData.map((item: IQuestion) => (
+            {/* {questionSelectData.map((item: IQuestion) => (
               <MenuItem value={item.key} sx={{ minWidth: '100% important' }}>
                 {!user
                   ? `${item.ten_poll} (${pollDataByKey?.ten_poll_en})`
@@ -357,33 +360,41 @@ export default function ProcessDHView() {
                   ? item.ten_poll_en
                   : item.ten_poll}
               </MenuItem>
-            ))}
+            ))} */}
+            {unitGroupQuestionSendVote.map(
+              (item: string | undefined, index: number) =>
+                item && (
+                  <MenuItem key={index} value={item as string} sx={{ minWidth: '100% important' }}>
+                    {`${
+                      !user ? 'Nhóm(Group)' : user.nguoi_nuoc_ngoai ? 'Group' : 'Nhóm'
+                    }   ${item}`}
+                  </MenuItem>
+                )
+            )}
           </Select>
         </FormControl>
-        <Typography sx={{ color: theme.palette.text.primary }} mt={2}>
-          {!user ? (
-            <>
-              <Box fontWeight="fontWeightBold" display="inline">
-                Nội dung (Content) :
+        <Typography sx={{ color: theme.palette.text.primary }} mt={1}>
+          <>
+            <Box fontWeight="fontWeightBold" display="inline">
+              {!user
+                ? 'Nội dung (Content) :'
+                : user.nguoi_nuoc_ngoai === true
+                ? 'Content :'
+                : 'Nội dung :'}
+            </Box>
+            {danhSachPollData.map((item) => (
+              <Box>
+                {item.group === questionSelect ? (
+                  <Box>
+                    <Box fontWeight="fontWeightBold" display="inline">
+                      {item.ten_poll}
+                    </Box>
+                    : {item.noi_dung}
+                  </Box>
+                ) : null}
               </Box>
-              {danhSachPollData.find((item) => item.key === questionSelect)?.noi_dung} (
-              {danhSachPollData.find((item) => item.key === questionSelect)?.noi_dung_en})
-            </>
-          ) : user.nguoi_nuoc_ngoai === true ? (
-            <>
-              <Box fontWeight="fontWeightBold" display="inline">
-                Content
-              </Box>
-              : {danhSachPollData.find((item) => item.key === questionSelect)?.noi_dung_en}
-            </>
-          ) : (
-            <>
-              <Box fontWeight="fontWeightBold" display="inline">
-                Nội dung
-              </Box>
-              : {danhSachPollData.find((item) => item.key === questionSelect)?.noi_dung}
-            </>
-          )}
+            ))}
+          </>
         </Typography>
       </Alert>
       <Box
