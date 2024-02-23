@@ -228,9 +228,9 @@ export default function ProcessDHView() {
     const percentDisApprove = (totalDisapproveShares / totalShareholderByGroupSelect) * 100;
 
     // Xây dựng các chuỗi cho cột approve và disapprove
-    const approveString = `Lượt: ${approveResults.length} | ${totalApproveShares.toLocaleString(
-      'vi-VN'
-    )} CP (${percentApprove.toFixed(2)} %)`;
+    const approveString = `Số lượt bầu : ${
+      approveResults.length
+    } | ${totalApproveShares.toLocaleString('vi-VN')} CP (${percentApprove.toFixed(2)} %)`;
     const disapproveString = `Lượt: ${
       disapproveResults.length
     } | ${totalDisapproveShares.toLocaleString('vi-VN')} CP (${percentDisApprove.toFixed(2)} %)`;
