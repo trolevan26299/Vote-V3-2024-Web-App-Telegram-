@@ -7,8 +7,8 @@ import { alpha, useTheme } from '@mui/material/styles';
 import { ApexOptions } from 'apexcharts';
 import Chart, { useChart } from 'src/components/chart';
 import { useUser } from 'src/firebase/user_accesss_provider';
-import { IHistorySendPoll, IQuestion } from 'src/types/setting';
-import { IHistoryVoted, ISelectedAnswer } from 'src/types/votedh.types';
+import { IQuestion } from 'src/types/setting';
+import { IUserAccess } from 'src/types/userAccess.types';
 import { bgGradient } from '../../theme/css';
 
 interface chart {
@@ -83,7 +83,11 @@ export default function DHContentRight({
       },
       formatter(val: string | number | number[]) {
         if (typeof val === 'number') {
-          return `${val.toFixed(2)}%`;
+          return `${
+            !user
+              ? `${val.toFixed(2)}% - 2000CP - 10 ${!user ? ' Lượt (Voted)' : ' Voted'}`
+              : `${val.toFixed(2)}%`
+          }`;
         }
 
         return `${String(val.toString())} %`;
