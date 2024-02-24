@@ -166,7 +166,7 @@ export default function VoteDHView() {
         const index_gui_den = item?.gui_den?.findIndex((item: any) => item.ma_cd === user?.ma_cd);
         // Use runTransaction() instead of update()
         await runTransaction(
-          ref(database, `poll_process/ls_gui_poll${item.key}/gui_den/${index_gui_den}`),
+          ref(database, `poll_process/ls_gui_poll/${item.key}/gui_den/${index_gui_den}`),
           (currentData) =>
             // If currentData exists, merge it with the new data
 
@@ -229,7 +229,7 @@ export default function VoteDHView() {
     )
       .then(() => {
         updateHistorySendPoll();
-        updateStringValue(selectedAnswers[0].key_question);
+        updateStringValue(selectedAnswers[0].group_question as string);
         enqueueSnackbar(
           user && user.nguoi_nuoc_ngoai === true ? 'Send Success !' : 'Gửi ý kiến thành công  !',
           { variant: 'success' }
