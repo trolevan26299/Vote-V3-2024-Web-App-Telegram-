@@ -8,7 +8,6 @@ import { ApexOptions } from 'apexcharts';
 import Chart, { useChart } from 'src/components/chart';
 import { useUser } from 'src/firebase/user_accesss_provider';
 import { IQuestion } from 'src/types/setting';
-import { IUserAccess } from 'src/types/userAccess.types';
 import { bgGradient } from '../../theme/css';
 
 interface chart {
@@ -135,6 +134,10 @@ export default function DHContentRight({
         formatter(val) {
           return `${val.toFixed(2)}% - 2000CP - 10 Lượt`;
         },
+      },
+      fixed: {
+        enabled: true, // Kích hoạt cố định tooltip
+        position: 'center', // Cố định tooltip ở giữa
       },
     },
     fill: {
