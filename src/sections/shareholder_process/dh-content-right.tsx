@@ -77,16 +77,16 @@ export default function DHContentRight({
   const chartOptions = useChart({
     dataLabels: {
       enabled: true,
-      formatter(val: string | number | number[]) {
-        if (typeof val === 'number') {
-          return val.toFixed(2);
-        }
-
-        return val.toString();
-      },
       dropShadow: {
         enabled: false,
         blur: 1,
+      },
+      formatter(val: string | number | number[]) {
+        if (typeof val === 'number') {
+          return `${val.toFixed(2)}%`;
+        }
+
+        return `${String(val.toString())} %`;
       },
     },
     chart: {
@@ -129,7 +129,7 @@ export default function DHContentRight({
     tooltip: {
       y: {
         formatter(val) {
-          return `${val}% - 2000CP - 10 Người bình chọn`;
+          return `${val.toFixed(2)}% - 2000CP - 10 Lượt`;
         },
       },
     },

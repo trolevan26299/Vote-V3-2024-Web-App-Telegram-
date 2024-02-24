@@ -49,7 +49,6 @@ export default function SendVoteView() {
   ];
 
   // handle select answer
-  const [inputValueTextAnswer, setInputValueTextAnswer] = useState('');
   const [answerSelect, setAnswerSelect] = React.useState<IQuestion[]>([]);
   const [groupQuestionSelect, setGroupQuestionSelect] = React.useState<string>('');
 
@@ -139,9 +138,7 @@ export default function SendVoteView() {
   };
 
   // Onchange for answer select
-  const handleActionSelectAnswer = (event: React.SyntheticEvent, values: any) => {
-    setAnswerSelect(values);
-  };
+
   // Onchange for group question select
   const handleGroupQuestionSelect = (values: any) => {
     // setAnswerSelect([]);
@@ -153,9 +150,9 @@ export default function SendVoteView() {
     setAnswerSelect([]);
     setShareHolderSelect([]);
     setExpireTime('');
+    setGroupQuestionSelect('');
   };
 
-  console.log('answerSelect:')
   // hàm trình chiếu muốn show tiến trình bầu cử của câu hỏi
   const handleShowResultQuestionForAdmin = () => {
     const keyShowFirebaseRef = ref(database, FIREBASE_COLLECTION.QUESTION_SHOW_BY_ADMIN);

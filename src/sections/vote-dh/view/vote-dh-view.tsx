@@ -163,7 +163,6 @@ export default function VoteDHView() {
         const gui_den_by_cd = item?.gui_den?.find((item: any) => item.ma_cd === user?.ma_cd);
         const index_gui_den = item?.gui_den?.findIndex((item: any) => item.ma_cd === user?.ma_cd);
         // Use runTransaction() instead of update()
-        console.log('item group question select:', item.groupQuestionSelect);
         await runTransaction(
           ref(database, `poll_process/ls_gui_poll/${item.key}/gui_den/${index_gui_den}`),
           (currentData) =>
