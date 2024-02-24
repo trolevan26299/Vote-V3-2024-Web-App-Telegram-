@@ -3,7 +3,7 @@
 import { Box, Button, Typography } from '@mui/material';
 import { alpha, useTheme } from '@mui/material/styles';
 import axios from 'axios';
-import { get, ref, set, remove } from 'firebase/database';
+import { get, ref, remove } from 'firebase/database';
 import { useSnackbar } from 'notistack';
 import { useEffect, useState } from 'react';
 import { ConfirmDialog } from 'src/components/custom-dialog';

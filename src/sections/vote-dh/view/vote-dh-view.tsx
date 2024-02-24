@@ -16,8 +16,7 @@ import {
   Typography,
 } from '@mui/material';
 import { alpha, useTheme } from '@mui/material/styles';
-import axios from 'axios';
-import { DataSnapshot, child, onValue, push, ref, runTransaction } from 'firebase/database';
+import { DataSnapshot, onValue, push, ref, runTransaction } from 'firebase/database';
 import { enqueueSnackbar } from 'notistack';
 import { useEffect, useState } from 'react';
 import CustomBreadcrumbs from 'src/components/custom-breadcrumbs';
@@ -32,7 +31,6 @@ import { IHistorySendPoll, IQuestion } from 'src/types/setting';
 import { IHistoryVoted, ISelectedAnswer } from 'src/types/votedh.types';
 import { convertToMilliseconds } from 'src/utils/convertTimeStringToMiliSeconds';
 import { currentTimeUTC7 } from 'src/utils/currentTimeUTC+7';
-import { GenerateUniqueID } from 'src/utils/getUuid';
 import { bgGradient } from '../../../theme/css';
 import VoteDHTable from '../vote-dh-table';
 
@@ -200,6 +198,7 @@ export default function VoteDHView() {
   //   // Nếu item không có gui_den, giữ nguyên item
   //   return item;
   // });
+  console.log('selectedAnswers[0].group_question:', selectedAnswers[0].group_question);
   const handleSubmitVote = async () => {
     const dataExist =
       listHistoryVoted.length > 0

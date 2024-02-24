@@ -58,7 +58,6 @@ export default function ProcessDHView() {
   const [danhSachPollData, setDanhSachPollData] = useState<IQuestion[]>([]);
   const [listHistoryVoted, setListHistoryVoted] = useState<IHistoryVoted[]>([]);
   const [isNewQuestion, setIsNewQuestion] = useState(false);
-  console.log('historySendPollData', historySendPollData);
 
   // CODE FOR SELECT QUESTION
   // Handle select question
@@ -116,14 +115,12 @@ export default function ProcessDHView() {
     .map((item2) => item2.gui_den)
     .flatMap((item3) => item3);
 
-  console.log('pollDataByKey', pollDataByKey);
-  console.log('listUserSendPoll', listUserSendPoll);
   // list tổng cổ phần theo list câu hỏi trong group question
   const totalShareholderByGroupSelect = listUserSendPoll?.reduce(
     (total, userSendPoll) => total + (userSendPoll?.cp_tham_du || 0),
     0
   );
-  console.log('totalShareholderByGroupSelect', totalShareholderByGroupSelect);
+
   // logic lấy ra câu trả lời của người dùng(đáp án , cp tham dự) theo từng câu hỏi có trong group question select
   const listResultByQuestionSelect = pollDataByKey
     ?.map((pollItem) => {
@@ -148,7 +145,6 @@ export default function ProcessDHView() {
     })
     .flat()
     .filter((item) => item !== null);
-  console.log('listResultByQuestionSelect', listResultByQuestionSelect);
 
   // logic tính phần trăm "Tán thành" và không tán thành theo cổ phần tham dự theo từng câu hỏi được gửi trong group question select
   const calculatePercentResultByQuestion = (answerId: string): ApprovePercentage[] =>
