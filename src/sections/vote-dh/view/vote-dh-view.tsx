@@ -208,6 +208,7 @@ export default function VoteDHView() {
   //       console.log('Error saving data:', error);
   //     });
   // };
+  console.log('selectedAnswers', selectedAnswers);
   const handleSubmitVote = async () => {
     const dataExist =
       listHistoryVoted.length > 0
@@ -223,7 +224,7 @@ export default function VoteDHView() {
       });
       if (response) {
         updateHistorySendPoll();
-        updateStringValue(selectedAnswers[0].key_question);
+        updateStringValue(selectedAnswers[0].group_question as string);
         enqueueSnackbar(
           user && user.nguoi_nuoc_ngoai === true ? 'Send Success !' : 'Gửi ý kiến thành công  !',
           { variant: 'success' }
