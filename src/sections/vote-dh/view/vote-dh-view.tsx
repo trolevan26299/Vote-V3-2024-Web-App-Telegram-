@@ -133,11 +133,55 @@ export default function VoteDHView() {
     0
   );
 
-  const updateHistorySendPoll = async () => {
+  // const updateHistorySendPoll = async () => {
+  //   // update lịch sử gửi poll khi gửi ý kiến thành công
+  //   // status : sent => voted
+  //   // Tạo mảng mới với dữ liệu đã được cập nhật
+  //   const updatedFilteredData = filteredData.map((item) => {
+  //     // Kiểm tra xem item có thuộc tính gui_den hay không
+  //     if (item.gui_den) {
+  //       // Lọc qua mảng item.gui_den và tìm đến object có ma_cd === user?.ma_cd
+  //       const updatedGuiDen = item.gui_den.map((den) => {
+  //         // Nếu ma_cd trùng với user?.ma_cd, thì cập nhật thuộc tính status thành 'voted'
+  //         if (den.ma_cd === user?.ma_cd) {
+  //           return { ...den, status: 'voted' };
+  //         }
+  //         // Nếu ma_cd không trùng, giữ nguyên object
+  //         return den;
+  //       });
+
+  //       // Trả về một bản sao của item với gui_den đã được cập nhật
+  //       return { ...item, gui_den: updatedGuiDen };
+  //     }
+
+  //     // Nếu item không có gui_den, giữ nguyên item
+  //     return item;
+  //   });
+
+  //   const historySendVoteRef = ref(database, 'poll_process/ls_gui_poll');
+
+  //   for (const item of updatedFilteredData) {
+  //     if (item.key) {
+  //       const itemRef = child(historySendVoteRef, item.key);
+
+  //       // Use runTransaction() instead of update()
+  //       await runTransaction(itemRef, (currentData) => {
+  //         // If currentData exists, merge it with the new data
+  //         if (currentData) {
+  //           return { ...currentData, ...item };
+  //         }
+  //         // If currentData does not exist, just return the new data
+  //         return item;
+  //       });
+  //       router.push(paths.dashboard.process.dh);
+  //     }
+  //   }
+  // };
+  const updateHistorySendPoll = async () =>
     // update lịch sử gửi poll khi gửi ý kiến thành công
     // status : sent => voted
     // Tạo mảng mới với dữ liệu đã được cập nhật
-    const updatedFilteredData = filteredData.map((item) => {
+    filteredData.map((item) => {
       // Kiểm tra xem item có thuộc tính gui_den hay không
       if (item.gui_den) {
         // Lọc qua mảng item.gui_den và tìm đến object có ma_cd === user?.ma_cd
@@ -157,27 +201,6 @@ export default function VoteDHView() {
       // Nếu item không có gui_den, giữ nguyên item
       return item;
     });
-
-    const historySendVoteRef = ref(database, 'poll_process/ls_gui_poll');
-
-    for (const item of updatedFilteredData) {
-      if (item.key) {
-        const itemRef = child(historySendVoteRef, item.key);
-
-        // Use runTransaction() instead of update()
-        await runTransaction(itemRef, (currentData) => {
-          // If currentData exists, merge it with the new data
-          if (currentData) {
-            return { ...currentData, ...item };
-          }
-          // If currentData does not exist, just return the new data
-          return item;
-        });
-        router.push(paths.dashboard.process.dh);
-      }
-    }
-  };
-
   // const handleSubmitVote = async () => {
   //   const dataExist =
   //     listHistoryVoted.length > 0
@@ -220,6 +243,8 @@ export default function VoteDHView() {
         ma_cd: user?.ma_cd,
         cp_tham_du: user?.cp_tham_du,
         detail: dataExist ? [...dataExist.detail, ...selectedAnswers] : selectedAnswers,
+        // for update ls_gui_poll
+        updateHistorySendPoll: updateHistorySendPoll(),
       });
       console.log('response:', response);
       if (response) {
