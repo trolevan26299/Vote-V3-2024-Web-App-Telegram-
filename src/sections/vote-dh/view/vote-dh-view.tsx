@@ -177,30 +177,30 @@ export default function VoteDHView() {
   //     }
   //   }
   // };
-  const updateHistorySendPoll = async () =>
-    // update lịch sử gửi poll khi gửi ý kiến thành công
-    // status : sent => voted
-    // Tạo mảng mới với dữ liệu đã được cập nhật
-    filteredData.map((item) => {
-      // Kiểm tra xem item có thuộc tính gui_den hay không
-      if (item.gui_den) {
-        // Lọc qua mảng item.gui_den và tìm đến object có ma_cd === user?.ma_cd
-        const updatedGuiDen = item.gui_den.map((den) => {
-          // Nếu ma_cd trùng với user?.ma_cd, thì cập nhật thuộc tính status thành 'voted'
-          if (den.ma_cd === user?.ma_cd) {
-            return { ...den, status: 'voted' };
-          }
-          // Nếu ma_cd không trùng, giữ nguyên object
-          return den;
-        });
+  // const updateHistorySendPoll = async () =>
+  // update lịch sử gửi poll khi gửi ý kiến thành công
+  // status : sent => voted
+  // Tạo mảng mới với dữ liệu đã được cập nhật
+  const dataUpdateLsSendPoll = filteredData.map((item) => {
+    // Kiểm tra xem item có thuộc tính gui_den hay không
+    if (item.gui_den) {
+      // Lọc qua mảng item.gui_den và tìm đến object có ma_cd === user?.ma_cd
+      const updatedGuiDen = item.gui_den.map((den) => {
+        // Nếu ma_cd trùng với user?.ma_cd, thì cập nhật thuộc tính status thành 'voted'
+        if (den.ma_cd === user?.ma_cd) {
+          return { ...den, status: 'voted' };
+        }
+        // Nếu ma_cd không trùng, giữ nguyên object
+        return den;
+      });
 
-        // Trả về một bản sao của item với gui_den đã được cập nhật
-        return { ...item, gui_den: updatedGuiDen };
-      }
+      // Trả về một bản sao của item với gui_den đã được cập nhật
+      return { ...item, gui_den: updatedGuiDen };
+    }
 
-      // Nếu item không có gui_den, giữ nguyên item
-      return item;
-    });
+    // Nếu item không có gui_den, giữ nguyên item
+    return item;
+  });
   // const handleSubmitVote = async () => {
   //   const dataExist =
   //     listHistoryVoted.length > 0
@@ -244,7 +244,7 @@ export default function VoteDHView() {
         cp_tham_du: user?.cp_tham_du,
         detail: dataExist ? [...dataExist.detail, ...selectedAnswers] : selectedAnswers,
         // for update ls_gui_poll
-        updateHistorySendPoll: updateHistorySendPoll(),
+        updateHistorySendPoll: dataUpdateLsSendPoll,
       });
       console.log('response:', response);
       if (response) {
