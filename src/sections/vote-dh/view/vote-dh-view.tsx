@@ -198,7 +198,7 @@ export default function VoteDHView() {
   //   // Nếu item không có gui_den, giữ nguyên item
   //   return item;
   // });
-  console.log('selectedAnswers[0].group_question:', selectedAnswers[0].group_question);
+  console.log('selectedAnswers[0].group_question:', selectedAnswers[0]?.group_question);
   const handleSubmitVote = async () => {
     const dataExist =
       listHistoryVoted.length > 0
@@ -228,7 +228,7 @@ export default function VoteDHView() {
     )
       .then(() => {
         updateHistorySendPoll();
-        updateStringValue(selectedAnswers[0].group_question as string);
+        updateStringValue(selectedAnswers[0]?.group_question as string);
         enqueueSnackbar(
           user && user.nguoi_nuoc_ngoai === true ? 'Send Success !' : 'Gửi ý kiến thành công  !',
           { variant: 'success' }
