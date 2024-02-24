@@ -208,7 +208,6 @@ export default function VoteDHView() {
   //       console.log('Error saving data:', error);
   //     });
   // };
-  console.log('selectedAnswers', selectedAnswers);
   const handleSubmitVote = async () => {
     const dataExist =
       listHistoryVoted.length > 0
