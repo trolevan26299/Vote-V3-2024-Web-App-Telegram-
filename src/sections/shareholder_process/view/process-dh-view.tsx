@@ -225,18 +225,30 @@ export default function ProcessDHView() {
     const percentDisApprove = (totalDisapproveShares / totalShareholderByGroupSelect) * 100;
 
     // Xây dựng các chuỗi cho cột approve và disapprove
-    const approveString = `Số lượt bầu : ${
-      approveResults.length
-    } | ${totalApproveShares.toLocaleString('vi-VN')} CP (${percentApprove.toFixed(2)} %)`;
-    const disapproveString = `Lượt: ${
-      disapproveResults.length
-    } | ${totalDisapproveShares.toLocaleString('vi-VN')} CP (${percentDisApprove.toFixed(2)} %)`;
+    const approveString = ` ${
+      !user
+        ? 'Lượt bầu (Number Voted) : '
+        : user.nguoi_nuoc_ngoai
+        ? 'Number Voted : '
+        : 'Lượt bầu :'
+    } ${approveResults.length} | ${totalApproveShares.toLocaleString(
+      'vi-VN'
+    )} CP (${percentApprove.toFixed(2)} %)`;
+    const disapproveString = `${
+      !user
+        ? 'Lượt bầu (Number Voted) : '
+        : user.nguoi_nuoc_ngoai
+        ? 'Number Voted : '
+        : 'Lượt bầu :'
+    } ${disapproveResults.length} | ${totalDisapproveShares.toLocaleString(
+      'vi-VN'
+    )} CP (${percentDisApprove.toFixed(2)} %)`;
 
     // Trả về dữ liệu cho mỗi hàng trong bảng
     return {
       question: `${
         !user
-          ? `${pollItem.ten_poll} (${pollItem.ten_poll_en}) `
+          ? `${pollItem.ten_poll} `
           : user.nguoi_nuoc_ngoai
           ? pollItem.ten_poll_en
           : pollItem.ten_poll
@@ -418,7 +430,7 @@ export default function ProcessDHView() {
                     <Box fontWeight="fontWeightBold" display="inline">
                       {item.ten_poll}
                     </Box>
-                    : {item.noi_dung}
+                    : {item.noi_dung} ( {item.noi_dung_en} )
                   </Box>
                 ) : null}
               </Box>
