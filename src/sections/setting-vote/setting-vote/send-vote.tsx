@@ -499,6 +499,8 @@ export default function SendVoteView() {
                 <MenuItem value="">
                   <em>Vui lòng chọn thời gian</em>
                 </MenuItem>
+                <MenuItem value={5}>5 Phút</MenuItem>
+                <MenuItem value={10}>10 Phút</MenuItem>
                 <MenuItem value={15}>15 Phút</MenuItem>
                 <MenuItem value={30}>30 Phút</MenuItem>
                 <MenuItem value={45}>45 Phút</MenuItem>
