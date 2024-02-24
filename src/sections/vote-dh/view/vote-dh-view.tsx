@@ -167,11 +167,10 @@ export default function VoteDHView() {
         // Use runTransaction() instead of update()
         await runTransaction(
           ref(database, `poll_process/ls_gui_poll${item.key}/gui_den/${index_gui_den}`),
-          (currentData) => {
+          (currentData) =>
             // If currentData exists, merge it with the new data
 
-            return gui_den_by_cd;
-          }
+            gui_den_by_cd
         );
         router.push(paths.dashboard.process.dh);
       }
