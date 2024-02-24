@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-loop-func */
+/* eslint-disable @typescript-eslint/no-shadow */
 /* eslint-disable no-await-in-loop */
 /* eslint-disable no-restricted-syntax */
 
@@ -15,7 +17,7 @@ import {
 } from '@mui/material';
 import { alpha, useTheme } from '@mui/material/styles';
 import axios from 'axios';
-import { DataSnapshot, child, onValue, ref, runTransaction } from 'firebase/database';
+import { DataSnapshot, child, onValue, push, ref, runTransaction } from 'firebase/database';
 import { enqueueSnackbar } from 'notistack';
 import { useEffect, useState } from 'react';
 import CustomBreadcrumbs from 'src/components/custom-breadcrumbs';
@@ -133,134 +135,142 @@ export default function VoteDHView() {
     0
   );
 
-  // const updateHistorySendPoll = async () => {
-  //   // update lịch sử gửi poll khi gửi ý kiến thành công
-  //   // status : sent => voted
-  //   // Tạo mảng mới với dữ liệu đã được cập nhật
-  //   const updatedFilteredData = filteredData.map((item) => {
-  //     // Kiểm tra xem item có thuộc tính gui_den hay không
-  //     if (item.gui_den) {
-  //       // Lọc qua mảng item.gui_den và tìm đến object có ma_cd === user?.ma_cd
-  //       const updatedGuiDen = item.gui_den.map((den) => {
-  //         // Nếu ma_cd trùng với user?.ma_cd, thì cập nhật thuộc tính status thành 'voted'
-  //         if (den.ma_cd === user?.ma_cd) {
-  //           return { ...den, status: 'voted' };
-  //         }
-  //         // Nếu ma_cd không trùng, giữ nguyên object
-  //         return den;
-  //       });
+  const updateHistorySendPoll = async () => {
+    // update lịch sử gửi poll khi gửi ý kiến thành công
+    // status : sent => voted
+    // Tạo mảng mới với dữ liệu đã được cập nhật
+    const updatedFilteredData = filteredData.map((item) => {
+      // Kiểm tra xem item có thuộc tính gui_den hay không
+      if (item.gui_den) {
+        // Lọc qua mảng item.gui_den và tìm đến object có ma_cd === user?.ma_cd
+        const updatedGuiDen = item.gui_den.map((den) => {
+          // Nếu ma_cd trùng với user?.ma_cd, thì cập nhật thuộc tính status thành 'voted'
+          if (den.ma_cd === user?.ma_cd) {
+            return { ...den, status: 'voted' };
+          }
+          // Nếu ma_cd không trùng, giữ nguyên object
+          return den;
+        });
 
-  //       // Trả về một bản sao của item với gui_den đã được cập nhật
-  //       return { ...item, gui_den: updatedGuiDen };
-  //     }
+        // Trả về một bản sao của item với gui_den đã được cập nhật
+        return { ...item, gui_den: updatedGuiDen };
+      }
 
-  //     // Nếu item không có gui_den, giữ nguyên item
-  //     return item;
-  //   });
+      // Nếu item không có gui_den, giữ nguyên item
+      return item;
+    });
 
-  //   const historySendVoteRef = ref(database, 'poll_process/ls_gui_poll');
+    for (const item of updatedFilteredData) {
+      if (item.key) {
+        const gui_den_by_cd = item?.gui_den?.find((item: any) => item.ma_cd === user?.ma_cd);
+        const index_gui_den = item?.gui_den?.findIndex((item: any) => item.ma_cd === user?.ma_cd);
+        // Use runTransaction() instead of update()
+        await runTransaction(
+          ref(database, `poll_process/ls_gui_poll${item.key}/gui_den/${index_gui_den}`),
+          (currentData) => {
+            // If currentData exists, merge it with the new data
 
-  //   for (const item of updatedFilteredData) {
-  //     if (item.key) {
-  //       const itemRef = child(historySendVoteRef, item.key);
-
-  //       // Use runTransaction() instead of update()
-  //       await runTransaction(itemRef, (currentData) => {
-  //         // If currentData exists, merge it with the new data
-  //         if (currentData) {
-  //           return { ...currentData, ...item };
-  //         }
-  //         // If currentData does not exist, just return the new data
-  //         return item;
-  //       });
-  //       router.push(paths.dashboard.process.dh);
-  //     }
-  //   }
-  // };
+            return gui_den_by_cd;
+          }
+        );
+        router.push(paths.dashboard.process.dh);
+      }
+    }
+  };
   // const updateHistorySendPoll = async () =>
   // update lịch sử gửi poll khi gửi ý kiến thành công
   // status : sent => voted
   // Tạo mảng mới với dữ liệu đã được cập nhật
-  const dataUpdateLsSendPoll = filteredData.map((item) => {
-    // Kiểm tra xem item có thuộc tính gui_den hay không
-    if (item.gui_den) {
-      // Lọc qua mảng item.gui_den và tìm đến object có ma_cd === user?.ma_cd
-      const updatedGuiDen = item.gui_den.map((den) => {
-        // Nếu ma_cd trùng với user?.ma_cd, thì cập nhật thuộc tính status thành 'voted'
-        if (den.ma_cd === user?.ma_cd) {
-          return { ...den, status: 'voted' };
-        }
-        // Nếu ma_cd không trùng, giữ nguyên object
-        return den;
-      });
-
-      // Trả về một bản sao của item với gui_den đã được cập nhật
-      return { ...item, gui_den: updatedGuiDen };
-    }
-
-    // Nếu item không có gui_den, giữ nguyên item
-    return item;
-  });
-  // const handleSubmitVote = async () => {
-  //   const dataExist =
-  //     listHistoryVoted.length > 0
-  //       ? listHistoryVoted.find((item) => item?.ma_cd === user?.ma_cd)
-  //       : undefined; // Tìm xem đã gửi voted lần nào chưa
-  //   const historyVotedRef = ref(
-  //     database,
-  //     `poll_process/ls_poll/${dataExist ? dataExist?.key : ''}`
-  //   ); // nếu có rồi đổi ref để chỉnh sửa , nếu chưa ref để thêm mới
-
-  //   const newRef = push(historyVotedRef);
-
-  //   await set(dataExist ? historyVotedRef : newRef, {
-  //     ma_cd: user?.ma_cd,
-  //     cp_tham_du: user?.cp_tham_du,
-  //     detail: dataExist ? [...dataExist.detail, ...selectedAnswers] : selectedAnswers,
-  //   })
-  //     .then(() => {
-  //       updateHistorySendPoll();
-  //       updateStringValue(selectedAnswers[0].key_question);
-  //       enqueueSnackbar(
-  //         user && user.nguoi_nuoc_ngoai === true ? 'Send Success !' : 'Gửi ý kiến thành công  !',
-  //         { variant: 'success' }
-  //       );
-  //     })
-  //     .catch((error) => {
-  //       enqueueSnackbar('Gửi ý kiến lỗi !', { variant: 'error' });
-  //       console.log('Error saving data:', error);
+  // const dataUpdateLsSendPoll = filteredData.map((item) => {
+  //   // Kiểm tra xem item có thuộc tính gui_den hay không
+  //   if (item.gui_den) {
+  //     // Lọc qua mảng item.gui_den và tìm đến object có ma_cd === user?.ma_cd
+  //     const updatedGuiDen = item.gui_den.map((den) => {
+  //       // Nếu ma_cd trùng với user?.ma_cd, thì cập nhật thuộc tính status thành 'voted'
+  //       if (den.ma_cd === user?.ma_cd) {
+  //         return { ...den, status: 'voted' };
+  //       }
+  //       // Nếu ma_cd không trùng, giữ nguyên object
+  //       return den;
   //     });
-  // };
+
+  //     // Trả về một bản sao của item với gui_den đã được cập nhật
+  //     return { ...item, gui_den: updatedGuiDen };
+  //   }
+
+  //   // Nếu item không có gui_den, giữ nguyên item
+  //   return item;
+  // });
   const handleSubmitVote = async () => {
     const dataExist =
       listHistoryVoted.length > 0
         ? listHistoryVoted.find((item) => item?.ma_cd === user?.ma_cd)
         : undefined; // Tìm xem đã gửi voted lần nào chưa
+    const historyVotedRef = ref(
+      database,
+      `poll_process/ls_poll/${dataExist ? dataExist?.key : ''}`
+    ); // nếu có rồi đổi ref để chỉnh sửa , nếu chưa ref để thêm mới
 
-    try {
-      const response = await axios.post(`${process.env.NEXT_PUBLIC_HOST_API}/vote`, {
-        key: dataExist ? dataExist?.key : GenerateUniqueID(),
+    const newRef = push(historyVotedRef);
+
+    // await set(dataExist ? historyVotedRef : newRef, {
+    //   ma_cd: user?.ma_cd,
+    //   cp_tham_du: user?.cp_tham_du,
+    //   detail: dataExist ? [...dataExist.detail, ...selectedAnswers] : selectedAnswers,
+    // });
+    // eslint-disable-next-line consistent-return
+    await runTransaction(dataExist ? historyVotedRef : newRef, (currentData) =>
+      // If currentData exists, merge it with the new data
+
+      ({
         ma_cd: user?.ma_cd,
         cp_tham_du: user?.cp_tham_du,
         detail: dataExist ? [...dataExist.detail, ...selectedAnswers] : selectedAnswers,
-        // for update ls_gui_poll
-        updateHistorySendPoll: dataUpdateLsSendPoll,
-      });
-      console.log('response:', response);
-      if (response) {
-        // updateHistorySendPoll();
-        // updateStringValue(selectedAnswers[0].group_question as string);
+      })
+    )
+      .then(() => {
+        updateHistorySendPoll();
+        updateStringValue(selectedAnswers[0].key_question);
         enqueueSnackbar(
           user && user.nguoi_nuoc_ngoai === true ? 'Send Success !' : 'Gửi ý kiến thành công  !',
           { variant: 'success' }
         );
-      }
-      console.log('response', response);
-    } catch (error) {
-      enqueueSnackbar('Gửi ý kiến lỗi !', { variant: 'error' });
-      console.log('Error saving data:', error);
-    }
+      })
+      .catch((error) => {
+        enqueueSnackbar('Gửi ý kiến lỗi !', { variant: 'error' });
+        console.log('Error saving data:', error);
+      });
   };
+  // const handleSubmitVote = async () => {
+  //   const dataExist =
+  //     listHistoryVoted.length > 0
+  //       ? listHistoryVoted.find((item) => item?.ma_cd === user?.ma_cd)
+  //       : undefined; // Tìm xem đã gửi voted lần nào chưa
+
+  //   try {
+  //     const response = await axios.post(`${process.env.NEXT_PUBLIC_HOST_API}/vote`, {
+  //       key: dataExist ? dataExist?.key : GenerateUniqueID(),
+  //       ma_cd: user?.ma_cd,
+  //       cp_tham_du: user?.cp_tham_du,
+  //       detail: dataExist ? [...dataExist.detail, ...selectedAnswers] : selectedAnswers,
+  //       // for update ls_gui_poll
+  //       updateHistorySendPoll: dataUpdateLsSendPoll,
+  //     });
+  //     console.log('response:', response);
+  //     if (response) {
+  //       // updateHistorySendPoll();
+  //       // updateStringValue(selectedAnswers[0].group_question as string);
+  //       enqueueSnackbar(
+  //         user && user.nguoi_nuoc_ngoai === true ? 'Send Success !' : 'Gửi ý kiến thành công  !',
+  //         { variant: 'success' }
+  //       );
+  //     }
+  //     console.log('response', response);
+  //   } catch (error) {
+  //     enqueueSnackbar('Gửi ý kiến lỗi !', { variant: 'error' });
+  //     console.log('Error saving data:', error);
+  //   }
+  // };
 
   // GET DATA FROM FIREBASE
   useEffect(() => {

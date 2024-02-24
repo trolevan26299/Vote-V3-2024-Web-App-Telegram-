@@ -58,6 +58,7 @@ export default function ProcessDHView() {
   const [danhSachPollData, setDanhSachPollData] = useState<IQuestion[]>([]);
   const [listHistoryVoted, setListHistoryVoted] = useState<IHistoryVoted[]>([]);
   const [isNewQuestion, setIsNewQuestion] = useState(false);
+  console.log('historySendPollData', historySendPollData);
 
   // CODE FOR SELECT QUESTION
   // Handle select question
