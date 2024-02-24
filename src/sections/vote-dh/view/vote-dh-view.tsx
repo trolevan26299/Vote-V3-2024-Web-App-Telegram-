@@ -221,14 +221,15 @@ export default function VoteDHView() {
         cp_tham_du: user?.cp_tham_du,
         detail: dataExist ? [...dataExist.detail, ...selectedAnswers] : selectedAnswers,
       });
-      // if (response) {
-      //   updateHistorySendPoll();
-      //   updateStringValue(selectedAnswers[0].group_question as string);
-      //   enqueueSnackbar(
-      //     user && user.nguoi_nuoc_ngoai === true ? 'Send Success !' : 'Gửi ý kiến thành công  !',
-      //     { variant: 'success' }
-      //   );
-      // }
+      console.log('response:', response);
+      if (response) {
+        // updateHistorySendPoll();
+        // updateStringValue(selectedAnswers[0].group_question as string);
+        enqueueSnackbar(
+          user && user.nguoi_nuoc_ngoai === true ? 'Send Success !' : 'Gửi ý kiến thành công  !',
+          { variant: 'success' }
+        );
+      }
       console.log('response', response);
     } catch (error) {
       enqueueSnackbar('Gửi ý kiến lỗi !', { variant: 'error' });
