@@ -120,7 +120,6 @@ export default function ProcessDHView() {
     (total, userSendPoll) => total + (userSendPoll?.cp_tham_du || 0),
     0
   );
-
   // logic lấy ra câu trả lời của người dùng(đáp án , cp tham dự) theo từng câu hỏi có trong group question select
   const listResultByQuestionSelect = pollDataByKey
     ?.map((pollItem) => {
@@ -198,6 +197,31 @@ export default function ProcessDHView() {
       100 || 0;
 
   // ======================= End for content right==================================================
+
+  const dataForChart = pollDataByKey.map((pollItem) => {
+    const approveResults = listResultByQuestionSelect.filter(
+      (resultItem) => resultItem?.key === pollItem.key && resultItem?.answer_select_id === '0'
+    );
+    const disapproveResults = listResultByQuestionSelect.filter(
+      (resultItem) => resultItem?.key === pollItem.key && resultItem?.answer_select_id === '2'
+    );
+
+    // số cổ phần chưa bầu
+    const totalShareholderNoVote = listUserSendPoll
+      .filter((item) => item?.status === 'sent')
+      ?.reduce((total, userSendPoll) => total + (userSendPoll?.cp_tham_du || 0), 0);
+    // số lượt chưa bầu :
+    const totalNoVote = listUserSendPoll.filter((item) => item?.status === 'sent').length || 0;
+    return {
+      question: pollItem.ten_poll,
+      approve: approveResults,
+      disapprove: disapproveResults,
+      noVote: {
+        totalShareholderNoVote,
+        totalNoVote,
+      },
+    };
+  });
 
   const dataTable = pollDataByKey.map((pollItem) => {
     // Lọc danh sách các kết quả bỏ phiếu cho câu hỏi hiện tại từ listResultByQuestionSelect
@@ -463,6 +487,7 @@ export default function ProcessDHView() {
               calculatePercentResultByQuestion={calculatePercentResultByQuestion}
               percentNoVoteByQuestion={percentNoVoteByQuestion}
               percentUserVoted={percentUserVoted}
+              dataForChart={dataForChart}
             />
           </Grid>
           <Grid item xs={12}>

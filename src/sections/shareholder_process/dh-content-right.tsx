@@ -27,6 +27,7 @@ interface Props {
   calculatePercentResultByQuestion: (answerId: string) => ApprovePercentage[];
   percentNoVoteByQuestion: any;
   percentUserVoted: number;
+  dataForChart: any[];
 }
 
 export default function DHContentRight({
@@ -34,9 +35,11 @@ export default function DHContentRight({
   calculatePercentResultByQuestion,
   percentNoVoteByQuestion,
   percentUserVoted,
+  dataForChart,
 }: Props) {
   const { user } = useUser();
   const theme = useTheme();
+  console.log('dataForChart', dataForChart);
 
   // ------------------ END LOGIC tính đã gửi câu hỏi select đến bao nhiêu người và không được trùng lặp số
 
@@ -80,11 +83,42 @@ export default function DHContentRight({
         enabled: false,
         blur: 1,
       },
-      formatter(val: string | number | number[]) {
+      formatter(
+        val: string | number | number[],
+        { seriesIndex, dataPointIndex }: { seriesIndex: number; dataPointIndex: number }
+      ) {
+        const questionAt = chartOptions.xaxis?.categories[dataPointIndex];
+        const dataChartByQuestion = dataForChart.find((item) => item.question === questionAt);
+        console.log('dataChartByQuestion', dataChartByQuestion);
+
         if (typeof val === 'number') {
           return `${
             !user
-              ? `${val.toFixed(2)}% - 2000CP - 10 ${!user ? ' Lượt (Voted)' : ' Voted'}`
+              ? `${val.toFixed(2)}% - ${
+                  seriesIndex === 0
+                    ? dataChartByQuestion.approve
+                        .reduce(
+                          (total: number, userSendPoll: any) =>
+                            total + (userSendPoll?.cp_tham_du || 0),
+                          0
+                        )
+                        .toLocaleString('vi-VN')
+                    : seriesIndex === 1
+                    ? dataChartByQuestion.disapprove
+                        .reduce(
+                          (total: number, userSendPoll: any) =>
+                            total + (userSendPoll?.cp_tham_du || 0),
+                          0
+                        )
+                        .toLocaleString('vi-VN')
+                    : dataChartByQuestion.noVote.totalShareholderNoVote.toLocaleString('vi-VN')
+                }CP - ${
+                  seriesIndex === 0
+                    ? dataChartByQuestion.approve.length
+                    : seriesIndex === 1
+                    ? dataChartByQuestion.disapprove.length
+                    : dataChartByQuestion.noVote.totalNoVote
+                } ${!user ? ' Lượt (Voted)' : ' Voted'}`
               : `${val.toFixed(2)}%`
           }`;
         }
@@ -131,8 +165,47 @@ export default function DHContentRight({
     },
     tooltip: {
       y: {
-        formatter(val) {
-          return `${val.toFixed(2)}% - 2000CP - 10 Lượt`;
+        formatter(
+          val: string | number | number[],
+          { seriesIndex, dataPointIndex }: { seriesIndex: number; dataPointIndex: number }
+        ) {
+          const questionAt = chartOptions.xaxis?.categories[dataPointIndex];
+          const dataChartByQuestion = dataForChart.find((item) => item.question === questionAt);
+          console.log('dataChartByQuestion', dataChartByQuestion);
+
+          if (typeof val === 'number') {
+            return `${
+              !user
+                ? `${val.toFixed(2)}% - ${
+                    seriesIndex === 0
+                      ? dataChartByQuestion.approve
+                          .reduce(
+                            (total: number, userSendPoll: any) =>
+                              total + (userSendPoll?.cp_tham_du || 0),
+                            0
+                          )
+                          .toLocaleString('vi-VN')
+                      : seriesIndex === 1
+                      ? dataChartByQuestion.disapprove
+                          .reduce(
+                            (total: number, userSendPoll: any) =>
+                              total + (userSendPoll?.cp_tham_du || 0),
+                            0
+                          )
+                          .toLocaleString('vi-VN')
+                      : dataChartByQuestion.noVote.totalShareholderNoVote.toLocaleString('vi-VN')
+                  }CP - ${
+                    seriesIndex === 0
+                      ? dataChartByQuestion.approve.length
+                      : seriesIndex === 1
+                      ? dataChartByQuestion.disapprove.length
+                      : dataChartByQuestion.noVote.totalNoVote
+                  } ${!user ? ' Lượt (Voted)' : ' Voted'}`
+                : `${val.toFixed(2)}%`
+            }`;
+          }
+
+          return `${String(val.toString())} %`;
         },
       },
       fixed: {
