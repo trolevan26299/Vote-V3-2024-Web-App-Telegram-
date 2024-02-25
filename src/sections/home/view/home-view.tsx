@@ -22,7 +22,7 @@ export default function HomeView() {
         router.push(paths.page404);
       }
     } else {
-      router.push(paths.dashboard.settingVote.info);
+      router.push(paths.dashboard.settingVote.vote);
     }
   };
 
