@@ -157,6 +157,7 @@ export default function QuestionAndAnswer() {
           variant="contained"
           sx={{ width: '25%' }}
           onClick={onClickSendButton}
+          disabled={!inputQuestion}
         >
           {user && user.nguoi_nuoc_ngoai ? 'Send' : 'Gửi'}
         </LoadingButton>
