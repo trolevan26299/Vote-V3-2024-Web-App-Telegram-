@@ -1,3 +1,4 @@
+/* eslint-disable no-nested-ternary */
 import { useMemo } from 'react';
 // routes
 import { paths } from 'src/routes/paths';
@@ -7,6 +8,7 @@ import { useLocales } from 'src/locales';
 
 import SvgColor from 'src/components/svg-color';
 import { useUser } from 'src/firebase/user_accesss_provider';
+import { useTelegram } from 'src/telegram/telegram.provider';
 
 // ----------------------------------------------------------------------
 
@@ -46,6 +48,7 @@ const ICONS = {
 export function useNavData() {
   const { t } = useLocales();
   const { user } = useUser();
+  const telegramContext = useTelegram();
   console.log('user menu:', user);
 
   const data = useMemo(() => {
@@ -106,8 +109,10 @@ export function useNavData() {
       },
     ];
 
+    // return user ? [...userMenu] : [...adminMenu];
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    return user ? [...userMenu] : [...adminMenu];
+    return !telegramContext?.user?.id ? [...adminMenu] : user ? [...userMenu] : [];
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
   return data;
 }

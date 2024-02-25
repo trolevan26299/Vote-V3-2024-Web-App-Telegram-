@@ -20,7 +20,7 @@ export const UserContext = createContext<IUserContext>({});
 export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<IUserAccess>();
   const [userAccess, setUserAccess] = useState<number | undefined>(0);
-
+  console.log('userAccess', userAccess);
   const telegramContext = useTelegram();
   useEffect(() => {
     setUserAccess(telegramContext?.user?.id);
