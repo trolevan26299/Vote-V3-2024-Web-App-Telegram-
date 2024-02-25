@@ -1,49 +1,21 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { LoadingScreen } from 'src/components/loading-screen';
+import { useEffect } from 'react';
 import { useUser } from 'src/firebase/user_accesss_provider';
 import { useRouter } from 'src/routes/hooks';
 import { paths } from 'src/routes/paths';
-import { useTelegram } from 'src/telegram/telegram.provider';
 
 export default function HomeView() {
   const router = useRouter();
-  const telegramContext = useTelegram();
   const { user } = useUser();
-  const [userAccess, setUserAccess] = useState<number | undefined>(undefined);
-  const [loading, setLoading] = useState(true);
-
   useEffect(() => {
-    const setInit = async () => {
-      // Fetch data and set userAccess
-      await setUserAccess(telegramContext?.user?.id);
-      setLoading(false); // Check role after setting userAccess
-    };
-    setInit();
+    if (!user) {
+      router.push(paths.dashboard.voteDH);
+    } else {
+      router.push(paths.dashboard.settingVote.vote);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [telegramContext]);
-
-  useEffect(() => {
-    const checkRole = () => {
-      if (userAccess !== undefined) {
-        // Check userAccess is defined
-        if (user) {
-          router.push(paths.dashboard.voteDH);
-        } else {
-          router.push(paths.dashboard.settingVote.vote);
-        }
-      }
-    };
-
-    checkRole();
-  }, [userAccess, user, router]);
-  // Display loading spinner or other UI while fetching data
-  if (loading) {
-    return <LoadingScreen />;
-  }
-
-  // Your other JSX components go here
-
-  return <></>; // Empty fragment
+  }, []);
+  // eslint-disable-next-line react/jsx-no-useless-fragment
+  return <></>;
 }
