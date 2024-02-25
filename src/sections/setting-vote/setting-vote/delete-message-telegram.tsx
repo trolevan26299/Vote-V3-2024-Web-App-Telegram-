@@ -39,7 +39,7 @@ Click vào nút bên dưới để tiến hành đặt câu hỏi
     try {
       const sendMessagesQueue = listSharesHolders.map(async (item) => {
         const button = {
-          text: item.nguoi_nuoc_ngoai === true ? 'Click To Vote' : 'Click để bỏ phiếu',
+          text: item.nguoi_nuoc_ngoai === true ? 'Click To make question' : 'Click để đặt câu hỏi',
           web_app: { url: 'https://vote-v3.vercel.app/dashboard/question-and-answer' },
         };
         const keyboard = {
