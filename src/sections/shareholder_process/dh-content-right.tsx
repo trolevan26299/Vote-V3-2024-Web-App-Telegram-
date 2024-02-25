@@ -209,7 +209,7 @@ export default function DHContentRight({
         },
       },
       fixed: {
-        enabled: !!user, // Kích hoạt cố định tooltip
+        enabled: true, // Kích hoạt cố định tooltip
         position: 'center', // Cố định tooltip ở giữa
       },
     },
