@@ -12,27 +12,34 @@ export default function HomeView() {
   const telegramContext = useTelegram();
   const { user } = useUser();
   const [userAccess, setUserAccess] = useState<number | undefined>(undefined);
-
-  const checkRole = () => {
-    if (user) {
-      router.push(paths.dashboard.voteDH);
-    } else {
-      router.push(paths.dashboard.settingVote.vote);
-    }
-  };
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const setInit = async () => {
       // Fetch data and set userAccess
       await setUserAccess(telegramContext?.user?.id);
-      checkRole(); // Check role after setting userAccess
+      setLoading(false); // Check role after setting userAccess
     };
     setInit();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [telegramContext]);
 
+  useEffect(() => {
+    const checkRole = () => {
+      if (userAccess !== undefined) {
+        // Check userAccess is defined
+        if (user) {
+          router.push(paths.dashboard.voteDH);
+        } else {
+          router.push(paths.dashboard.settingVote.vote);
+        }
+      }
+    };
+
+    checkRole();
+  }, [userAccess, user, router]);
   // Display loading spinner or other UI while fetching data
-  if (userAccess === undefined) {
+  if (loading) {
     return <LoadingScreen />;
   }
 
