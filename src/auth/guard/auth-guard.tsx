@@ -28,7 +28,8 @@ export default function AuthGuard({ children }: Props) {
       if (pathname === '/dashboard/question-and-answer') {
         router.push(paths.dashboard.questionAndAnswerPath);
       } else {
-        router.push(PATH_AFTER_LOGIN);
+        // router.push(PATH_AFTER_LOGIN);
+        router.push(paths.dashboard.questionAndAnswerPath);
       }
     } else {
       router.replace(paths.auth.jwt.login);
