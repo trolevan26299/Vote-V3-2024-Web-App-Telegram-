@@ -25,12 +25,8 @@ export default function AuthGuard({ children }: Props) {
     if (userAccess?.user?.id) {
       localStorage.setItem('checked', JSON.stringify(true));
     } else if (checked.current === true) {
-      if (!user) {
-        if (pathname === '/dashboard/question-and-answer') {
-          router.push(paths.dashboard.questionAndAnswerPath);
-        } else {
-          router.push(paths.dashboard.voteDH);
-        }
+      if (pathname === '/dashboard/question-and-answer') {
+        router.push(paths.dashboard.questionAndAnswerPath);
       } else {
         router.push(PATH_AFTER_LOGIN);
       }
