@@ -69,7 +69,7 @@ export default function Header({ onOpenNav }: Props) {
             color="primary"
             onClick={() => router.push(paths.dashboard.questionAndAnswerPath)}
           >
-            {user && user.nguoi_nuoc_ngoai ? 'Question' : 'Câu hỏi'}
+            {user && user.nguoi_nuoc_ngoai ? 'Make Question' : 'Đặt câu hỏi'}
           </Button>
         )}
 
