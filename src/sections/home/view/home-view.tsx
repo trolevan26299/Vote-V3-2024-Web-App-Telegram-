@@ -25,8 +25,11 @@ export default function HomeView() {
   };
 
   useEffect(() => {
-    setUserAccess(telegramContext?.user?.id);
-
+    const setInit = async () => {
+      await setUserAccess(telegramContext?.user?.id);
+      checkRole();
+    };
+    setInit();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [telegramContext]);
   // eslint-disable-next-line react/jsx-no-useless-fragment
