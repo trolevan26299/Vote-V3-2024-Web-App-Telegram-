@@ -23,13 +23,14 @@ export default function HomeView() {
     const checkRole = () => {
       console.log('userAccess', userAccess);
       console.log('user:', user);
-      if (userAccess !== undefined) {
-        if (user) {
-          router.push(paths.dashboard.voteDH);
-        } else {
-          router.push(paths.page404);
-        }
+      // Chỉ thực hiện kiểm tra khi cả userAccess và user đã được định nghĩa
+      if (userAccess !== undefined && user !== undefined) {
+        router.push(paths.dashboard.voteDH);
+      } else if (userAccess !== undefined) {
+        // Nếu chỉ userAccess được định nghĩa, nhưng user chưa được, chuyển đến trang 404
+        router.push(paths.page404);
       } else {
+        // Nếu cả userAccess và user đều chưa được định nghĩa, chuyển đến trang đặt cấu hình vote
         router.push(paths.dashboard.settingVote.vote);
       }
     };
