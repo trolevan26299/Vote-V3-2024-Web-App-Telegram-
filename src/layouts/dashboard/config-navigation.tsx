@@ -111,7 +111,7 @@ export function useNavData() {
 
     // return user ? [...userMenu] : [...adminMenu];
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    return !telegramContext?.user?.id ? [...adminMenu] : user ? [...userMenu] : [];
+    return telegramContext?.user?.id ? (user ? [...userMenu] : []) : [...adminMenu];
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
   return data;
