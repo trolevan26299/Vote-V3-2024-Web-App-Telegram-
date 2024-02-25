@@ -19,7 +19,7 @@ export default function HomeView() {
       if (user) {
         router.push(paths.dashboard.voteDH);
       } else {
-        router.push(paths.dashboard.permission);
+        router.push(paths.page404);
       }
     } else {
       router.push(paths.dashboard.settingVote.info);
