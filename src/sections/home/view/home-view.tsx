@@ -1,6 +1,5 @@
 'use client';
 
-import { pad } from 'lodash';
 import { useEffect } from 'react';
 import { useUser } from 'src/firebase/user_accesss_provider';
 import { usePathname, useRouter } from 'src/routes/hooks';
