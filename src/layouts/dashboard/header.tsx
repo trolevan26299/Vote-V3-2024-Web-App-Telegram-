@@ -15,11 +15,11 @@ import { useSettingsContext } from 'src/components/settings';
 import SvgColor from 'src/components/svg-color';
 //
 import { Button } from '@mui/material';
+import { useUser } from 'src/firebase/user_accesss_provider';
 import { useRouter } from 'src/routes/hooks';
 import { paths } from 'src/routes/paths';
 import { AccountPopover, Searchbar, SettingsButton } from '../_common';
 import { HEADER, NAV } from '../config-layout';
-import { useUser } from 'src/firebase/user_accesss_provider';
 
 // ----------------------------------------------------------------------
 
