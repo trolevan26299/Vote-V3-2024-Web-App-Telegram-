@@ -43,7 +43,6 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
               console.log(data);
             }
           });
-          console.groupEnd();
         } else {
           console.log('No Data');
         }

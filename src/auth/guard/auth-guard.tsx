@@ -22,7 +22,7 @@ export default function AuthGuard({ children }: Props) {
 
     checked.current = storedChecked ? JSON.parse(storedChecked) : false;
 
-    if (userAccess?.user?.id) {
+    if (userAccess) {
       localStorage.setItem('checked', JSON.stringify(true));
     } else if (checked.current === true) {
       if (pathname === '/dashboard/question-and-answer') {
