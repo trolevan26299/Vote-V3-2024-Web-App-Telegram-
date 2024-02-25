@@ -14,7 +14,7 @@ import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
-import { get, push, ref, runTransaction } from 'firebase/database';
+import { get, push, ref, remove, runTransaction } from 'firebase/database';
 import { enqueueSnackbar } from 'notistack';
 import { useEffect, useState } from 'react';
 import { FIREBASE_COLLECTION } from 'src/constant/firebase_collection.constant';
@@ -67,7 +67,7 @@ export default function QuestionAndAnswer() {
     setInputQuestion(event.target.value);
   };
 
-  const updateQuestion = (post: any) => axios.post(`${HOST_API}/update_question`, post);
+  // const updateQuestion = (post: any) => axios.post(`${HOST_API}/update_question`, post);
 
   const onClickSendButton: React.MouseEventHandler<HTMLButtonElement> = async (
     event: React.MouseEvent<HTMLButtonElement, MouseEvent>
@@ -125,22 +125,51 @@ export default function QuestionAndAnswer() {
     setIsDeleteOpen(false);
     setDeleteSelected(null);
   };
+  // const handleOke = async () => {
+  //   if (deleteSelected) {
+  //     const post = {
+  //       action: 1, // Delete
+  //       key: deleteSelected.key,
+  //     };
+  //     await updateQuestion(post)
+  //       .then(() => {
+  //         setDeleteSelected(null);
+  //         setIsDeleteOpen(false);
+  //         enqueueSnackbar('Xóa thành công', { variant: 'success' });
+  //       })
+  //       .catch((err) => {
+  //         enqueueSnackbar('Thao tác thất bại', { variant: 'error' });
+  //       });
+  //   }
+  // };
   const handleOke = async () => {
     if (deleteSelected) {
-      const post = {
-        action: 1, // Delete
-        key: deleteSelected.key,
-      };
-      await updateQuestion(post)
+      const refDelQuestion = ref(database, `${FIREBASE_COLLECTION.QA}/${deleteSelected.key}`);
+      remove(refDelQuestion)
         .then(() => {
           setDeleteSelected(null);
           setIsDeleteOpen(false);
-          enqueueSnackbar('Xóa thành công', { variant: 'success' });
+          enqueueSnackbar('Xóa Thành Công !', { variant: 'success' });
         })
-        .catch((err) => {
+        .catch((error) => {
           enqueueSnackbar('Thao tác thất bại', { variant: 'error' });
         });
     }
+    // if (deleteSelected) {
+    //   const post = {
+    //     action: 1, // Delete
+    //     key: deleteSelected.key,
+    //   };
+    //   await updateQuestion(post)
+    //     .then(() => {
+    //       setDeleteSelected(null);
+    //       setIsDeleteOpen(false);
+    //       enqueueSnackbar('Xóa thành công', { variant: 'success' });
+    //     })
+    //     .catch((err) => {
+    //       enqueueSnackbar('Thao tác thất bại', { variant: 'error' });
+    //     });
+    // }
   };
   return (
     <Stack direction="column" spacing={0.7} sx={{ m: 1 }}>
