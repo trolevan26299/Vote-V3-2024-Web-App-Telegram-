@@ -25,7 +25,11 @@ export default function HomeView() {
       console.log('user:', user);
       // Chỉ thực hiện kiểm tra khi cả userAccess và user đã được định nghĩa
       if (userAccess !== undefined && user !== undefined) {
-        router.push(paths.dashboard.voteDH);
+        if (user) {
+          router.push(paths.dashboard.voteDH);
+        } else {
+          router.push(paths.page404);
+        }
       } else if (userAccess !== undefined) {
         // Nếu chỉ userAccess được định nghĩa, nhưng user chưa được, chuyển đến trang 404
         router.push(paths.page404);
