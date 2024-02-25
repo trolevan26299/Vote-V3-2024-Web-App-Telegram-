@@ -1,6 +1,5 @@
-'use client';
-
 import { useEffect, useState } from 'react';
+import { LoadingScreen } from 'src/components/loading-screen';
 import { useUser } from 'src/firebase/user_accesss_provider';
 import { useRouter } from 'src/routes/hooks';
 import { paths } from 'src/routes/paths';
@@ -12,35 +11,30 @@ export default function HomeView() {
   const { user } = useUser();
   const [userAccess, setUserAccess] = useState<number | undefined>(undefined);
 
+  const checkRole = () => {
+    if (user) {
+      router.push(paths.dashboard.voteDH);
+    } else {
+      router.push(paths.dashboard.settingVote.vote);
+    }
+  };
+
   useEffect(() => {
     const setInit = async () => {
+      // Fetch data and set userAccess
       await setUserAccess(telegramContext?.user?.id);
+      checkRole(); // Check role after setting userAccess
     };
     setInit();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [telegramContext]);
-  useEffect(() => {
-    const checkRole = () => {
-      console.log('userAccess', userAccess);
-      console.log('user:', user);
-      // Chỉ thực hiện kiểm tra khi cả userAccess và user đã được định nghĩa
-      if (userAccess !== undefined && user !== undefined) {
-        if (user) {
-          router.push(paths.dashboard.voteDH);
-        } else {
-          router.push(paths.page404);
-        }
-      } else if (userAccess !== undefined) {
-        // Nếu chỉ userAccess được định nghĩa, nhưng user chưa được, chuyển đến trang 404
-        router.push(paths.page404);
-      } else {
-        // Nếu cả userAccess và user đều chưa được định nghĩa, chuyển đến trang đặt cấu hình vote
-        router.push(paths.dashboard.settingVote.vote);
-      }
-    };
 
-    checkRole();
-  }, [userAccess, user, router]);
-  // eslint-disable-next-line react/jsx-no-useless-fragment
-  return <></>;
+  // Display loading spinner or other UI while fetching data
+  if (userAccess === undefined) {
+    return <LoadingScreen />;
+  }
+
+  // Your other JSX components go here
+
+  return <></>; // Empty fragment
 }
