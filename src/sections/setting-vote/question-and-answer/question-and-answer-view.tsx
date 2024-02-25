@@ -2,7 +2,7 @@ import { TableBody, TableCell, TableRow, Typography } from '@mui/material';
 import Box from '@mui/material/Box';
 import Table from '@mui/material/Table';
 import TableContainer from '@mui/material/TableContainer';
-import { get, ref } from 'firebase/database';
+import { get, onValue, ref } from 'firebase/database';
 import { useEffect, useState } from 'react';
 import Scrollbar from 'src/components/scrollbar';
 import { TableHeadCustom } from 'src/components/table';
@@ -20,31 +20,30 @@ export default function QuestionAndAnswerView() {
   const [questions, setQuestions] = useState<any[]>([]);
   useEffect(() => {
     const userRef = ref(database, FIREBASE_COLLECTION.QA);
-    const fetchData = async () => {
-      try {
-        const snapshot = await get(userRef);
-        const ls_questions: any[] = [];
-        console.log('snapshot', snapshot.val());
 
-        if (snapshot.exists()) {
-          snapshot.forEach((childSnapshot) => {
-            const data = childSnapshot.val();
-            const { key } = childSnapshot;
-            if (data) {
-              ls_questions.push({ ...data, key });
-            }
-          });
-          setQuestions(ls_questions);
-          console.groupEnd();
-        } else {
-          console.log('No Data');
-        }
-      } catch (error) {
-        console.error('Error when get data :', error);
+    const unsubscribe = onValue(userRef, (snapshot) => {
+      const ls_questions: any[] = [];
+      console.log('snapshot', snapshot.val());
+
+      if (snapshot.exists()) {
+        snapshot.forEach((childSnapshot) => {
+          const data = childSnapshot.val();
+          const { key } = childSnapshot;
+          if (data) {
+            ls_questions.push({ ...data, key });
+          }
+        });
+        setQuestions(ls_questions);
+        console.groupEnd();
+      } else {
+        console.log('No Data');
       }
-    };
-    fetchData();
+    });
+
+    // Hủy lắng nghe khi component unmount
+    return () => unsubscribe();
   }, []);
+
   return (
     <Box className="list_question" sx={{ marginTop: '30px' }}>
       <Typography variant="h6" sx={{ mb: 2 }}>
