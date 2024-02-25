@@ -118,7 +118,7 @@ export default function DHContentRight({
                     : seriesIndex === 1
                     ? dataChartByQuestion.disapprove.length
                     : dataChartByQuestion.noVote.totalNoVote
-                } ${!user ? ' Lượt (Voted)' : ' Voted'}`
+                } ${!user ? ' Lượt (Vote)' : ' Vote'}`
               : `${val.toFixed(2)}%`
           }`;
         }
@@ -200,7 +200,7 @@ export default function DHContentRight({
                       : seriesIndex === 1
                       ? dataChartByQuestion.disapprove.length
                       : dataChartByQuestion.noVote.totalNoVote
-                  } ${!user ? ' Lượt (Voted)' : ' Voted'}`
+                  } ${!user ? ' Lượt (Vote)' : ' Vote'}`
                 : `${val.toFixed(2)}%`
             }`;
           }
