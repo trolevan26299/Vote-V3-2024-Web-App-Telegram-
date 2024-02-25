@@ -3,7 +3,7 @@
 import { Box, Button, Typography } from '@mui/material';
 import { alpha, useTheme } from '@mui/material/styles';
 import axios from 'axios';
-import { get, ref, remove } from 'firebase/database';
+import { get, push, ref, remove, set } from 'firebase/database';
 import { useSnackbar } from 'notistack';
 import { useEffect, useState } from 'react';
 import { ConfirmDialog } from 'src/components/custom-dialog';
@@ -23,6 +23,28 @@ export default function DeleteMessageTelegram() {
   const [historySendMessageList, setHistorySendMessageList] = useState<IHistorySendMessage[]>([]);
   const [listSharesHolders, setListSharesHolders] = useState<IUserAccess[]>([]);
   const botToken = process.env.NEXT_PUBLIC_BOT_TOKEN;
+
+  const saveHistorySendMessageBot = async (messageId: number, chatId: number) => {
+    const saveLogStatusSendPollRef = ref(database, FIREBASE_COLLECTION.HISTORY_SEND_MESSAGE_BOT);
+
+    try {
+      // Tạo một reference mới cho mỗi dữ liệu được lưu
+      const newMessageRef = push(saveLogStatusSendPollRef);
+
+      // Định nghĩa dữ liệu mới để lưu vào Firebase
+      const newMessageData = {
+        messageId,
+        chatId,
+      };
+
+      // Sử dụng set() để lưu dữ liệu mới vào Firebase
+      await set(newMessageRef, newMessageData);
+
+      console.log('Message history saved successfully:', newMessageData);
+    } catch (error) {
+      console.error('Error saving message history:', error);
+    }
+  };
 
   const sendMakeQuestion = async () => {
     const TELEGRAM_API_URL = `https://api.telegram.org/bot${botToken}/sendMessage`;
@@ -65,10 +87,21 @@ Click vào nút bên dưới để tiến hành đặt câu hỏi
           return { chatId: item.telegram_id, error };
         }
       });
+
+       // Đợi cho tất cả các tin nhắn được gửi
+    const results = await Promise.all(sendMessagesQueue);
+    for (const result of results) {
+      const { chatId, message_id, error } = result;
+      if (!error) {
+        await saveHistorySendMessageBot(message_id, Number(chatId) );
+      }
+    }
     } catch (error) {
       console.error('Error sending messages to Telegram:', error);
     }
   };
+
+
   const handleDeleteMessageAll = async () => {
     try {
       // Lặp qua mỗi tin nhắn trong historySendMessageList và gửi yêu cầu xóa đến Telegram API
