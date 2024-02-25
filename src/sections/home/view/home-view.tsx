@@ -1,3 +1,5 @@
+'use client';
+
 import { useEffect, useState } from 'react';
 import { LoadingScreen } from 'src/components/loading-screen';
 import { useUser } from 'src/firebase/user_accesss_provider';
