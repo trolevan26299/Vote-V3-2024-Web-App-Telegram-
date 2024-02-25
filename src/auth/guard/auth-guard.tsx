@@ -38,7 +38,7 @@ export default function AuthGuard({ children }: Props) {
       router.replace(paths.auth.jwt.login);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [checked, user]);
+  }, [checked, user, pathname]);
 
   if (!checked) {
     return null;
