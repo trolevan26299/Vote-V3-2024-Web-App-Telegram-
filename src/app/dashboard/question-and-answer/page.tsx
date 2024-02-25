@@ -153,7 +153,7 @@ export default function QuestionAndAnswer() {
             key={item.key}
             secondaryAction={
               <IconButton edge="end" aria-label="delete" onClick={() => handleDeleteQuestion(item)}>
-                <Iconify icon="ic:baseline-delete" width={30} color="#ff5630" />
+                <Iconify icon="ic:baseline-delete" width={25} color="#ff5630" />
               </IconButton>
             }
           >
