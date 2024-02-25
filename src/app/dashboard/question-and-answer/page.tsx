@@ -83,10 +83,15 @@ export default function QuestionAndAnswer() {
       })
     )
       .then(() => {
-        enqueueSnackbar('Gửi câu hỏi thành công', { variant: 'success' });
+        enqueueSnackbar(
+          user && user.nguoi_nuoc_ngoai ? 'Send question success !' : 'Gửi câu hỏi thành công !',
+          { variant: 'success' }
+        );
       })
       .catch((error) => {
-        enqueueSnackbar('Thao tác thất bại', { variant: 'error' });
+        enqueueSnackbar(user && user.nguoi_nuoc_ngoai ? 'Send failed !' : 'Gửi thất bại !', {
+          variant: 'error',
+        });
         console.log('Error send question:', error);
       });
     setSending(false);
@@ -108,26 +113,36 @@ export default function QuestionAndAnswer() {
         .then(() => {
           setDeleteSelected(null);
           setIsDeleteOpen(false);
-          enqueueSnackbar('Xóa Thành Công !', { variant: 'success' });
+          enqueueSnackbar(user && user.nguoi_nuoc_ngoai ? 'Delete Success !' : 'Xóa Thành Công !', {
+            variant: 'success',
+          });
         })
         .catch((error) => {
-          enqueueSnackbar('Thao tác thất bại', { variant: 'error' });
+          enqueueSnackbar(user && user.nguoi_nuoc_ngoai ? 'Delete failed !' : 'Xóa thất bại !', {
+            variant: 'error',
+          });
         });
     }
   };
   return (
     <Stack direction="column" spacing={0.7} sx={{ m: 1 }}>
       <CustomBreadcrumbs
-        heading="Mời quý cổ đông đặt câu hỏi"
+        heading={user && user.nguoi_nuoc_ngoai ? 'Make a question' : 'Mời quý cổ đông đặt câu hỏi'}
         links={[{ name: '' }]}
         sx={{
           mb: { xs: 1, md: 1 },
         }}
       />
-      <Typography variant="overline">Nội dung câu hỏi:</Typography>
+      <Typography variant="overline">
+        {user && user.nguoi_nuoc_ngoai ? 'Content Question :' : 'Nội dung câu hỏi :'}
+      </Typography>
       <TextField
         variant="outlined"
-        placeholder="Nhập nội dung điều bạn thắc mắc"
+        placeholder={
+          user && user.nguoi_nuoc_ngoai
+            ? 'Enter the content you want to ask'
+            : 'Nhập nội dung điều bạn thắc mắc'
+        }
         multiline
         rows={4}
         maxRows={20}
@@ -143,10 +158,12 @@ export default function QuestionAndAnswer() {
           sx={{ width: '25%' }}
           onClick={onClickSendButton}
         >
-          Gửi
+          {user && user.nguoi_nuoc_ngoai ? 'Send' : 'Gửi'}
         </LoadingButton>
       </Box>
-      <Typography variant="overline">Câu hỏi của bạn:</Typography>
+      <Typography variant="overline">
+        {user && user.nguoi_nuoc_ngoai ? 'Your question :' : 'Câu hỏi của bạn :'}
+      </Typography>
       <List>
         {questions?.map((item, index) => (
           <ListItem
@@ -157,7 +174,10 @@ export default function QuestionAndAnswer() {
               </IconButton>
             }
           >
-            <ListItemText primary={`Câu hỏi ${index + 1}:`} secondary={item.content} />
+            <ListItemText
+              primary={`${user && user.nguoi_nuoc_ngoai ? 'Question' : 'Câu hỏi'} ${index + 1}:`}
+              secondary={item.content}
+            />
           </ListItem>
         ))}
       </List>
@@ -167,18 +187,22 @@ export default function QuestionAndAnswer() {
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
       >
-        <DialogTitle id="alert-dialog-title">Xác nhận</DialogTitle>
+        <DialogTitle id="alert-dialog-title">
+          {user && user.nguoi_nuoc_ngoai ? 'Confirm' : 'Xác nhận'}
+        </DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
-            Bạn chắc chắn muốn xóa câu hỏi ?
+            {user && user.nguoi_nuoc_ngoai
+              ? 'Are you sure you want to delete the question ?'
+              : 'Bạn chắc chắn muốn xóa câu hỏi ?'}
           </DialogContentText>
         </DialogContent>
         <DialogActions>
           <Button variant="contained" color="error" onClick={handleClose}>
-            Hủy bỏ
+            {user && user.nguoi_nuoc_ngoai ? 'Cancel' : 'Hủy'}
           </Button>
           <Button variant="contained" color="success" onClick={handleOke} autoFocus>
-            Đồng ý
+            {user && user.nguoi_nuoc_ngoai ? 'Oke' : 'Đồng ý'}
           </Button>
         </DialogActions>
       </Dialog>

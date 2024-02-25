@@ -19,6 +19,7 @@ import { useRouter } from 'src/routes/hooks';
 import { paths } from 'src/routes/paths';
 import { AccountPopover, Searchbar, SettingsButton } from '../_common';
 import { HEADER, NAV } from '../config-layout';
+import { useUser } from 'src/firebase/user_accesss_provider';
 
 // ----------------------------------------------------------------------
 
@@ -27,8 +28,8 @@ type Props = {
 };
 
 export default function Header({ onOpenNav }: Props) {
+  const { user } = useUser();
   const theme = useTheme();
-
   const settings = useSettingsContext();
 
   const isNavHorizontal = settings.themeLayout === 'horizontal';
@@ -62,14 +63,15 @@ export default function Header({ onOpenNav }: Props) {
         justifyContent="flex-end"
         spacing={{ xs: 0.5, sm: 1 }}
       >
-        {/* <LanguagePopover /> */}
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={() => router.push(paths.dashboard.questionAndAnswerPath)}
-        >
-          Câu hỏi
-        </Button>
+        {user && (
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => router.push(paths.dashboard.questionAndAnswerPath)}
+          >
+            {user && user.nguoi_nuoc_ngoai ? 'Question' : 'Câu hỏi'} Câu hỏi
+          </Button>
+        )}
 
         <SettingsButton />
 
