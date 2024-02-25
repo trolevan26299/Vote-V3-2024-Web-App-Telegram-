@@ -63,7 +63,13 @@ export default function Header({ onOpenNav }: Props) {
         spacing={{ xs: 0.5, sm: 1 }}
       >
         {/* <LanguagePopover /> */}
-        <Button onClick={() => router.push(paths.dashboard.questionAndAnswerPath)}>Câu hỏi</Button>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={() => router.push(paths.dashboard.questionAndAnswerPath)}
+        >
+          Câu hỏi
+        </Button>
 
         <SettingsButton />
 

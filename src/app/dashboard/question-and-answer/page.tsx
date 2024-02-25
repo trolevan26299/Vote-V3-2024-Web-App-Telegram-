@@ -22,9 +22,7 @@ import { database } from 'src/firebase/firebase.config';
 import { currentTimeUTC7 } from 'src/utils/currentTimeUTC+7';
 import CustomBreadcrumbs from '../../../components/custom-breadcrumbs';
 import Iconify from '../../../components/iconify';
-import { HOST_API } from '../../../config-global';
 import { useUser } from '../../../firebase/user_accesss_provider';
-import axios from '../../../utils/axios';
 
 export default function QuestionAndAnswer() {
   const { user } = useUser();
@@ -67,8 +65,6 @@ export default function QuestionAndAnswer() {
     setInputQuestion(event.target.value);
   };
 
-  // const updateQuestion = (post: any) => axios.post(`${HOST_API}/update_question`, post);
-
   const onClickSendButton: React.MouseEventHandler<HTMLButtonElement> = async (
     event: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
@@ -95,27 +91,6 @@ export default function QuestionAndAnswer() {
       });
     setSending(false);
     setInputQuestion('');
-
-    // // Call axios api
-    // const post = {
-    //   action: 0, // ADD question
-    //   info: {
-    //     user,
-    //     content: inputQuestion,
-    //     time: currentTimeUTC7(),
-    //   },
-    // };
-    // await updateQuestion(post)
-    //   .then(() => {
-    //     enqueueSnackbar('Gửi câu hỏi thành công', { variant: 'success' });
-    //   })
-    //   .catch((err) => {
-    //     enqueueSnackbar('Thao tác thất bại', { variant: 'error' });
-    //   });
-
-    // // Update loading -> false
-    // setSending(false);
-    // setInputQuestion('');
   };
   const handleDeleteQuestion = (item: any) => {
     setIsDeleteOpen(true);
@@ -125,23 +100,7 @@ export default function QuestionAndAnswer() {
     setIsDeleteOpen(false);
     setDeleteSelected(null);
   };
-  // const handleOke = async () => {
-  //   if (deleteSelected) {
-  //     const post = {
-  //       action: 1, // Delete
-  //       key: deleteSelected.key,
-  //     };
-  //     await updateQuestion(post)
-  //       .then(() => {
-  //         setDeleteSelected(null);
-  //         setIsDeleteOpen(false);
-  //         enqueueSnackbar('Xóa thành công', { variant: 'success' });
-  //       })
-  //       .catch((err) => {
-  //         enqueueSnackbar('Thao tác thất bại', { variant: 'error' });
-  //       });
-  //   }
-  // };
+
   const handleOke = async () => {
     if (deleteSelected) {
       const refDelQuestion = ref(database, `${FIREBASE_COLLECTION.QA}/${deleteSelected.key}`);
@@ -155,21 +114,6 @@ export default function QuestionAndAnswer() {
           enqueueSnackbar('Thao tác thất bại', { variant: 'error' });
         });
     }
-    // if (deleteSelected) {
-    //   const post = {
-    //     action: 1, // Delete
-    //     key: deleteSelected.key,
-    //   };
-    //   await updateQuestion(post)
-    //     .then(() => {
-    //       setDeleteSelected(null);
-    //       setIsDeleteOpen(false);
-    //       enqueueSnackbar('Xóa thành công', { variant: 'success' });
-    //     })
-    //     .catch((err) => {
-    //       enqueueSnackbar('Thao tác thất bại', { variant: 'error' });
-    //     });
-    // }
   };
   return (
     <Stack direction="column" spacing={0.7} sx={{ m: 1 }}>
@@ -209,7 +153,7 @@ export default function QuestionAndAnswer() {
             key={item.key}
             secondaryAction={
               <IconButton edge="end" aria-label="delete" onClick={() => handleDeleteQuestion(item)}>
-                <Iconify icon="ic:baseline-delete" width={20} />
+                <Iconify icon="ic:baseline-delete" width={30} color="#ff5630" />
               </IconButton>
             }
           >
