@@ -39,7 +39,6 @@ export default function DHContentRight({
 }: Props) {
   const { user } = useUser();
   const theme = useTheme();
-  console.log('dataForChart', dataForChart);
 
   // ------------------ END LOGIC tính đã gửi câu hỏi select đến bao nhiêu người và không được trùng lặp số
 
@@ -89,7 +88,6 @@ export default function DHContentRight({
       ) {
         const questionAt = chartOptions.xaxis?.categories[dataPointIndex];
         const dataChartByQuestion = dataForChart.find((item) => item.question === questionAt);
-        console.log('dataChartByQuestion', dataChartByQuestion);
 
         if (typeof val === 'number') {
           return `${
@@ -164,6 +162,10 @@ export default function DHContentRight({
       },
     },
     tooltip: {
+      // fixed: {
+      //   enabled: true, // Kích hoạt cố định tooltip
+      //   position: 'center', // Cố định tooltip ở giữa
+      // },
       y: {
         formatter(
           val: string | number | number[],
@@ -171,7 +173,6 @@ export default function DHContentRight({
         ) {
           const questionAt = chartOptions.xaxis?.categories[dataPointIndex];
           const dataChartByQuestion = dataForChart.find((item) => item.question === questionAt);
-          console.log('dataChartByQuestion', dataChartByQuestion);
 
           if (typeof val === 'number') {
             return `${
@@ -207,10 +208,6 @@ export default function DHContentRight({
 
           return `${String(val.toString())} %`;
         },
-      },
-      fixed: {
-        enabled: true, // Kích hoạt cố định tooltip
-        position: 'center', // Cố định tooltip ở giữa
       },
     },
     fill: {
