@@ -61,7 +61,7 @@ export default function ProcessDHView() {
 
   // CODE FOR SELECT QUESTION
   // Handle select question
-  const [questionSelect, SetQuestionSelect] = useState<string>(danhSachPollData[0]?.key || '');
+  const [questionSelect, SetQuestionSelect] = useState<string>('');
 
   const handleChangeSelectQuestion = (event: SelectChangeEvent) => {
     SetQuestionSelect(event.target.value);
@@ -492,7 +492,7 @@ export default function ProcessDHView() {
           </Grid>
           <Grid item xs={12}>
             <DHContentTable
-              tableData={dataTable}
+              tableData={questionSelect !== '' ? dataTable : []}
               tableLabels={[
                 {
                   id: 'question',

@@ -1,16 +1,23 @@
 'use client';
 
+import { pad } from 'lodash';
 import { useEffect } from 'react';
 import { useUser } from 'src/firebase/user_accesss_provider';
-import { useRouter } from 'src/routes/hooks';
+import { usePathname, useRouter } from 'src/routes/hooks';
 import { paths } from 'src/routes/paths';
 
 export default function HomeView() {
   const router = useRouter();
   const { user } = useUser();
+  const pathname = usePathname();
+  console.log('pathname', pathname);
   useEffect(() => {
-    if (!user) {
-      router.push(paths.dashboard.voteDH);
+    if (user) {
+      if (pathname === '/dashboard/question-and-answer') {
+        router.push(paths.dashboard.questionAndAnswerPath);
+      } else {
+        router.push(paths.dashboard.voteDH);
+      }
     } else {
       router.push(paths.dashboard.settingVote.vote);
     }
