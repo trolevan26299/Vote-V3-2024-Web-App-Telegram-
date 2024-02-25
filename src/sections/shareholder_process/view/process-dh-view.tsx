@@ -31,7 +31,7 @@ import { useSettingsContext } from 'src/components/settings';
 import { FIREBASE_COLLECTION } from 'src/constant/firebase_collection.constant';
 import { database } from 'src/firebase/firebase.config';
 import { useUser } from 'src/firebase/user_accesss_provider';
-import { useRouter } from 'src/routes/hooks';
+import { usePathname, useRouter } from 'src/routes/hooks';
 import { paths } from 'src/routes/paths';
 import { useStringState } from 'src/stores/questionSelectUser.provider';
 import { IHistorySendPoll, IQuestion } from 'src/types/setting';
@@ -49,6 +49,8 @@ interface ApprovePercentage {
 
 export default function ProcessDHView() {
   const settings = useSettingsContext();
+  const pathname = usePathname();
+  console.log('pathname', pathname);
   const theme = useTheme();
   const { user } = useUser();
   const router = useRouter();
