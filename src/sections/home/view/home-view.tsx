@@ -13,6 +13,8 @@ export default function HomeView() {
   const [userAccess, setUserAccess] = useState<number | undefined>(undefined);
 
   const checkRole = () => {
+    console.log('userAccess', userAccess);
+    console.log('user:', user);
     if (userAccess) {
       if (user) {
         router.push(paths.dashboard.voteDH);
