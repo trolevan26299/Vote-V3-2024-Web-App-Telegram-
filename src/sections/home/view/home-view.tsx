@@ -15,21 +15,22 @@ export default function HomeView() {
   const checkRole = () => {
     console.log('userAccess', userAccess);
     console.log('user:', user);
-    if (userAccess) {
-      if (user) {
-        router.push(paths.dashboard.voteDH);
-      } else {
-        router.push(paths.page404);
-      }
+
+    if (user) {
+      router.push(paths.dashboard.voteDH);
     } else {
-      router.push(paths.dashboard.settingVote.vote);
+      router.push(paths.page404);
     }
   };
 
   useEffect(() => {
     const setInit = async () => {
       await setUserAccess(telegramContext?.user?.id);
-      checkRole();
+      if (telegramContext?.user?.id !== undefined) {
+        checkRole();
+      } else {
+        router.push(paths.page404);
+      }
     };
     setInit();
     // eslint-disable-next-line react-hooks/exhaustive-deps
