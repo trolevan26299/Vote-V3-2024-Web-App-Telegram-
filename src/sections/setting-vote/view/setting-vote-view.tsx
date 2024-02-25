@@ -6,6 +6,7 @@ import SettingView from '../setting-vote/setting';
 import SendVoteView from '../setting-vote/send-vote';
 import ResultView from '../setting-vote/result';
 import DeleteMessageTelegram from '../setting-vote/delete-message-telegram';
+import QuestionAndAnswerView from '../question-and-answer/question-and-answer-view';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -55,10 +56,11 @@ export default function SettingVoteView() {
           aria-label="basic tabs example"
           sx={{ width: '100%' }}
         >
-          <Tab sx={{ width: '23%', maxWidth: '31%' }} label="Cấu Hình" {...a11yProps(0)} />
-          <Tab sx={{ width: '23%', maxWidth: '31%' }} label="Gửi Bỏ Phiếu" {...a11yProps(1)} />
-          <Tab sx={{ width: '23%', maxWidth: '31%' }} label="Kết Quả" {...a11yProps(2)} />
-          <Tab sx={{ width: '23%', maxWidth: '31%' }} label="Tin nhắn Telegram" {...a11yProps(3)} />
+          <Tab sx={{ width: '19%', maxWidth: '31%' }} label="Cấu Hình" {...a11yProps(0)} />
+          <Tab sx={{ width: '19%', maxWidth: '31%' }} label="Gửi Bỏ Phiếu" {...a11yProps(1)} />
+          <Tab sx={{ width: '19%', maxWidth: '31%' }} label="Kết Quả" {...a11yProps(2)} />
+          <Tab sx={{ width: '19%', maxWidth: '31%' }} label="Tin nhắn Telegram" {...a11yProps(3)} />
+          <Tab sx={{ width: '19%', maxWidth: '31%' }} label="Câu hỏi" {...a11yProps(4)} />
         </Tabs>
       </Box>
       <CustomTabPanel value={value} index={0}>
@@ -72,6 +74,9 @@ export default function SettingVoteView() {
       </CustomTabPanel>
       <CustomTabPanel value={value} index={3}>
         <DeleteMessageTelegram />
+      </CustomTabPanel>
+      <CustomTabPanel value={value} index={4}>
+        <QuestionAndAnswerView />
       </CustomTabPanel>
     </Box>
   );

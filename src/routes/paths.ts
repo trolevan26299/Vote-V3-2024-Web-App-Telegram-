@@ -36,6 +36,7 @@ export const paths = {
     },
     voteDH: `${ROOTS.DASHBOARD}/vote-dh`,
     voteHD: `${ROOTS.DASHBOARD}/vote-hd`,
+    questionAndAnswerPath: `${ROOTS.DASHBOARD}/question-and-answer`,
     settingVote: {
       election: `${ROOTS.DASHBOARD}/setting-vote/setting-election`,
       vote: `${ROOTS.DASHBOARD}/setting-vote/setting-vote`,

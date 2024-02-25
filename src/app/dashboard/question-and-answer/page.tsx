@@ -1,0 +1,214 @@
+'use client';
+
+import LoadingButton from '@mui/lab/LoadingButton';
+import { DialogContentText, TextField } from '@mui/material';
+import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogTitle from '@mui/material/DialogTitle';
+import IconButton from '@mui/material/IconButton';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import ListItemText from '@mui/material/ListItemText';
+import Stack from '@mui/material/Stack';
+import Typography from '@mui/material/Typography';
+import { get, push, ref, runTransaction } from 'firebase/database';
+import { enqueueSnackbar } from 'notistack';
+import { useEffect, useState } from 'react';
+import { FIREBASE_COLLECTION } from 'src/constant/firebase_collection.constant';
+import { database } from 'src/firebase/firebase.config';
+import { currentTimeUTC7 } from 'src/utils/currentTimeUTC+7';
+import CustomBreadcrumbs from '../../../components/custom-breadcrumbs';
+import Iconify from '../../../components/iconify';
+import { HOST_API } from '../../../config-global';
+import { useUser } from '../../../firebase/user_accesss_provider';
+import axios from '../../../utils/axios';
+
+export default function QuestionAndAnswer() {
+  const { user } = useUser();
+  const [questions, setQuestions] = useState<any[]>();
+  const [inputQuestion, setInputQuestion] = useState<String>();
+  const [sending, setSending] = useState<boolean>(false);
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const [deleteSelected, setDeleteSelected] = useState<any>(null);
+  useEffect(() => {
+    const userRef = ref(database, FIREBASE_COLLECTION.QA);
+    const fetchData = async () => {
+      try {
+        const snapshot = await get(userRef);
+        const ls_questions: any[] = [];
+        console.log('snapshot', snapshot.val());
+
+        if (snapshot.exists()) {
+          // Lặp qua từng đối tượng trong collection, nếu trùng telegram_id >> thì lấy nội dung show ra
+          snapshot.forEach((childSnapshot) => {
+            const data = childSnapshot.val();
+            const { key } = childSnapshot;
+            if (data && String(data.user.telegram_id) === String(user?.telegram_id)) {
+              ls_questions.push({ ...data, key });
+            }
+          });
+          setQuestions(ls_questions);
+          console.groupEnd();
+        } else {
+          setQuestions([]);
+          console.log('No Data');
+        }
+      } catch (error) {
+        console.error('Error when get data :', error);
+      }
+    };
+    fetchData();
+  }, [inputQuestion, user?.telegram_id, deleteSelected]);
+
+  const onQuestionInput = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setInputQuestion(event.target.value);
+  };
+
+  const updateQuestion = (post: any) => axios.post(`${HOST_API}/update_question`, post);
+
+  const onClickSendButton: React.MouseEventHandler<HTMLButtonElement> = async (
+    event: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => {
+    // Update loading -> true
+    setSending(true);
+
+    const refQA = ref(database, FIREBASE_COLLECTION.QA);
+    const newRefQA = push(refQA);
+
+    await runTransaction(newRefQA, (currentData) =>
+      // If currentData exists, merge it with the new data
+      ({
+        user,
+        content: inputQuestion,
+        time: currentTimeUTC7(),
+      })
+    )
+      .then(() => {
+        enqueueSnackbar('Gửi câu hỏi thành công', { variant: 'success' });
+      })
+      .catch((error) => {
+        enqueueSnackbar('Thao tác thất bại', { variant: 'error' });
+        console.log('Error send question:', error);
+      });
+    setSending(false);
+    setInputQuestion('');
+
+    // // Call axios api
+    // const post = {
+    //   action: 0, // ADD question
+    //   info: {
+    //     user,
+    //     content: inputQuestion,
+    //     time: currentTimeUTC7(),
+    //   },
+    // };
+    // await updateQuestion(post)
+    //   .then(() => {
+    //     enqueueSnackbar('Gửi câu hỏi thành công', { variant: 'success' });
+    //   })
+    //   .catch((err) => {
+    //     enqueueSnackbar('Thao tác thất bại', { variant: 'error' });
+    //   });
+
+    // // Update loading -> false
+    // setSending(false);
+    // setInputQuestion('');
+  };
+  const handleDeleteQuestion = (item: any) => {
+    setIsDeleteOpen(true);
+    setDeleteSelected(item);
+  };
+  const handleClose = () => {
+    setIsDeleteOpen(false);
+    setDeleteSelected(null);
+  };
+  const handleOke = async () => {
+    if (deleteSelected) {
+      const post = {
+        action: 1, // Delete
+        key: deleteSelected.key,
+      };
+      await updateQuestion(post)
+        .then(() => {
+          setDeleteSelected(null);
+          setIsDeleteOpen(false);
+          enqueueSnackbar('Xóa thành công', { variant: 'success' });
+        })
+        .catch((err) => {
+          enqueueSnackbar('Thao tác thất bại', { variant: 'error' });
+        });
+    }
+  };
+  return (
+    <Stack direction="column" spacing={0.7} sx={{ m: 1 }}>
+      <CustomBreadcrumbs
+        heading="Mời quý cổ đông đặt câu hỏi"
+        links={[{ name: '' }]}
+        sx={{
+          mb: { xs: 1, md: 1 },
+        }}
+      />
+      <Typography variant="overline">Nội dung câu hỏi:</Typography>
+      <TextField
+        variant="outlined"
+        placeholder="Nhập nội dung điều bạn thắc mắc"
+        multiline
+        rows={4}
+        maxRows={20}
+        onChange={onQuestionInput}
+        value={inputQuestion}
+      />
+      <Box display="flex" justifyContent="flex-end">
+        <LoadingButton
+          color="success"
+          startIcon={<Iconify icon="material-symbols:send" width={20} />}
+          loading={sending}
+          variant="contained"
+          sx={{ width: '25%' }}
+          onClick={onClickSendButton}
+        >
+          Gửi
+        </LoadingButton>
+      </Box>
+      <Typography variant="overline">Câu hỏi của bạn:</Typography>
+      <List>
+        {questions?.map((item, index) => (
+          <ListItem
+            key={item.key}
+            secondaryAction={
+              <IconButton edge="end" aria-label="delete" onClick={() => handleDeleteQuestion(item)}>
+                <Iconify icon="ic:baseline-delete" width={20} />
+              </IconButton>
+            }
+          >
+            <ListItemText primary={`Câu hỏi ${index + 1}:`} secondary={item.content} />
+          </ListItem>
+        ))}
+      </List>
+      <Dialog
+        open={isDeleteOpen}
+        onClose={handleClose}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">Xác nhận</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            Bạn chắc chắn muốn xóa câu hỏi ?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button variant="contained" color="error" onClick={handleClose}>
+            Hủy bỏ
+          </Button>
+          <Button variant="contained" color="success" onClick={handleOke} autoFocus>
+            Đồng ý
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </Stack>
+  );
+}

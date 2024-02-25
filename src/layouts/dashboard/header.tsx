@@ -14,6 +14,9 @@ import Logo from 'src/components/logo';
 import { useSettingsContext } from 'src/components/settings';
 import SvgColor from 'src/components/svg-color';
 //
+import { Button } from '@mui/material';
+import { useRouter } from 'src/routes/hooks';
+import { paths } from 'src/routes/paths';
 import { AccountPopover, Searchbar, SettingsButton } from '../_common';
 import { HEADER, NAV } from '../config-layout';
 
@@ -35,6 +38,8 @@ export default function Header({ onOpenNav }: Props) {
   const lgUp = useResponsive('up', 'lg');
 
   const offset = useOffSetTop(HEADER.H_DESKTOP);
+
+  const router = useRouter();
 
   const offsetTop = offset && !isNavHorizontal;
 
@@ -58,6 +63,7 @@ export default function Header({ onOpenNav }: Props) {
         spacing={{ xs: 0.5, sm: 1 }}
       >
         {/* <LanguagePopover /> */}
+        <Button onClick={() => router.push(paths.dashboard.questionAndAnswerPath)}>Câu hỏi</Button>
 
         <SettingsButton />
 

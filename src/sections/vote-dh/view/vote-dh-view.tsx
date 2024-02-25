@@ -175,30 +175,7 @@ export default function VoteDHView() {
       }
     }
   };
-  // const updateHistorySendPoll = async () =>
-  // update lịch sử gửi poll khi gửi ý kiến thành công
-  // status : sent => voted
-  // Tạo mảng mới với dữ liệu đã được cập nhật
-  // const dataUpdateLsSendPoll = filteredData.map((item) => {
-  //   // Kiểm tra xem item có thuộc tính gui_den hay không
-  //   if (item.gui_den) {
-  //     // Lọc qua mảng item.gui_den và tìm đến object có ma_cd === user?.ma_cd
-  //     const updatedGuiDen = item.gui_den.map((den) => {
-  //       // Nếu ma_cd trùng với user?.ma_cd, thì cập nhật thuộc tính status thành 'voted'
-  //       if (den.ma_cd === user?.ma_cd) {
-  //         return { ...den, status: 'voted' };
-  //       }
-  //       // Nếu ma_cd không trùng, giữ nguyên object
-  //       return den;
-  //     });
 
-  //     // Trả về một bản sao của item với gui_den đã được cập nhật
-  //     return { ...item, gui_den: updatedGuiDen };
-  //   }
-
-  //   // Nếu item không có gui_den, giữ nguyên item
-  //   return item;
-  // });
   const handleSubmitVote = async () => {
     const dataExist =
       listHistoryVoted.length > 0
@@ -211,12 +188,6 @@ export default function VoteDHView() {
 
     const newRef = push(historyVotedRef);
 
-    // await set(dataExist ? historyVotedRef : newRef, {
-    //   ma_cd: user?.ma_cd,
-    //   cp_tham_du: user?.cp_tham_du,
-    //   detail: dataExist ? [...dataExist.detail, ...selectedAnswers] : selectedAnswers,
-    // });
-    // eslint-disable-next-line consistent-return
     await runTransaction(dataExist ? historyVotedRef : newRef, (currentData) =>
       // If currentData exists, merge it with the new data
 
@@ -239,36 +210,6 @@ export default function VoteDHView() {
         console.log('Error saving data:', error);
       });
   };
-  // const handleSubmitVote = async () => {
-  //   const dataExist =
-  //     listHistoryVoted.length > 0
-  //       ? listHistoryVoted.find((item) => item?.ma_cd === user?.ma_cd)
-  //       : undefined; // Tìm xem đã gửi voted lần nào chưa
-
-  //   try {
-  //     const response = await axios.post(`${process.env.NEXT_PUBLIC_HOST_API}/vote`, {
-  //       key: dataExist ? dataExist?.key : GenerateUniqueID(),
-  //       ma_cd: user?.ma_cd,
-  //       cp_tham_du: user?.cp_tham_du,
-  //       detail: dataExist ? [...dataExist.detail, ...selectedAnswers] : selectedAnswers,
-  //       // for update ls_gui_poll
-  //       updateHistorySendPoll: dataUpdateLsSendPoll,
-  //     });
-  //     console.log('response:', response);
-  //     if (response) {
-  //       // updateHistorySendPoll();
-  //       // updateStringValue(selectedAnswers[0].group_question as string);
-  //       enqueueSnackbar(
-  //         user && user.nguoi_nuoc_ngoai === true ? 'Send Success !' : 'Gửi ý kiến thành công  !',
-  //         { variant: 'success' }
-  //       );
-  //     }
-  //     console.log('response', response);
-  //   } catch (error) {
-  //     enqueueSnackbar('Gửi ý kiến lỗi !', { variant: 'error' });
-  //     console.log('Error saving data:', error);
-  //   }
-  // };
 
   // GET DATA FROM FIREBASE
   useEffect(() => {
