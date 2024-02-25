@@ -14,7 +14,6 @@ import AppWelcome from '../app-welcome';
 export default function OverviewAppView() {
   const { user } = useUser();
   const [userAccess, setUserAccess] = useState<any>();
-  console.log('userAccess', userAccess);
   const telegramContext = useTelegram();
   useEffect(() => {
     setUserAccess(telegramContext?.user);

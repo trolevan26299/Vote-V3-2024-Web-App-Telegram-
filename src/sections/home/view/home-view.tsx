@@ -9,9 +9,8 @@ export default function HomeView() {
   const router = useRouter();
   const { user } = useUser();
   const pathname = usePathname();
-  console.log('pathname', pathname);
   useEffect(() => {
-    if (!user) {
+    if (user) {
       if (pathname === '/dashboard/question-and-answer') {
         router.push(paths.dashboard.questionAndAnswerPath);
       } else {
