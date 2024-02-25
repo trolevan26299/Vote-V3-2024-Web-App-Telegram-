@@ -10,6 +10,7 @@ export default function HomeView() {
   const router = useRouter();
   const telegramContext = useTelegram();
   const { user } = useUser();
+
   useEffect(() => {
     if (telegramContext?.user?.id) {
       if (user) {
@@ -21,7 +22,7 @@ export default function HomeView() {
       router.push(paths.dashboard.settingVote.vote);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [telegramContext]);
   // eslint-disable-next-line react/jsx-no-useless-fragment
   return <></>;
 }
