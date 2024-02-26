@@ -32,8 +32,11 @@ export default function OverviewAppView() {
             }`}
             img={<SeoIllustration />}
             code_holder={user?.ma_cd}
-            number_shares={user?.cp_tham_du}
-            join_rate={user?.ty_le_cp_tham_du}
+            cp_so_huu={user?.cp_so_huu}
+            cp_uy_quyen={user?.cp_uy_quyen}
+            cp_tham_du={user?.cp_tham_du}
+            ty_le_cp_so_huu={user?.ty_le_cp_so_huu}
+            ty_le_cp_tham_du={user?.ty_le_cp_tham_du}
             foreign={user?.nguoi_nuoc_ngoai}
           />
         </Grid>

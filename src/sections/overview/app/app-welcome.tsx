@@ -17,20 +17,30 @@ interface Props extends StackProps {
   img?: React.ReactNode;
   action?: React.ReactNode;
   code_holder?: string;
+  cp_so_huu?: number;
+  cp_uy_quyen?: number;
+  cp_tham_du?: number;
   number_shares?: number;
   join_rate?: number;
   foreign?: boolean;
+  ty_le_cp_so_huu?: number;
+  ty_le_cp_tham_du?: number;
 }
 
 export default function AppWelcome({
   title,
   description,
-  action,
   img,
+  action,
   code_holder,
+  cp_so_huu,
+  cp_uy_quyen,
+  cp_tham_du,
   number_shares,
   join_rate,
   foreign,
+  ty_le_cp_so_huu,
+  ty_le_cp_tham_du,
   ...other
 }: Props) {
   const theme = useTheme();
@@ -77,22 +87,45 @@ export default function AppWelcome({
               <Typography sx={{ fontWeight: 'bold' }}>{code_holder}</Typography>
             </Grid>
             <Grid item xs={8} md={6} lg={4}>
-              <Typography>{foreign ? 'Participation shares :' : 'Cổ phần tham dự :'}</Typography>
+              <Typography>{foreign ? 'Owned Shares :' : 'Cổ phần sở hữu :'}</Typography>
             </Grid>
             <Grid item xs={4} md={6} lg={8}>
               <Typography sx={{ fontWeight: 'bold' }}>
-                {number_shares?.toLocaleString('vi-VN')}
+                {cp_so_huu?.toLocaleString('vi-VN')}
+                {`( ${((ty_le_cp_so_huu || 0) * 100)
+                  .toFixed(2)
+                  .replace(/(\.[0-9]*[1-9])0+$/, '$1')
+                  .replace(/\.$/, '')}% )`}
               </Typography>
             </Grid>
             <Grid item xs={8} md={6} lg={4}>
-              <Typography>{foreign ? 'Participation share ratio :' : 'Tỷ lệ tham dự :'}</Typography>
+              <Typography>{foreign ? 'Proxy Shares :' : 'Cổ phần ủy quền :'}</Typography>
             </Grid>
             <Grid item xs={4} md={6} lg={8}>
               <Typography sx={{ fontWeight: 'bold' }}>
-                {` ${((join_rate || 0) * 100)
+                {/* {` ${((join_rate || 0) * 100)
                   .toFixed(2)
                   .replace(/(\.[0-9]*[1-9])0+$/, '$1')
-                  .replace(/\.$/, '')}%`}{' '}
+                  .replace(/\.$/, '')}%`}{' '} */}
+                {cp_uy_quyen?.toLocaleString('vi-VN')}
+              </Typography>
+            </Grid>
+            <Grid item xs={8} md={6} lg={4}>
+              <Typography>
+                {foreign ? 'Total Participating Shares :' : 'Tổng cổ phần tham dự: :'}
+              </Typography>
+            </Grid>
+            <Grid item xs={4} md={6} lg={8}>
+              <Typography sx={{ fontWeight: 'bold' }}>
+                {/* {` ${((join_rate || 0) * 100)
+                  .toFixed(2)
+                  .replace(/(\.[0-9]*[1-9])0+$/, '$1')
+                  .replace(/\.$/, '')}%`}{' '} */}
+                {cp_tham_du?.toLocaleString('vi-VN')}
+                {`( ${((ty_le_cp_so_huu || 0) * 100)
+                  .toFixed(2)
+                  .replace(/(\.[0-9]*[1-9])0+$/, '$1')
+                  .replace(/\.$/, '')}% )`}
               </Typography>
             </Grid>
           </Grid>
