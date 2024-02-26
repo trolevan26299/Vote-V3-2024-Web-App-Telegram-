@@ -28,7 +28,8 @@ export default function HomeView() {
     // } else {
     //   router.push(paths.dashboard.root);
     // }
-
+    console.log('user:', user);
+    console.log('userAccess:', userAccess);
     if (user) {
       if (pathname === '/dashboard/question-and-answer') {
         router.push(paths.dashboard.questionAndAnswerPath);
