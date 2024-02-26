@@ -32,7 +32,7 @@ export default function HomeView() {
 
     // Xóa timeout khi component unmount
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [userAccess, user, pathname, router]);
+  }, []);
 
   useEffect(() => {
     setUserAccess(telegramContext?.user);
