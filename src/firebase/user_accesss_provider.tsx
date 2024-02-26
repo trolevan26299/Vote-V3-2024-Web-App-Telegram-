@@ -19,7 +19,7 @@ export const UserContext = createContext<IUserContext>({});
 
 export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<IUserAccess>();
-  const [userAccess, setUserAccess] = useState<number | undefined>(0);
+  const [userAccess, setUserAccess] = useState<number | undefined>(undefined);
   console.log('userAccess', userAccess);
   const telegramContext = useTelegram();
   useEffect(() => {
@@ -40,7 +40,6 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
             const data = childSnapshot.val();
             if (data && String(data.telegram_id) === String(userAccess)) {
               setUser(data);
-              console.log(data);
             }
           });
         } else {
