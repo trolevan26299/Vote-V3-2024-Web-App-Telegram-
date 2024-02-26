@@ -18,7 +18,7 @@ export default function HomeView() {
       if (user) {
         if (pathname === '/dashboard/question-and-answer') {
           router.push(paths.dashboard.questionAndAnswerPath);
-        } else if ('/dashboard/vote-dh') {
+        } else if (pathname === '/dashboard/vote-dh') {
           router.push(paths.dashboard.voteDH);
         }
       } else {
