@@ -79,7 +79,7 @@ export default function AppWelcome({
           <Typography variant="h5">
             {foreign ? 'Your stake information:' : 'Thông tin cổ phần của bạn :'}
           </Typography>
-          <Grid container spacing={2} sx={styles.grid_box}>
+          <Grid container spacing={1} sx={styles.grid_box}>
             <Grid item xs={8} md={6} lg={4}>
               <Typography>{foreign ? 'Shareholder code :' : 'Mã cổ đông :'}</Typography>
             </Grid>
@@ -112,7 +112,7 @@ export default function AppWelcome({
             </Grid>
             <Grid item xs={8} md={6} lg={4}>
               <Typography>
-                {foreign ? 'Total Participating Shares :' : 'Tổng cổ phần tham dự: :'}
+                {foreign ? 'Total Participating Shares :' : 'Tổng CP tham dự: :'}
               </Typography>
             </Grid>
             <Grid item xs={4} md={6} lg={8}>
