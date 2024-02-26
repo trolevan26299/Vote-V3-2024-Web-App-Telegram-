@@ -21,7 +21,9 @@ export default function AuthGuard({ children }: Props) {
     const storedChecked = localStorage.getItem('checked');
 
     checked.current = storedChecked ? JSON.parse(storedChecked) : false;
-
+    console.log('checked:', checked.current);
+    console.log('userAcess', userAccess);
+    console.log('user', user.user);
     if (userAccess && user.user) {
       localStorage.setItem('checked', JSON.stringify(true));
     } else if (checked.current === true) {
