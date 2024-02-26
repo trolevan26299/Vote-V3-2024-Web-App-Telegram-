@@ -19,34 +19,31 @@ export default function AuthGuard({ children }: Props) {
 
   useEffect(() => {
     const storedChecked = localStorage.getItem('checked');
+
     checked.current = storedChecked ? JSON.parse(storedChecked) : false;
 
-    if (checked.current && userAccess && user.user) {
-      // Nếu đã được kiểm tra và người dùng hợp lệ, điều hướng đến router phù hợp
+    if (userAccess && user.user) {
+      localStorage.setItem('checked', JSON.stringify(true));
+    } else if (checked.current === true) {
       if (pathname === '/dashboard/question-and-answer') {
         router.push(paths.dashboard.questionAndAnswerPath);
       } else if (pathname === '/dashboard/vote-dh') {
         router.push(paths.dashboard.voteDH);
-      } else {
+      } else if (user.user !== undefined) {
         router.push(paths.dashboard.voteDH);
+        // router.push(paths.dashboard.questionAndAnswerPath);
       }
     } else {
-      // Nếu chưa được kiểm tra hoặc người dùng không hợp lệ, chuyển hướng đến trang login
       router.replace(paths.auth.jwt.login);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [checked.current, userAccess, user.user, pathname]);
-
-  useEffect(() => {
-    const storedChecked = localStorage.getItem('checked');
-    checked.current = storedChecked ? JSON.parse(storedChecked) : false;
-  }, []);
+  }, [checked.current, user.user, pathname, userAccess]);
 
   useEffect(() => {
     setUserAccess(telegramContext?.user);
   }, [telegramContext]);
 
-  if (!checked) {
+  if (!checked.current) {
     return null;
   }
 
