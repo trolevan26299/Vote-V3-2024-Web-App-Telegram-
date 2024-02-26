@@ -43,6 +43,7 @@ export default function VoteDHView() {
   const telegramContext = useTelegram();
 
   const [userAccess, setUserAccess] = useState<any>();
+  const [userCD, setUserCD] = useState<any>();
   const { updateStringValue } = useStringState();
   // LIST DATA SEND POLL FROM FIREBASE
 
@@ -254,15 +255,15 @@ export default function VoteDHView() {
       console.log('userAccess dh',userAccess)
       console.log('user dh',user)
       if (!user) {
-
         router.push(paths.auth.jwt.login);
       }}
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [userAccess,user])
+  }, [userAccess,userCD])
 
     useEffect(() => {
       setUserAccess(telegramContext?.user);
-    }, [telegramContext]);
+      setUserCD(user)
+    }, [telegramContext,user]);
 
   return (
     <Container sx={{ maxWidth: '100% !important' }}>

@@ -23,7 +23,7 @@ export default function HomeView() {
           router.push(paths.dashboard.voteDH);
         }
       } else {
-        router.push(paths.auth.jwt.login);
+        router.push(paths.page403);
       }
     } else {
       router.push(paths.dashboard.voteDH);
