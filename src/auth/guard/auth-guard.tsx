@@ -19,13 +19,11 @@ export default function AuthGuard({ children }: Props) {
 
   useEffect(() => {
     const storedChecked = localStorage.getItem('checked');
-
     checked.current = storedChecked ? JSON.parse(storedChecked) : false;
-    console.log('checked:', checked.current);
-    console.log('userAcess', userAccess);
-    console.log('user', user.user);
+  }, []);
+
+  useEffect(() => {
     if (userAccess && user.user) {
-      localStorage.setItem('checked', JSON.stringify(true));
       if (checked.current === true) {
         if (pathname === '/dashboard/question-and-answer') {
           router.push(paths.dashboard.questionAndAnswerPath);
@@ -33,11 +31,12 @@ export default function AuthGuard({ children }: Props) {
           router.push(paths.dashboard.voteDH);
         } else if (user.user !== undefined) {
           router.push(paths.dashboard.voteDH);
-          // router.push(paths.dashboard.questionAndAnswerPath);
         }
       } else {
         router.replace(paths.auth.jwt.login);
       }
+      // Lưu trạng thái checked vào localStorage trước khi kiểm tra điều kiện
+      localStorage.setItem('checked', JSON.stringify(true));
     } else if (userAccess === undefined && checked.current === true) {
       router.replace(paths.dashboard.settingVote.vote);
     }
