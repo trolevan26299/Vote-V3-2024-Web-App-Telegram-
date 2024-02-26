@@ -21,9 +21,7 @@ export default function AuthGuard({ children }: Props) {
     const storedChecked = localStorage.getItem('checked');
 
     checked.current = storedChecked ? JSON.parse(storedChecked) : false;
-    console.log('user:', user);
-    console.log('pathname:', pathname);
-    console.log('checked:', checked.current);
+
     if (userAccess && user.user) {
       localStorage.setItem('checked', JSON.stringify(true));
     } else if (checked.current === true) {
@@ -36,7 +34,7 @@ export default function AuthGuard({ children }: Props) {
         // router.push(paths.dashboard.questionAndAnswerPath);
       }
     } else {
-      router.replace(paths.auth.jwt.login);
+      router.push(paths.auth.jwt.login);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [checked, user, pathname, userAccess]);
