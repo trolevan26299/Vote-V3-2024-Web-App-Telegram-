@@ -29,8 +29,6 @@ export default function AuthGuard({ children }: Props) {
         router.push(paths.dashboard.questionAndAnswerPath);
       } else if (pathname === '/dashboard/vote-dh') {
         router.push(paths.dashboard.voteDH);
-      } else if (userCD !== undefined) {
-        router.push(paths.dashboard.voteDH);
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
