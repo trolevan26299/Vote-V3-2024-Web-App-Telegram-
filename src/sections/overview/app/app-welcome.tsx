@@ -79,17 +79,17 @@ export default function AppWelcome({
           <Typography variant="h5">
             {foreign ? 'Your stake information:' : 'Thông tin cổ phần của bạn :'}
           </Typography>
-          <Grid container spacing={1} sx={styles.grid_box}>
-            <Grid item xs={8} md={6} lg={4}>
+          <Grid container spacing={0} sx={styles.grid_box}>
+            <Grid item xs={6} md={6} lg={4}>
               <Typography>{foreign ? 'Shareholder code :' : 'Mã cổ đông :'}</Typography>
             </Grid>
-            <Grid item xs={4} md={6} lg={8}>
+            <Grid item xs={6} md={6} lg={8}>
               <Typography sx={{ fontWeight: 'bold' }}>{code_holder}</Typography>
             </Grid>
-            <Grid item xs={8} md={6} lg={4}>
+            <Grid item xs={6} md={6} lg={4}>
               <Typography>{foreign ? 'Owned Shares :' : 'Cổ phần sở hữu :'}</Typography>
             </Grid>
-            <Grid item xs={4} md={6} lg={8}>
+            <Grid item xs={6} md={6} lg={8}>
               <Typography sx={{ fontWeight: 'bold' }}>
                 {cp_so_huu?.toLocaleString('vi-VN')}
                 {`( ${((ty_le_cp_so_huu || 0) * 100)
@@ -98,29 +98,21 @@ export default function AppWelcome({
                   .replace(/\.$/, '')}% )`}
               </Typography>
             </Grid>
-            <Grid item xs={8} md={6} lg={4}>
+            <Grid item xs={6} md={6} lg={4}>
               <Typography>{foreign ? 'Proxy Shares :' : 'Cổ phần ủy quền :'}</Typography>
             </Grid>
-            <Grid item xs={4} md={6} lg={8}>
+            <Grid item xs={6} md={6} lg={8}>
               <Typography sx={{ fontWeight: 'bold' }}>
-                {/* {` ${((join_rate || 0) * 100)
-                  .toFixed(2)
-                  .replace(/(\.[0-9]*[1-9])0+$/, '$1')
-                  .replace(/\.$/, '')}%`}{' '} */}
                 {cp_uy_quyen?.toLocaleString('vi-VN')}
               </Typography>
             </Grid>
-            <Grid item xs={8} md={6} lg={4}>
+            <Grid item xs={6} md={6} lg={4}>
               <Typography>
                 {foreign ? 'Total Participating Shares :' : 'Tổng CP tham dự: :'}
               </Typography>
             </Grid>
-            <Grid item xs={4} md={6} lg={8}>
+            <Grid item xs={6} md={6} lg={8}>
               <Typography sx={{ fontWeight: 'bold' }}>
-                {/* {` ${((join_rate || 0) * 100)
-                  .toFixed(2)
-                  .replace(/(\.[0-9]*[1-9])0+$/, '$1')
-                  .replace(/\.$/, '')}%`}{' '} */}
                 {cp_tham_du?.toLocaleString('vi-VN')}
                 {`( ${((ty_le_cp_so_huu || 0) * 100)
                   .toFixed(2)
