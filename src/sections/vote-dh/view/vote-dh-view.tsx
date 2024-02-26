@@ -27,6 +27,7 @@ import { useUser } from 'src/firebase/user_accesss_provider';
 import { useRouter } from 'src/routes/hooks';
 import { paths } from 'src/routes/paths';
 import { useStringState } from 'src/stores/questionSelectUser.provider';
+import { useTelegram } from 'src/telegram/telegram.provider';
 import { IHistorySendPoll, IQuestion } from 'src/types/setting';
 import { IHistoryVoted, ISelectedAnswer } from 'src/types/votedh.types';
 import { convertToMilliseconds } from 'src/utils/convertTimeStringToMiliSeconds';
@@ -39,6 +40,9 @@ export default function VoteDHView() {
   const theme = useTheme();
   const { user } = useUser();
   const router = useRouter();
+  const telegramContext = useTelegram();
+
+  const [userAccess, setUserAccess] = useState<any>();
   const { updateStringValue } = useStringState();
   // LIST DATA SEND POLL FROM FIREBASE
 
@@ -244,6 +248,18 @@ export default function VoteDHView() {
       unsubscribe();
     };
   }, []);
+
+  useEffect(() => {
+    if (userAccess) {
+      if (!user?.telegram_id) {
+        router.push(paths.auth.jwt.login);
+      }}
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userAccess,user])
+
+    useEffect(() => {
+      setUserAccess(telegramContext?.user);
+    }, [telegramContext]);
 
   return (
     <Container sx={{ maxWidth: '100% !important' }}>
