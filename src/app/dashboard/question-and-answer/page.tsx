@@ -44,23 +44,23 @@ export default function QuestionAndAnswer() {
   const pathname = usePathname();
 
   const [userAccess, setUserAccess] = useState<any>();
-
-  const handleClosePopup = () => {
-    setIsNewQuestion(false);
-  };
-  useEffect(() => {
-    // Chờ 1 giây trước khi thực hiện các kiểm tra
-    if (userAccess) {
-      if (!user?.telegram_id) {
-        router.push(paths.auth.jwt.login);
-      }}
-    // Xóa timeout khi component unmount
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user?.telegram_id]);
+useEffect(() => {
+  if (userAccess) {
+    if (!user?.telegram_id) {
+      router.push(paths.auth.jwt.login);
+    }}
+// eslint-disable-next-line react-hooks/exhaustive-deps
+}, [])
 
   useEffect(() => {
     setUserAccess(telegramContext?.user);
   }, [telegramContext]);
+
+  const handleClosePopup = () => {
+    setIsNewQuestion(false);
+  };
+
+
 
   useEffect(() => {
     const userRef = ref(database, FIREBASE_COLLECTION.QA);
