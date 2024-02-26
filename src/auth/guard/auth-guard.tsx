@@ -29,6 +29,8 @@ export default function AuthGuard({ children }: Props) {
     } else if (checked.current === true) {
       if (pathname === '/dashboard/question-and-answer') {
         router.push(paths.dashboard.questionAndAnswerPath);
+      } else if (pathname === '/dashboard/vote-dh') {
+        router.push(paths.dashboard.voteDH);
       } else if (user.user !== undefined) {
         router.push(paths.dashboard.voteDH);
         // router.push(paths.dashboard.questionAndAnswerPath);
