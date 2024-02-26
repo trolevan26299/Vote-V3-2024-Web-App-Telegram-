@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { PATH_AFTER_LOGIN } from 'src/config-global';
 import { useUser } from 'src/firebase/user_accesss_provider';
 import { paths } from 'src/routes/paths';
@@ -14,42 +14,42 @@ export default function AuthGuard({ children }: Props) {
   const telegramContext = useTelegram();
   const user = useUser();
   const pathname = usePathname();
-  const [userAccess, setUserAccess] = useState<any>();
-  const checked = useRef<boolean>(false);
+  const [checked, setChecked] = useState<boolean>(false);
+  const [userTele, setUserTele] = useState<boolean>(false);
+  const [userCD, setUserCD] = useState<boolean>(false);
 
   useEffect(() => {
-    const storedChecked = localStorage.getItem('checked');
-    checked.current = storedChecked ? JSON.parse(storedChecked) : false;
-  }, []);
-
-  useEffect(() => {
-    if (userAccess && user.user) {
-      if (checked.current === true) {
-        if (pathname === '/dashboard/question-and-answer') {
-          router.push(paths.dashboard.questionAndAnswerPath);
-        } else if (pathname === '/dashboard/vote-dh') {
-          router.push(paths.dashboard.voteDH);
-        } else if (user.user !== undefined) {
-          router.push(paths.dashboard.voteDH);
-        }
-      } else {
+    const getLocal = async () => {
+      const storedChecked = await localStorage.getItem('checked');
+      const isChecked = !!storedChecked;
+      setChecked(isChecked);
+      if (!isChecked) {
         router.replace(paths.auth.jwt.login);
       }
-      // Lưu trạng thái checked vào localStorage trước khi kiểm tra điều kiện
-      localStorage.setItem('checked', JSON.stringify(true));
-    } else if (userAccess === undefined && checked.current === true) {
-      router.replace(paths.dashboard.settingVote.vote);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [checked, user, pathname, userAccess]);
+    };
+    getLocal();
+  }, [router]);
 
   useEffect(() => {
-    setUserAccess(telegramContext?.user);
+    setUserTele(!!telegramContext?.user);
   }, [telegramContext]);
 
-  if (!checked) {
-    return null;
-  }
+  useEffect(() => {
+    setUserCD(!!user.user);
+  }, [user]);
+
+  useEffect(() => {
+    if (userTele && userCD) {
+      localStorage.setItem('checked', JSON.stringify(true));
+      if (pathname === '/dashboard/question-and-answer') {
+        router.push(paths.dashboard.questionAndAnswerPath);
+      } else if (pathname === '/dashboard/vote-dh') {
+        router.push(paths.dashboard.voteDH);
+      } else {
+        router.replace(PATH_AFTER_LOGIN);
+      }
+    }
+  }, [userCD, userTele, pathname, router]);
 
   return <>{children}</>;
 }
