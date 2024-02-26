@@ -252,6 +252,7 @@ export default function VoteDHView() {
   useEffect(() => {
     if (userAccess) {
       console.log('userAccess',userAccess)
+      console.log('user',user)
       if (user?.telegram_id === undefined) {
         console.log('teleid:',user?.telegram_id)
         router.push(paths.auth.jwt.login);
