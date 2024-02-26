@@ -3,7 +3,7 @@
 import { Box, Button, Typography } from '@mui/material';
 import { alpha, useTheme } from '@mui/material/styles';
 import axios from 'axios';
-import { get, push, ref, remove, set } from 'firebase/database';
+import { DataSnapshot, get, onValue, push, ref, remove, set } from 'firebase/database';
 import { useSnackbar } from 'notistack';
 import { useEffect, useState } from 'react';
 import { ConfirmDialog } from 'src/components/custom-dialog';
@@ -88,19 +88,18 @@ Click vào nút bên dưới để tiến hành đặt câu hỏi
         }
       });
 
-       // Đợi cho tất cả các tin nhắn được gửi
-    const results = await Promise.all(sendMessagesQueue);
-    for (const result of results) {
-      const { chatId, message_id, error } = result;
-      if (!error) {
-        await saveHistorySendMessageBot(message_id, Number(chatId) );
+      // Đợi cho tất cả các tin nhắn được gửi
+      const results = await Promise.all(sendMessagesQueue);
+      for (const result of results) {
+        const { chatId, message_id, error } = result;
+        if (!error) {
+          await saveHistorySendMessageBot(message_id, Number(chatId));
+        }
       }
-    }
     } catch (error) {
       console.error('Error sending messages to Telegram:', error);
     }
   };
-
 
   const handleDeleteMessageAll = async () => {
     try {
@@ -154,6 +153,28 @@ Click vào nút bên dưới để tiến hành đặt câu hỏi
     };
 
     fetchData();
+  }, []);
+  useEffect(() => {
+    // get data từ firebase realtime
+    const userRef = ref(database, FIREBASE_COLLECTION.HISTORY_SEND_MESSAGE_BOT);
+    const onDataChange = (snapshot: DataSnapshot) => {
+      const dataSnapShot = snapshot.exists();
+      if (dataSnapShot) {
+        const data = snapshot.val();
+        // Convert the object into an array
+        const historySendMessageArray = Object.values(data);
+        setHistorySendMessageList(historySendMessageArray as IHistorySendMessage[]);
+      } else {
+        console.log('No Data');
+      }
+    };
+
+    const unsubscribe = onValue(userRef, onDataChange);
+    return () => {
+      // Detach the listener
+      unsubscribe();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   useEffect(() => {
     const userRef = ref(database, FIREBASE_COLLECTION.THONG_TIN_CD);
