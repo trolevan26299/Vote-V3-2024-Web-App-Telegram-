@@ -251,7 +251,9 @@ export default function VoteDHView() {
 
   useEffect(() => {
     if (userAccess) {
+      console.log('userAccess',userAccess)
       if (!user?.telegram_id) {
+        console.log('teleid:',user?.telegram_id)
         router.push(paths.auth.jwt.login);
       }}
   // eslint-disable-next-line react-hooks/exhaustive-deps
