@@ -36,7 +36,7 @@ export default function AuthGuard({ children }: Props) {
       } else if (user.user !== undefined) {
         router.push(paths.dashboard.voteDH);
       }
-    } else {
+    } else if (!checked.current) {
       router.replace(paths.auth.jwt.login);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
