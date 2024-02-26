@@ -19,9 +19,9 @@ export default function AuthGuard({ children }: Props) {
   const checked = useRef<boolean>(false);
 
   useEffect(() => {
-    const storedChecked = localStorage.getItem('checked');
+    // const storedChecked = localStorage.getItem('checked');
 
-    checked.current = storedChecked ? JSON.parse(storedChecked) : false;
+    // checked.current = storedChecked ? JSON.parse(storedChecked) : false;
     if (userAccess && userCD && !checked.current) {
       localStorage.setItem('checked', JSON.stringify(true));
     } else if (checked.current === true) {
@@ -37,6 +37,11 @@ export default function AuthGuard({ children }: Props) {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [checked, userCD, pathname, userAccess]);
+  useEffect(() => {
+    const storedChecked = localStorage.getItem('checked');
+    checked.current = storedChecked ? JSON.parse(storedChecked) : false;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     setUserAccess(telegramContext?.user);
