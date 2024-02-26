@@ -20,8 +20,9 @@ import { enqueueSnackbar } from 'notistack';
 import { useEffect, useState } from 'react';
 import { FIREBASE_COLLECTION } from 'src/constant/firebase_collection.constant';
 import { database } from 'src/firebase/firebase.config';
-import { useRouter } from 'src/routes/hooks';
+import { usePathname, useRouter } from 'src/routes/hooks';
 import { paths } from 'src/routes/paths';
+import { useTelegram } from 'src/telegram/telegram.provider';
 import { IHistorySendPoll } from 'src/types/setting';
 import { convertToMilliseconds } from 'src/utils/convertTimeStringToMiliSeconds';
 import { currentTimeUTC7 } from 'src/utils/currentTimeUTC+7';
@@ -39,10 +40,28 @@ export default function QuestionAndAnswer() {
   const [isNewQuestion, setIsNewQuestion] = useState(false);
   const [historySendPollData, setHistorySendPollData] = useState<IHistorySendPoll[]>([]);
   const [deleteSelected, setDeleteSelected] = useState<any>(null);
+  const telegramContext = useTelegram();
+  const pathname = usePathname();
+
+  const [userAccess, setUserAccess] = useState<any>();
 
   const handleClosePopup = () => {
     setIsNewQuestion(false);
   };
+  useEffect(() => {
+    // Chờ 1 giây trước khi thực hiện các kiểm tra
+    if (userAccess) {
+      if (!user) {
+        router.push(paths.auth.jwt.login);
+      }}
+    // Xóa timeout khi component unmount
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user]);
+
+  useEffect(() => {
+    setUserAccess(telegramContext?.user);
+  }, [telegramContext]);
+
   useEffect(() => {
     const userRef = ref(database, FIREBASE_COLLECTION.QA);
     const fetchData = async () => {
