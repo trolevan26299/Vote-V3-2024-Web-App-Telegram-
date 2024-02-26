@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { PATH_AFTER_LOGIN } from 'src/config-global';
 import { useUser } from 'src/firebase/user_accesss_provider';
 import { paths } from 'src/routes/paths';
@@ -11,31 +11,37 @@ type Props = {
 
 export default function AuthGuard({ children }: Props) {
   const router = useRouter();
-  const userAccess = useTelegram();
+  const telegramContext = useTelegram();
   const user = useUser();
   const pathname = usePathname();
-
+  const [userAccess, setUserAccess] = useState<any>();
   const checked = useRef<boolean>(false);
 
   useEffect(() => {
     const storedChecked = localStorage.getItem('checked');
 
     checked.current = storedChecked ? JSON.parse(storedChecked) : false;
-
-    if (userAccess) {
+    console.log('user:', user);
+    console.log('pathname:', pathname);
+    console.log('checked:', checked.current);
+    if (userAccess && user.user) {
       localStorage.setItem('checked', JSON.stringify(true));
     } else if (checked.current === true) {
       if (pathname === '/dashboard/question-and-answer') {
         router.push(paths.dashboard.questionAndAnswerPath);
-      } else {
-        // router.push(PATH_AFTER_LOGIN);
-        router.push(paths.dashboard.questionAndAnswerPath);
+      } else if (user.user !== undefined) {
+        router.push(paths.dashboard.voteDH);
+        // router.push(paths.dashboard.questionAndAnswerPath);
       }
     } else {
       router.replace(paths.auth.jwt.login);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [checked, user, pathname]);
+  }, [checked, user, pathname, userAccess]);
+
+  useEffect(() => {
+    setUserAccess(telegramContext?.user);
+  }, [telegramContext]);
 
   if (!checked) {
     return null;
