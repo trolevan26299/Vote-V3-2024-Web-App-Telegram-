@@ -15,26 +15,24 @@ export default function HomeView() {
 
   useEffect(() => {
     // Chờ 1 giây trước khi thực hiện các kiểm tra
-    const timeoutId = setTimeout(() => {
-      if (userAccess) {
-        if (user) {
-          if (pathname === '/dashboard/question-and-answer') {
-            router.push(paths.dashboard.questionAndAnswerPath);
-          } else if (pathname === '/dashboard/vote-dh') {
-            router.push(paths.dashboard.voteDH);
-          }
-        } else {
-          router.push(paths.page403);
+
+    if (userAccess) {
+      if (user) {
+        if (pathname === '/dashboard/question-and-answer') {
+          router.push(paths.dashboard.questionAndAnswerPath);
+        } else if (pathname === '/dashboard/vote-dh') {
+          router.push(paths.dashboard.voteDH);
         }
       } else {
-        router.push(paths.dashboard.root);
+        router.push(paths.page403);
       }
-    }, 1000);
+    } else {
+      router.push(paths.dashboard.root);
+    }
 
     // Xóa timeout khi component unmount
-    return () => clearTimeout(timeoutId);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [userAccess, user, pathname, router]);
 
   useEffect(() => {
     setUserAccess(telegramContext?.user);
