@@ -15,25 +15,26 @@ export default function AuthGuard({ children }: Props) {
   const user = useUser();
   const pathname = usePathname();
   const [userAccess, setUserAccess] = useState<any>();
-  const [checked, setChecked] = useState<boolean>(false); // Sử dụng state thay vì useRef
+  const checked = useRef<boolean>(false);
 
   useEffect(() => {
     const storedChecked = localStorage.getItem('checked');
-    setChecked(storedChecked ? JSON.parse(storedChecked) : false); // Cập nhật giá trị checked từ localStorage
 
-    // Kiểm tra khi cả userAccess và user đã được load và checked đã được thiết lập
-    if (userAccess !== undefined && user !== undefined && checked) {
-      if (userAccess && user.user) {
-        localStorage.setItem('checked', JSON.stringify(true));
-      } else if (pathname === '/dashboard/question-and-answer') {
+    checked.current = storedChecked ? JSON.parse(storedChecked) : false;
+
+    if (userAccess && user.user) {
+      localStorage.setItem('checked', JSON.stringify(true));
+    } else if (checked.current === true) {
+      if (pathname === '/dashboard/question-and-answer') {
         router.push(paths.dashboard.questionAndAnswerPath);
       } else if (pathname === '/dashboard/vote-dh') {
         router.push(paths.dashboard.voteDH);
       } else if (user.user !== undefined) {
         router.push(paths.dashboard.voteDH);
-      } else {
-        router.replace(paths.auth.jwt.login);
+        // router.push(paths.dashboard.questionAndAnswerPath);
       }
+    } else {
+      router.replace(paths.auth.jwt.login);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [checked, user, pathname, userAccess]);
@@ -42,8 +43,7 @@ export default function AuthGuard({ children }: Props) {
     setUserAccess(telegramContext?.user);
   }, [telegramContext]);
 
-  // Hiển thị children chỉ khi đã kiểm tra hoàn tất
-  if (!checked || userAccess === undefined || user === undefined) {
+  if (!checked) {
     return null;
   }
 
