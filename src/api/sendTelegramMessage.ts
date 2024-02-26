@@ -90,7 +90,7 @@ export const sendTelegramMessage = async (
     const sendMessagesQueue = chatIds.map(async (item) => {
       const button = {
         text: item.nguoi_nuoc_ngoai === true ? 'Click To Vote' : 'Click để bỏ phiếu',
-        web_app: { url: 'https://vote-v3.vercel.app' },
+        web_app: { url: 'https://vote-v3.vercel.app/dashboard/vote-dh' },
       };
       const keyboard = {
         inline_keyboard: [[button]],
