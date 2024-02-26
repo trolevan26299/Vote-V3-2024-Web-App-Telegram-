@@ -24,7 +24,6 @@ export default function AuthGuard({ children }: Props) {
 
     if (userAccess && user.user) {
       localStorage.setItem('checked', JSON.stringify(true));
-      router.push(paths.dashboard.voteDH);
     } else if (checked.current === true) {
       if (pathname === '/dashboard/question-and-answer') {
         router.push(paths.dashboard.questionAndAnswerPath);
@@ -38,13 +37,13 @@ export default function AuthGuard({ children }: Props) {
       router.replace(paths.auth.jwt.login);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [checked.current, user.user, pathname, userAccess]);
+  }, [checked, user, pathname, userAccess]);
 
   useEffect(() => {
     setUserAccess(telegramContext?.user);
   }, [telegramContext]);
 
-  if (!checked.current) {
+  if (!checked) {
     return null;
   }
 
