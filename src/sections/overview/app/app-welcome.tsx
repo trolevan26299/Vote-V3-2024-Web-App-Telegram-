@@ -84,13 +84,13 @@ export default function AppWelcome({
               <Typography>{foreign ? 'Shareholder code :' : 'Mã cổ đông :'}</Typography>
             </Grid>
             <Grid item xs={6} md={6} lg={8}>
-              <Typography sx={{ fontWeight: 'bold' }}>{code_holder}</Typography>
+              <Typography sx={{ fontWeight: 'bold', fontSize: '15px' }}>{code_holder}</Typography>
             </Grid>
             <Grid item xs={6} md={6} lg={4}>
               <Typography>{foreign ? 'Owned Shares :' : 'Cổ phần sở hữu :'}</Typography>
             </Grid>
             <Grid item xs={6} md={6} lg={8}>
-              <Typography sx={{ fontWeight: 'bold' }}>
+              <Typography sx={{ fontWeight: 'bold', fontSize: '15px' }}>
                 {cp_so_huu?.toLocaleString('vi-VN')}
                 {`( ${((ty_le_cp_so_huu || 0) * 100)
                   .toFixed(2)
@@ -102,7 +102,7 @@ export default function AppWelcome({
               <Typography>{foreign ? 'Proxy Shares :' : 'Cổ phần ủy quền :'}</Typography>
             </Grid>
             <Grid item xs={6} md={6} lg={8}>
-              <Typography sx={{ fontWeight: 'bold' }}>
+              <Typography sx={{ fontWeight: 'bold', fontSize: '15px' }}>
                 {cp_uy_quyen?.toLocaleString('vi-VN')}
               </Typography>
             </Grid>
@@ -112,7 +112,7 @@ export default function AppWelcome({
               </Typography>
             </Grid>
             <Grid item xs={6} md={6} lg={8}>
-              <Typography sx={{ fontWeight: 'bold' }}>
+              <Typography sx={{ fontWeight: 'bold', fontSize: '15px' }}>
                 {cp_tham_du?.toLocaleString('vi-VN')}
                 {`( ${((ty_le_cp_so_huu || 0) * 100)
                   .toFixed(2)
