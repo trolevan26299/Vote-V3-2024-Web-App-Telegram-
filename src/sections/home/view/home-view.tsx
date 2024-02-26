@@ -34,7 +34,7 @@ export default function HomeView() {
     // Xóa timeout khi component unmount
     return () => clearTimeout(timeoutId);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [userAccess]);
+  }, []);
 
   useEffect(() => {
     setUserAccess(telegramContext?.user);
