@@ -41,7 +41,6 @@ export default function QuestionAndAnswer() {
   const [historySendPollData, setHistorySendPollData] = useState<IHistorySendPoll[]>([]);
   const [deleteSelected, setDeleteSelected] = useState<any>(null);
   const telegramContext = useTelegram();
-  const pathname = usePathname();
 
   const [userAccess, setUserAccess] = useState<any>();
 useEffect(() => {
@@ -50,7 +49,7 @@ useEffect(() => {
       router.push(paths.auth.jwt.login);
     }}
 // eslint-disable-next-line react-hooks/exhaustive-deps
-}, [])
+}, [userAccess,user])
 
   useEffect(() => {
     setUserAccess(telegramContext?.user);
