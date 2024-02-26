@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { PATH_AFTER_LOGIN } from 'src/config-global';
 import { useUser } from 'src/firebase/user_accesss_provider';
 import { paths } from 'src/routes/paths';
@@ -14,42 +14,37 @@ export default function AuthGuard({ children }: Props) {
   const telegramContext = useTelegram();
   const user = useUser();
   const pathname = usePathname();
-  const [checked, setChecked] = useState<boolean>(false);
-  const [userTele, setUserTele] = useState<boolean>(false);
-  const [userCD, setUserCD] = useState<boolean>(false);
+  const [userAccess, setUserAccess] = useState<any>();
+  const checked = useRef<boolean>(false);
 
   useEffect(() => {
-    const getLocal = async () => {
-      const storedChecked = await localStorage.getItem('checked');
-      const isChecked = !!storedChecked;
-      setChecked(isChecked);
-      if (!isChecked && !userTele) {
-        router.replace(paths.auth.jwt.login);
-      }
-    };
-    getLocal();
-  }, [router,userTele]);
+    const storedChecked = localStorage.getItem('checked');
 
-  useEffect(() => {
-    setUserTele(!!telegramContext?.user);
-  }, [telegramContext]);
-
-  useEffect(() => {
-    setUserCD(!!user.user);
-  }, [user]);
-
-  useEffect(() => {
-    if (userTele && userCD) {
+    checked.current = storedChecked ? JSON.parse(storedChecked) : false;
+    if (userAccess && user.user) {
       localStorage.setItem('checked', JSON.stringify(true));
+    } else if (checked.current === true) {
       if (pathname === '/dashboard/question-and-answer') {
         router.push(paths.dashboard.questionAndAnswerPath);
       } else if (pathname === '/dashboard/vote-dh') {
         router.push(paths.dashboard.voteDH);
-      } else {
-        router.replace(PATH_AFTER_LOGIN);
+      } else if (user.user !== undefined) {
+        router.push(paths.dashboard.voteDH);
+        // router.push(paths.dashboard.questionAndAnswerPath);
       }
+    } else {
+      router.replace(paths.auth.jwt.login);
     }
-  }, [userCD, userTele, pathname, router]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [checked, user, pathname, userAccess]);
+
+  useEffect(() => {
+    setUserAccess(telegramContext?.user);
+  }, [telegramContext]);
+
+  if (!checked) {
+    return null;
+  }
 
   return <>{children}</>;
 }
