@@ -23,12 +23,12 @@ export default function AuthGuard({ children }: Props) {
       const storedChecked = await localStorage.getItem('checked');
       const isChecked = !!storedChecked;
       setChecked(isChecked);
-      if (!isChecked) {
+      if (!isChecked && !userTele) {
         router.replace(paths.auth.jwt.login);
       }
     };
     getLocal();
-  }, [router]);
+  }, [router,userTele]);
 
   useEffect(() => {
     setUserTele(!!telegramContext?.user);
