@@ -15,19 +15,30 @@ export default function HomeView() {
 
   useEffect(() => {
     // Chờ 1 giây trước khi thực hiện các kiểm tra
+    // if (userAccess) {
+    //   if (user) {
+    //     if (pathname === '/dashboard/question-and-answer') {
+    //       router.push(paths.dashboard.questionAndAnswerPath);
+    //     } else if (pathname === '/dashboard/vote-dh') {
+    //       router.push(paths.dashboard.voteDH);
+    //     }
+    //   } else {
+    //     router.push(paths.page403);
+    //   }
+    // } else {
+    //   router.push(paths.dashboard.root);
+    // }
 
-    if (userAccess) {
-      if (user) {
-        if (pathname === '/dashboard/question-and-answer') {
-          router.push(paths.dashboard.questionAndAnswerPath);
-        } else if (pathname === '/dashboard/vote-dh') {
-          router.push(paths.dashboard.voteDH);
-        }
-      } else {
-        router.push(paths.page403);
+    if (user) {
+      if (pathname === '/dashboard/question-and-answer') {
+        router.push(paths.dashboard.questionAndAnswerPath);
+      } else if (pathname === '/dashboard/vote-dh') {
+        router.push(paths.dashboard.voteDH);
       }
+    } else if (userAccess && !user) {
+      router.push(paths.page403);
     } else {
-      router.push(paths.dashboard.root);
+      router.push(paths.dashboard.settingVote.vote);
     }
 
     // Xóa timeout khi component unmount
