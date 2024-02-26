@@ -21,13 +21,13 @@ import { useEffect, useState } from 'react';
 import { FIREBASE_COLLECTION } from 'src/constant/firebase_collection.constant';
 import { database } from 'src/firebase/firebase.config';
 import { useRouter } from 'src/routes/hooks';
+import { paths } from 'src/routes/paths';
 import { IHistorySendPoll } from 'src/types/setting';
 import { convertToMilliseconds } from 'src/utils/convertTimeStringToMiliSeconds';
 import { currentTimeUTC7 } from 'src/utils/currentTimeUTC+7';
 import CustomBreadcrumbs from '../../../components/custom-breadcrumbs';
 import Iconify from '../../../components/iconify';
 import { useUser } from '../../../firebase/user_accesss_provider';
-import { paths } from 'src/routes/paths';
 
 export default function QuestionAndAnswer() {
   const { user } = useUser();
