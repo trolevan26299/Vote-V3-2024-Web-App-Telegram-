@@ -253,7 +253,7 @@ export default function VoteDHView() {
     if (userAccess) {
       console.log('userAccess',userAccess)
       console.log('user',user)
-      if (user?.telegram_id === undefined) {
+      if (!user) {
         console.log('teleid:',user?.telegram_id)
         router.push(paths.auth.jwt.login);
       }}
