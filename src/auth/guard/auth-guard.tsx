@@ -26,17 +26,20 @@ export default function AuthGuard({ children }: Props) {
     console.log('user', user.user);
     if (userAccess && user.user) {
       localStorage.setItem('checked', JSON.stringify(true));
-    } else if (checked.current === true) {
-      if (pathname === '/dashboard/question-and-answer') {
-        router.push(paths.dashboard.questionAndAnswerPath);
-      } else if (pathname === '/dashboard/vote-dh') {
-        router.push(paths.dashboard.voteDH);
-      } else if (user.user !== undefined) {
-        router.push(paths.dashboard.voteDH);
-        // router.push(paths.dashboard.questionAndAnswerPath);
+      if (checked.current === true) {
+        if (pathname === '/dashboard/question-and-answer') {
+          router.push(paths.dashboard.questionAndAnswerPath);
+        } else if (pathname === '/dashboard/vote-dh') {
+          router.push(paths.dashboard.voteDH);
+        } else if (user.user !== undefined) {
+          router.push(paths.dashboard.voteDH);
+          // router.push(paths.dashboard.questionAndAnswerPath);
+        }
+      } else {
+        router.replace(paths.auth.jwt.login);
       }
-    } else {
-      router.replace(paths.auth.jwt.login);
+    } else if (userAccess === undefined && checked.current === true) {
+      router.replace(paths.dashboard.settingVote.vote);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [checked, user, pathname, userAccess]);
