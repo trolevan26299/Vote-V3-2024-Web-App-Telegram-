@@ -1,5 +1,6 @@
 'use client';
 
+import { Icon } from '@iconify/react';
 import LoadingButton from '@mui/lab/LoadingButton';
 import { DialogContentText, TextField } from '@mui/material';
 import Box from '@mui/material/Box';
@@ -14,23 +15,34 @@ import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
-import { get, push, ref, remove, runTransaction } from 'firebase/database';
+import { DataSnapshot, get, onValue, push, ref, remove, runTransaction } from 'firebase/database';
 import { enqueueSnackbar } from 'notistack';
 import { useEffect, useState } from 'react';
 import { FIREBASE_COLLECTION } from 'src/constant/firebase_collection.constant';
 import { database } from 'src/firebase/firebase.config';
+import { useRouter } from 'src/routes/hooks';
+import { IHistorySendPoll } from 'src/types/setting';
+import { convertToMilliseconds } from 'src/utils/convertTimeStringToMiliSeconds';
 import { currentTimeUTC7 } from 'src/utils/currentTimeUTC+7';
 import CustomBreadcrumbs from '../../../components/custom-breadcrumbs';
 import Iconify from '../../../components/iconify';
 import { useUser } from '../../../firebase/user_accesss_provider';
+import { paths } from 'src/routes/paths';
 
 export default function QuestionAndAnswer() {
   const { user } = useUser();
+  const router = useRouter();
   const [questions, setQuestions] = useState<any[]>();
   const [inputQuestion, setInputQuestion] = useState<String>();
   const [sending, setSending] = useState<boolean>(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const [isNewQuestion, setIsNewQuestion] = useState(false);
+  const [historySendPollData, setHistorySendPollData] = useState<IHistorySendPoll[]>([]);
   const [deleteSelected, setDeleteSelected] = useState<any>(null);
+
+  const handleClosePopup = () => {
+    setIsNewQuestion(false);
+  };
   useEffect(() => {
     const userRef = ref(database, FIREBASE_COLLECTION.QA);
     const fetchData = async () => {
@@ -60,6 +72,63 @@ export default function QuestionAndAnswer() {
     };
     fetchData();
   }, [inputQuestion, user?.telegram_id, deleteSelected]);
+
+  useEffect(() => {
+    // hàm dùng để check nếu có câu hỏi mới và còn hạn thì sẽ hiện popup thông báo quay lại câu hỏi
+    const filteredData = historySendPollData.filter((item) => {
+      // Kiểm tra xem item có thuộc tính gui_den và thoi_gian_ket_thuc hay không
+      if (item.gui_den && item.thoi_gian_ket_thuc) {
+        // Chuyển đổi item.thoi_gian_ket_thuc thành số mili giây
+        const endTime = convertToMilliseconds(item.thoi_gian_ket_thuc);
+        // Chuyển đổi currentTimeUTC7 thành số mili giây
+        const currentUTC7Date = convertToMilliseconds(currentTimeUTC7());
+
+        // Kiểm tra xem endTime có lớn hơn currentUTC7Date không
+        if (endTime > currentUTC7Date) {
+          // Lọc qua mảng item.gui_den và trả về những phần tử có ma_cd bằng user?.ma_cd và status bằng 'sent'
+          const filteredDen = item.gui_den.filter(
+            (den) => den.ma_cd === user?.ma_cd && den.status === 'sent'
+          );
+
+          // Nếu có ít nhất một phần tử thỏa mãn điều kiện trong gui_den, trả về mảng đó
+          if (filteredDen.length > 0) {
+            return true;
+          }
+        }
+      }
+
+      // Nếu không thỏa mãn điều kiện hoặc không có phần tử nào thỏa mãn trong gui_den, trả về false
+      return false;
+    });
+    if (filteredData.length > 0) {
+      setIsNewQuestion(true);
+    } else {
+      setIsNewQuestion(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [historySendPollData]);
+  useEffect(() => {
+    // get data từ firebase realtime
+    const userRef = ref(database, FIREBASE_COLLECTION.POLL_PROCESS);
+    const onDataChange = (snapshot: DataSnapshot) => {
+      const dataSnapShot = snapshot.exists();
+      if (dataSnapShot) {
+        const ls_gui_poll = snapshot.val().ls_gui_poll ?? {};
+
+        const listHistorySendPoll = Object.keys(ls_gui_poll).map((key) => ({
+          key,
+          ...snapshot.val().ls_gui_poll[key],
+        }));
+        setHistorySendPollData(listHistorySendPoll);
+      }
+    };
+    const unsubscribe = onValue(userRef, onDataChange);
+    return () => {
+      // Detach the listener
+      unsubscribe();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const onQuestionInput = (event: React.ChangeEvent<HTMLInputElement>) => {
     setInputQuestion(event.target.value);
@@ -204,6 +273,44 @@ export default function QuestionAndAnswer() {
           </Button>
           <Button variant="contained" color="success" onClick={handleOke} autoFocus>
             {user && user.nguoi_nuoc_ngoai ? 'Oke' : 'Đồng ý'}
+          </Button>
+        </DialogActions>
+      </Dialog>
+      <Dialog
+        open={isNewQuestion}
+        onClose={handleClosePopup}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle
+          id="alert-dialog-title"
+          sx={{
+            textAlign: 'center',
+            padding: '12px !important',
+            display: 'flex',
+            flexDirection: 'row',
+            width: '100%',
+          }}
+        >
+          <Typography sx={{ width: '90%', fontWeight: 600, fontSize: '18px' }}>
+            {user?.nguoi_nuoc_ngoai === true ? "It's time to vote" : ' Đã đến thời gian bỏ phiếu !'}
+          </Typography>
+          <Icon
+            style={{ width: '10%', textAlign: 'center', fontSize: '30px', cursor: 'pointer' }}
+            icon="ic:outline-close"
+            onClick={() => handleClosePopup()}
+          />
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description" sx={{ textAlign: 'center' }}>
+            {user?.nguoi_nuoc_ngoai === true
+              ? 'Please click the following button to vote.'
+              : 'Vui lòng nhấn vào nút sau để thực hiện bỏ phiếu.'}
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button fullWidth variant="contained" onClick={() => router.push(paths.dashboard.voteDH)}>
+            {user?.nguoi_nuoc_ngoai === true ? 'Vote' : 'Bỏ Phiếu'}
           </Button>
         </DialogActions>
       </Dialog>
