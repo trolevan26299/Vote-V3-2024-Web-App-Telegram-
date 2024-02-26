@@ -251,8 +251,8 @@ export default function VoteDHView() {
 
   useEffect(() => {
     if (userAccess) {
-      console.log('userAccess',userAccess)
-      console.log('user',user)
+      console.log('userAccess dh',userAccess)
+      console.log('user dh',user)
       if (!user) {
 
         router.push(paths.auth.jwt.login);

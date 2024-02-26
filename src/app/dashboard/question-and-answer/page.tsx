@@ -20,9 +20,8 @@ import { enqueueSnackbar } from 'notistack';
 import { useEffect, useState } from 'react';
 import { FIREBASE_COLLECTION } from 'src/constant/firebase_collection.constant';
 import { database } from 'src/firebase/firebase.config';
-import { usePathname, useRouter } from 'src/routes/hooks';
+import { useRouter } from 'src/routes/hooks';
 import { paths } from 'src/routes/paths';
-import { useTelegram } from 'src/telegram/telegram.provider';
 import { IHistorySendPoll } from 'src/types/setting';
 import { convertToMilliseconds } from 'src/utils/convertTimeStringToMiliSeconds';
 import { currentTimeUTC7 } from 'src/utils/currentTimeUTC+7';
@@ -40,20 +39,7 @@ export default function QuestionAndAnswer() {
   const [isNewQuestion, setIsNewQuestion] = useState(false);
   const [historySendPollData, setHistorySendPollData] = useState<IHistorySendPoll[]>([]);
   const [deleteSelected, setDeleteSelected] = useState<any>(null);
-  const telegramContext = useTelegram();
 
-  const [userAccess, setUserAccess] = useState<any>();
-useEffect(() => {
-  if (userAccess) {
-    if (!user?.telegram_id) {
-      router.push(paths.auth.jwt.login);
-    }}
-// eslint-disable-next-line react-hooks/exhaustive-deps
-}, [userAccess,user])
-
-  useEffect(() => {
-    setUserAccess(telegramContext?.user);
-  }, [telegramContext]);
 
   const handleClosePopup = () => {
     setIsNewQuestion(false);
