@@ -27,7 +27,7 @@ export default function HomeView() {
           router.push(paths.page403);
         }
       } else {
-        router.push(paths.dashboard.settingVote.vote);
+        router.push(paths.dashboard.root);
       }
     }, 1000);
 
