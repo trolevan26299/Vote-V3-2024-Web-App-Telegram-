@@ -251,19 +251,17 @@ export default function VoteDHView() {
   }, []);
 
   useEffect(() => {
-    if (userAccess) {
-      console.log('userAccess dh',userAccess)
       console.log('user dh',user)
       if (!user) {
         router.push(paths.auth.jwt.login);
-      }}
+      }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [userAccess,userCD])
+  }, [userCD])
 
     useEffect(() => {
-      setUserAccess(telegramContext?.user);
+
       setUserCD(user)
-    }, [telegramContext,user]);
+    }, [user]);
 
   return (
     <Container sx={{ maxWidth: '100% !important' }}>
