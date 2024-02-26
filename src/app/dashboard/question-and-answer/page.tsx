@@ -51,12 +51,12 @@ export default function QuestionAndAnswer() {
   useEffect(() => {
     // Chờ 1 giây trước khi thực hiện các kiểm tra
     if (userAccess) {
-      if (!user) {
+      if (!user?.telegram_id) {
         router.push(paths.auth.jwt.login);
       }}
     // Xóa timeout khi component unmount
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user]);
+  }, [user?.telegram_id]);
 
   useEffect(() => {
     setUserAccess(telegramContext?.user);
